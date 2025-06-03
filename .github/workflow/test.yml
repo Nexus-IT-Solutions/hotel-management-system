@@ -4,12 +4,12 @@ on:
   push:
     branches: [main, anthony, development, gilbert]
     paths:
-      - "backend//**"
+      - "backend/**"
       - ".github/workflows/php.yml"
   pull_request:
     branches: [main, anthony, development, gilbert]
     paths:
-      - "backend//**"
+      - "backend/**"
   workflow_dispatch:
 
 jobs:

@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { CalendarDays, Bed, DollarSignIcon, CalendarMinus2, Plus, Trash2Icon, Wrench, DoorClosedLockedIcon  } from 'lucide-react';
 import { RevenueChart } from '../../components/Revenue';
 import Image1 from '../../assets/images/image1.jpg';
@@ -148,13 +147,13 @@ export default function Dashboard(){
       </div>
 
       {/* Available rooms */}
-      <div className='h-[50vh] bg-white shadow-md rounded-md p-6'>
+      <div className=' bg-white shadow-md rounded-md px-6 py-4'>
         <div className='flex items-center justify-between'>
           <h1 className='text-slate-800 font-semibold text-lg'>Available Rooms</h1>
-          <Link to="/add-room" className='flex items-center gap-1 bg-blue-600 text-white p-2 rounded-sm'>
+          <button  className='flex items-center gap-1 bg-blue-600 text-white p-2 rounded-sm'>
             <Plus/>
-            Add Room
-          </Link>
+            Add Room Type
+          </button>
         </div>
 
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 py-4'>

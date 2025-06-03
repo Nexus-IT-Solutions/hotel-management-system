@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
+use Phinx\Util\Literal;
 
 final class InitHotelSchema extends AbstractMigration
 {
@@ -24,7 +25,9 @@ final class InitHotelSchema extends AbstractMigration
 
         // Hotel
         $this->table('hotels', ['id' => false, 'primary_key' => ['id']])
-            ->addColumn('id', 'uuid', ['default' => 'uuid_generate_v4()'])
+            ->addColumn('id', 'uuid', [
+                'default' => Literal::from('uuid_generate_v4()'),
+                'null' => false])
             ->addColumn('name', 'string')
             ->addColumn('address', 'text')
             ->addColumn('city', 'string')
@@ -37,7 +40,9 @@ final class InitHotelSchema extends AbstractMigration
 
         // RoomType
         $this->table('room_types', ['id' => false, 'primary_key' => ['id']])
-            ->addColumn('id', 'uuid', ['default' => 'uuid_generate_v4()'])
+            ->addColumn('id', 'uuid', [
+                'default' => Literal::from('uuid_generate_v4()'),
+                'null' => false])
             ->addColumn('hotel_id', 'uuid')
             ->addColumn('name', 'string')
             ->addColumn('description', 'text')
@@ -50,7 +55,9 @@ final class InitHotelSchema extends AbstractMigration
 
         // Room
         $this->table('rooms', ['id' => false, 'primary_key' => ['id']])
-            ->addColumn('id', 'uuid', ['default' => 'uuid_generate_v4()'])
+            ->addColumn('id', 'uuid', [
+                'default' => Literal::from('uuid_generate_v4()'),
+                'null' => false])
             ->addColumn('hotel_id', 'uuid')
             ->addColumn('room_type_id', 'uuid')
             ->addColumn('room_number', 'string')
@@ -63,9 +70,11 @@ final class InitHotelSchema extends AbstractMigration
 
         // Customer
         $this->table('customers', ['id' => false, 'primary_key' => ['id']])
-            ->addColumn('id', 'uuid', ['default' => 'uuid_generate_v4()'])
+            ->addColumn('id', 'uuid', [
+                'default' => Literal::from('uuid_generate_v4()'),
+                'null' => false])
             ->addColumn('full_name', 'string')
-            ->addColumn('email', 'string', ["null" => false])
+            ->addColumn('email', 'string', ["null" => true])
             ->addColumn('phone', 'string')
             ->addColumn('address', 'text')
             ->addColumn('id_type', 'string')
@@ -75,7 +84,9 @@ final class InitHotelSchema extends AbstractMigration
 
         // EmergencyContact
         $this->table('emergency_contacts', ['id' => false, 'primary_key' => ['id']])
-            ->addColumn('id', 'uuid', ['default' => 'uuid_generate_v4()'])
+            ->addColumn('id', 'uuid', [
+                'default' => Literal::from('uuid_generate_v4()'),
+                'null' => false])
             ->addColumn('customer_id', 'uuid')
             ->addColumn('name', 'string')
             ->addColumn('relationship', 'string')
@@ -87,7 +98,9 @@ final class InitHotelSchema extends AbstractMigration
 
         // Booking
         $this->table('bookings', ['id' => false, 'primary_key' => ['id']])
-            ->addColumn('id', 'uuid', ['default' => 'uuid_generate_v4()'])
+            ->addColumn('id', 'uuid', [
+                'default' => Literal::from('uuid_generate_v4()'),
+                'null' => false])
             ->addColumn('customer_id', 'uuid')
             ->addColumn('room_id', 'uuid')
             ->addColumn('check_in_date', 'date')
@@ -103,7 +116,9 @@ final class InitHotelSchema extends AbstractMigration
 
         // User
         $this->table('users', ['id' => false, 'primary_key' => ['id']])
-            ->addColumn('id', 'uuid', ['default' => 'uuid_generate_v4()'])
+            ->addColumn('id', 'uuid', [
+                'default' => Literal::from('uuid_generate_v4()'),
+                'null' => false])
             ->addColumn('hotel_id', 'uuid')
             ->addColumn('name', 'string')
             ->addColumn('email', 'string')
@@ -117,7 +132,9 @@ final class InitHotelSchema extends AbstractMigration
 
         // CheckIn
         $this->table('check_ins', ['id' => false, 'primary_key' => ['id']])
-            ->addColumn('id', 'uuid', ['default' => 'uuid_generate_v4()'])
+            ->addColumn('id', 'uuid', [
+                'default' => Literal::from('uuid_generate_v4()'),
+                'null' => false])
             ->addColumn('booking_id', 'uuid')
             ->addColumn('checked_in_by', 'uuid')
             ->addColumn('checked_in_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
@@ -127,7 +144,9 @@ final class InitHotelSchema extends AbstractMigration
 
         // CheckOut
         $this->table('check_outs', ['id' => false, 'primary_key' => ['id']])
-            ->addColumn('id', 'uuid', ['default' => 'uuid_generate_v4()'])
+            ->addColumn('id', 'uuid', [
+                'default' => Literal::from('uuid_generate_v4()'),
+                'null' => false])
             ->addColumn('booking_id', 'uuid')
             ->addColumn('checked_out_by', 'uuid')
             ->addColumn('checked_out_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
@@ -139,7 +158,9 @@ final class InitHotelSchema extends AbstractMigration
 
         // PaymentMethod
         $this->table('payment_methods', ['id' => false, 'primary_key' => ['id']])
-            ->addColumn('id', 'uuid', ['default' => 'uuid_generate_v4()'])
+            ->addColumn('id', 'uuid', [
+                'default' => Literal::from('uuid_generate_v4()'),
+                'null' => false])
             ->addColumn('name', 'string')
             ->addColumn('details', 'jsonb', ['null' => true])
             ->addColumn('is_active', 'boolean', ['default' => true])
@@ -147,7 +168,9 @@ final class InitHotelSchema extends AbstractMigration
 
         // Payment
         $this->table('payments', ['id' => false, 'primary_key' => ['id']])
-            ->addColumn('id', 'uuid', ['default' => 'uuid_generate_v4()'])
+            ->addColumn('id', 'uuid', [
+                'default' => Literal::from('uuid_generate_v4()'),
+                'null' => false])
             ->addColumn('booking_id', 'uuid')
             ->addColumn('payment_method_id', 'uuid')
             ->addColumn('amount', 'decimal', ['precision' => 10, 'scale' => 2])
@@ -159,7 +182,9 @@ final class InitHotelSchema extends AbstractMigration
 
         // Setting
         $this->table('settings', ['id' => false, 'primary_key' => ['id']])
-            ->addColumn('id', 'uuid', ['default' => 'uuid_generate_v4()'])
+            ->addColumn('id', 'uuid', [
+                'default' => Literal::from('uuid_generate_v4()'),
+                'null' => false])
             ->addColumn('hotel_id', 'uuid')
             ->addColumn('key', 'string')
             ->addColumn('value', 'text')

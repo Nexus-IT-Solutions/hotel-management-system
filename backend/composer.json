@@ -24,7 +24,10 @@
     "stan": "phpstan analyse src --level=5",
     "phinx-init": "vendor/bin/phinx init",
     "phinx-create": "vendor/bin/phinx create",
-    "phinx-migrate": "vendor/bin/phinx migrate",
+    "phinx-migrate-dev": "vendor/bin/phinx migrate -e development",
+    "phinx-migrate-prod": "vendor/bin/phinx migrate -e production",
+    "phinx-migrate-test": "vendor/bin/phinx migrate -e testing",
+    "phinx-migrate-dry": "vendor/bin/phinx migrate --dry-run",
     "phinx-rollback": "vendor/bin/phinx rollback",
     "phinx-status": "vendor/bin/phinx status",
     "phinx-seed": "vendor/bin/phinx seed:run"

@@ -15,7 +15,7 @@ export const navLinks = [
       { icon: LayoutDashboard, label: 'Dashboard', path: '/', role: 'all'  },
       { icon: Book, label: 'New Booking', path: '/new-booking', role: 'receptionist' },
       { icon: CalendarDays, label: 'Bookings', path: '/bookings', role: 'all' },
-      { icon: Bed, label: 'Room Availability', path: '/rooms/availability', role: 'receptionist' },
+      { icon: Bed, label: 'Room Availability', path: '/room-availability', role: 'receptionist' },
       { icon: Users, label: "Customer", path: "/customers" },
       { icon: Bed, label: "Add Room", path: "/add-room" },
     ],

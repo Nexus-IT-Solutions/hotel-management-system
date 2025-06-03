@@ -104,7 +104,7 @@ export default function BookingForm() {
               <Calendar className="w-5 h-5 mr-2 text-purple-600" />
               Booking Details
             </h3>
-
+ 
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>

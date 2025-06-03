@@ -9,7 +9,7 @@ on:
   pull_request:
     branches: [main, anthony, development, gilbert]
     paths:
-      - "backend//**"
+      - "backend/**"
   workflow_dispatch:
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
+          php-version: "8.3"
           extensions: mbstring, intl, pdo, pdo_mysql, zip
           coverage: none
           tools: composer:v2

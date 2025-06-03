@@ -1,5 +1,5 @@
 import { navLinks } from "./NavLinks";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Bed } from "lucide-react";
 
 const Sidebar = (probs: any) => {
@@ -38,15 +38,20 @@ const Sidebar = (probs: any) => {
               )}
               <nav className="space-y-1">
                 {item.menuItems.map((item, index) => (
-                  <Link to={item.path}
+                  <NavLink to={item.path}
                     key={index}
-                    className={`w-full flex items-center gap-3 text-slate-800 hover:bg-blue-100 hover:text-blue-700 px-3 py-2 rounded-lg text-left transition-colors `}
+                    className={({ isActive }) =>
+                      `w-full flex items-center gap-3 text-slate-800 px-3 py-2 rounded-lg text-left transition-colors ${
+                        isActive
+                          ? 'bg-blue-200 text-blue-800'
+                          : 'hover:bg-blue-100 hover:text-blue-700'
+                      }`}
                   >
                     <item.icon size={18} />
                     {probs.showLabels && (
                       <span className="text-sm">{item.label}</span>
                     )}
-                  </Link>
+                  </NavLink>
                 ))}
               </nav>
             </div>

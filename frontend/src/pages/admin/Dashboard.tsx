@@ -33,12 +33,12 @@ export default function Dashboard(){
       </div>
 
       {/* overview stat */}
-      <div className='grid grid-cols-1 md:grid-cols-4 gap-5'>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5'>
         {/* today's check in */}
-        <div className='bg-white shadow-md rounded-xl px-6 py-6 flex items-center gap-5 border-b-4 border-blue-500'>
+        <div className='bg-white shadow-md rounded-xl px-6 py-3 flex items-center gap-5 border-b-4 border-blue-500'>
           <div className='flex-2'>
             <p className='text-[14px]'>Today's Bookings</p>
-            <p className='text-3xl font-bold py-4'>10</p>
+            <p className='text-3xl font-bold py-2'>10</p>
             <p className='text-green-600 text-sm'>+12%</p>
             <p className='text-sm text-gray-600 mt-1'>18 confirmed, 6 pending</p>
           </div>
@@ -50,10 +50,10 @@ export default function Dashboard(){
         </div>
 
         {/* Available rooms */}
-        <div className='bg-white shadow-md rounded-xl px-6 py-6 flex items-center gap-5 border-b-4 border-green-500'>
+        <div className='bg-white shadow-md rounded-xl px-6 py-3 flex items-center gap-5 border-b-4 border-green-500'>
           <div className='flex-2'>
             <p className='text-[14px]'>Available Rooms</p>
-            <p className='text-3xl font-bold py-4'>24</p>
+            <p className='text-3xl font-bold py-2'>24</p>
             <p className='text-blue-600 text-sm'>-5 from yesterday</p>
             <p className='text-sm text-gray-600 mt-1'>Out of 50 total rooms</p>
           </div>
@@ -65,10 +65,10 @@ export default function Dashboard(){
         </div>
 
         {/* Today's revenue */}
-        <div className='bg-white shadow-md rounded-xl px-6 py-6 flex items-center gap-5 border-b-4 border-purple-500'>
+        <div className='bg-white shadow-md rounded-xl px-6 py-3 flex items-center gap-5 border-b-4 border-purple-500'>
           <div className='flex-2'>
             <p className='text-[14px]'>Today's Revenue</p>
-            <p className='text-3xl font-bold py-4'>$24,679</p>
+            <p className='text-3xl font-bold py-2'>$24,679</p>
             <p className='text-green-600 text-sm'>+8%</p>
             <p className='text-sm text-gray-600 mt-1'>Target: $15,000</p>
           </div>
@@ -80,10 +80,10 @@ export default function Dashboard(){
         </div>
 
         {/* Today's check in */}
-        <div className='bg-white shadow-md rounded-xl px-6 py-6 flex items-center gap-5 border-b-4 border-orange-500'>
+        <div className='bg-white shadow-md rounded-xl px-6 py-3 flex items-center gap-5 border-b-4 border-orange-500'>
           <div className='flex-2'>
             <p className='text-[14px]'>Today's Check-ins</p>
-            <p className='text-3xl font-bold py-4'>6</p>
+            <p className='text-3xl font-bold py-2'>6</p>
             <p className='text-green-600 text-sm'>+8%</p>
             <p className='text-sm text-gray-600 mt-1'>Target: $15,000</p>
           </div>
@@ -96,17 +96,17 @@ export default function Dashboard(){
       </div>
 
       {/* today's check in and room status */}
-      <div className='flex items-center gap-5'>
+      <div className='flex flex-col lg:flex-row items-center gap-5'>
         {/* Revenue Chart */}
-      <div className='flex-2'>
+      <div className='w-[100%] md:flex-2'>
         <RevenueChart/>
       </div>
-      <div className='flex-[0.8] h-[56vh] bg-white shadow-md rounded-md'>
+      <div className='w-[100%] md:flex-[0.8] pb-10 bg-white shadow-md rounded-md'>
         <div className='border-b p-6'>
           <h1 className='text-slate-800 font-semibold text-lg'>Room Status</h1>
         </div>
 
-        <div className='flex flex-col gap-2'>
+        <div className='flex flex-col gap-1'>
           <div className='flex items-center justify-between px-6 pt-6'>
             <p className='text-slate-600 text-sm flex items-center gap-2'>
               <span className='bg-purple-500 w-10 h-10 rounded-sm flex items-center justify-center p-1'><CalendarDays className='w-7 h-7 text-white'/></span>

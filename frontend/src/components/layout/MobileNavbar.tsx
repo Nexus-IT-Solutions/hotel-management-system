@@ -11,7 +11,7 @@ const MobileNavbar = () => {
   return (
     <div className="md:hidden bg-slate-800 text-white">
       <div className="flex justify-between items-center p-4 bg-maroon text-white">
-        <h2 className="text-gold text-xl font-bold">School Portal</h2>
+        <h2 className="text-gold text-xl font-bold">Hotel</h2>
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="p-2 text-white rounded-md hover:bg-maroon-dark"

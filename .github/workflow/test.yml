@@ -2,12 +2,12 @@ name: PHP Application CI
 
 on:
   push:
-    branches: [main, master, development, gilbert]
+    branches: [main, anthony, development, gilbert]
     paths:
       - "backend//**"
       - ".github/workflows/php.yml"
   pull_request:
-    branches: [main, master, development, gilbert]
+    branches: [main, anthony, development, gilbert]
     paths:
       - "backend//**"
   workflow_dispatch:

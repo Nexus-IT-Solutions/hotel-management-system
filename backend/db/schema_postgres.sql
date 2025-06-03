@@ -47,7 +47,7 @@ CREATE TABLE Customer (
     id UUID PRIMARY KEY,
     full_name VARCHAR(255) NOT NULL,
     email VARCHAR(255),
-    phone VARCHAR(20),
+    phone VARCHAR(20) ,
     address TEXT,
     id_type VARCHAR(50),
     id_number VARCHAR(100),

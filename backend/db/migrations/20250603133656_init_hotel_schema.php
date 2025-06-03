@@ -65,7 +65,7 @@ final class InitHotelSchema extends AbstractMigration
         $this->table('customers', ['id' => false, 'primary_key' => ['id']])
             ->addColumn('id', 'uuid', ['default' => 'uuid_generate_v4()'])
             ->addColumn('full_name', 'string')
-            ->addColumn('email', 'string')
+            ->addColumn('email', 'string', ["null" => false])
             ->addColumn('phone', 'string')
             ->addColumn('address', 'text')
             ->addColumn('id_type', 'string')

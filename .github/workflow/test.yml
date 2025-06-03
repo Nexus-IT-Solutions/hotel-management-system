@@ -4,12 +4,12 @@ on:
   push:
     branches: [main, master, development, gilbert]
     paths:
-      - "backend/slim/**"
+      - "backend//**"
       - ".github/workflows/php.yml"
   pull_request:
     branches: [main, master, development, gilbert]
     paths:
-      - "backend/slim/**"
+      - "backend//**"
   workflow_dispatch:
 
 jobs:
@@ -29,23 +29,23 @@ jobs:
           tools: composer:v2
 
       - name: Validate composer.json and composer.lock
-        working-directory: ./backend/slim
+        working-directory: ./backend/
         run: composer validate --strict
 
       - name: Cache Composer packages
         uses: actions/cache@v3
         with:
-          path: ./backend/slim/vendor
+          path: ./backend//vendor
           key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-php-
 
       - name: Install dependencies
-        working-directory: ./backend/slim
+        working-directory: ./backend/
         run: composer install --prefer-dist --no-progress
 
       - name: Check PHP syntax
-        working-directory: ./backend/slim
+        working-directory: ./backend/
         run: find . -name "*.php" -not -path "./vendor/*" -print0 | xargs -0 -n1 php -l
 
   test:
@@ -77,17 +77,17 @@ jobs:
       - name: Cache Composer packages
         uses: actions/cache@v3
         with:
-          path: ./backend/slim/vendor
+          path: ./backend/vendor
           key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-php-
 
       - name: Install dependencies
-        working-directory: ./backend/slim
+        working-directory: ./backend/
         run: composer install --prefer-dist --no-progress
 
       - name: Create environment file
-        working-directory: ./backend/slim
+        working-directory: ./backend/
         run: |
           cp .env.example .env
           sed -i 's/DB_HOST=localhost/DB_HOST=127.0.0.1/g' .env
@@ -97,11 +97,11 @@ jobs:
           sed -i 's/ENVIRONMENT=production/ENVIRONMENT=testing/g' .env
 
       - name: Create log directory
-        working-directory: ./backend/slim
+        working-directory: ./backend/
         run: mkdir -p src/logs/app src/logs/http src/logs/error
 
       - name: Run test suite
-        working-directory: ./backend/slim
+        working-directory: ./backend/
         run: |
           if [ -f vendor/bin/phpunit ]; then
             vendor/bin/phpunit --coverage-text
@@ -129,17 +129,17 @@ jobs:
       - name: Cache Composer packages
         uses: actions/cache@v3
         with:
-          path: ./backend/slim/vendor
+          path: ./backend/vendor
           key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-php-
 
       - name: Install dependencies
-        working-directory: ./backend/slim
+        working-directory: ./backend/
         run: composer install --prefer-dist --no-progress
 
       - name: Check code style
-        working-directory: ./backend/slim
+        working-directory: ./backend/
         continue-on-error: true
         run: |
           if [ -f vendor/bin/php-cs-fixer ]; then
@@ -151,7 +151,7 @@ jobs:
           fi
 
       - name: Run static analysis
-        working-directory: ./backend/slim
+        working-directory: ./backend/
         continue-on-error: true
         run: |
           if [ -f vendor/bin/phpstan ]; then
@@ -176,8 +176,8 @@ jobs:
       - name: Build Docker image
         uses: docker/build-push-action@v4
         with:
-          context: ./backend/slim
-          file: ./backend/slim/Dockerfile
+          context: ./backend/
+          file: ./backend//Dockerfile
           push: false
           tags: ngo-help:test
           cache-from: type=gha
@@ -209,11 +209,11 @@ jobs:
           tools: composer:v2
 
       - name: Install dependencies
-        working-directory: ./backend/slim
+        working-directory: ./backend/
         run: composer install --prefer-dist --no-progress
 
       - name: Create environment file
-        working-directory: ./backend/slim
+        working-directory: ./backend/
         run: |
           cp .env.example .env
           sed -i 's/DB_HOST=localhost/DB_HOST=127.0.0.1/g' .env
@@ -223,11 +223,11 @@ jobs:
           sed -i 's/ENVIRONMENT=production/ENVIRONMENT=testing/g' .env
 
       - name: Create log directory
-        working-directory: ./backend/slim
+        working-directory: ./backend/
         run: mkdir -p src/logs/app src/logs/http src/logs/error
 
       - name: Test application bootstrap
-        working-directory: ./backend/slim
+        working-directory: ./backend/
         run: |
           # Start PHP built-in server in the background
           php -S localhost:8080 -t public &
@@ -266,16 +266,16 @@ jobs:
           tools: composer:v2, composer-normalize, composer-require-checker
 
       - name: Install dependencies
-        working-directory: ./backend/slim
+        working-directory: ./backend/
         run: composer install --prefer-dist --no-progress
 
       - name: Security check for vulnerable dependencies
         uses: symfonycorp/security-checker-action@v4
         with:
-          lock: ./backend/slim/composer.lock
+          lock: ./backend/composer.lock
 
       - name: Check composer packages
-        working-directory: ./backend/slim
+        working-directory: ./backend/
         continue-on-error: true
         run: |
           if command -v composer-require-checker &> /dev/null; then

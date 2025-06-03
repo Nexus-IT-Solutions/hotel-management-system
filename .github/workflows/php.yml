@@ -262,7 +262,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.1"
+          php-version: "8.3"
           tools: composer:v2, composer-normalize, composer-require-checker
 
       - name: Install dependencies
@@ -283,5 +283,3 @@ jobs:
           else
             echo "composer-require-checker not installed, skipping check"
           fi
-
-          

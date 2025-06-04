@@ -77,23 +77,9 @@ $app->add(function ($request, $handler) {
 $contentLengthMiddleware = new ContentLengthMiddleware();
 $app->add($contentLengthMiddleware);
 
-
-$container->set(PDO::class, function () {
-    $host = $_ENV['DB_HOST'];
-    $db   = $_ENV['DB_NAME'];
-    $user = $_ENV['DB_USER'];
-    $pass = $_ENV['DB_PASS'];
-    $dsn  = "mysql:host=$host;dbname=$db;charset=utf8mb4";
-
-    return new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
-});
-
 // Default welcome route
 $app->get('/', function ($request, $response) {
-    $data = ['message' => 'Welcome to NGO-Help API', 'status' => 'running'];
+    $data = ['message' => 'Welcome to Hotel Management and Booking API', 'status' => 'running'];
     $payload = json_encode($data);
     $response->getBody()->write($payload);
     return $response->withHeader('Content-Type', 'application/json');

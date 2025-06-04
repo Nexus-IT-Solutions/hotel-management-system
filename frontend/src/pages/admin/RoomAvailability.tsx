@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Calendar, Users, Settings, Search, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -84,7 +84,7 @@ const RoomAvailability = () => {
     },
   ];
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: 'available' | 'occupied' | 'reserved' | 'maintenance' | 'cleaning') => {
     const colors = {
       available: "bg-green-100 border-green-300 text-green-800",
       occupied: "bg-red-100 border-red-300 text-red-800",
@@ -94,7 +94,7 @@ const RoomAvailability = () => {
     };
     return colors[status] || colors.available;
   };
-  const getStatusIcon = (status) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case "available":
         return "✓";
@@ -215,7 +215,7 @@ const RoomAvailability = () => {
             <div
               key={room.number}
               className={`border-2 rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow ${getStatusColor(
-                room.status
+                room.status as "available" | "occupied" | "maintenance" | "reserved" | "cleaning"
               )}`}
             >
               <div className="text-center">
@@ -282,7 +282,7 @@ const RoomAvailability = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(
-                        room.status
+                        room.status as "available" | "occupied" | "maintenance" | "reserved" | "cleaning"
                       )}`}
                     >
                       {room.status}

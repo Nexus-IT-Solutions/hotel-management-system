@@ -1,12 +1,13 @@
-import { navLinks } from "./NavLinks";
+
+import { recepNavLinks } from "./RecepNavLinks";
 import { NavLink } from "react-router-dom";
 import { Bed } from "lucide-react";
 
-interface SidebarProps {
+interface RecepSidebarProps {
   showLabels: boolean;
 }
 
-const Sidebar = (probs: SidebarProps) => {
+const RecepSidebar = (probs: RecepSidebarProps) => {
   return (
     <div
       className={`bg-white shadow-lg h-screen flex-col duration-700 hidden md:flex ${
@@ -32,7 +33,7 @@ const Sidebar = (probs: SidebarProps) => {
       {/* Navigation */}
       <div className="flex-1 p-4">
         {/* Main Section */}
-        {navLinks.map((item, index) => (
+        {recepNavLinks.map((item, index) => (
           <div className="mb-6">
             <div key={index}>
               {probs.showLabels && (
@@ -44,7 +45,6 @@ const Sidebar = (probs: SidebarProps) => {
                 {item.menuItems.map((item, index) => (
                   <NavLink to={item.path}
                     key={index}
-                    end={item.path === '/'}
                     className={({ isActive }) =>
                       `w-full flex items-center gap-3 text-slate-800 px-3 py-2 rounded-lg text-left transition-colors ${
                         isActive
@@ -63,10 +63,8 @@ const Sidebar = (probs: SidebarProps) => {
           </div>
         ))}
       </div>
-
-      
     </div>
   );
 };
 
-export default Sidebar;
+export default RecepSidebar;

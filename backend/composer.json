@@ -30,7 +30,8 @@
     "phinx-migrate-dry": "vendor/bin/phinx migrate --dry-run",
     "phinx-rollback": "vendor/bin/phinx rollback",
     "phinx-status": "vendor/bin/phinx status",
-    "phinx-seed": "vendor/bin/phinx seed:run"
+    "phinx-seed-create": "vendor/bin/phinx seed:create",
+    "phinx-seed-run": "vendor/bin/phinx seed:run"
   },
   "config": {
     "sort-packages": true,

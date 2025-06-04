@@ -6,7 +6,7 @@ use Phinx\Seed\AbstractSeed;
 use Faker\Factory;
 use Ramsey\Uuid\Uuid;
 
-class HotelSeeder extends AbstractSeed
+class HotelManagementSeeder extends AbstractSeed
 {
     public function run(): void
     {
@@ -46,7 +46,7 @@ class HotelSeeder extends AbstractSeed
         }
         $this->table('room_types')->insert($roomTypes)->saveData();
 
-        // Rooms (5 rooms)
+        // Rooms (3 rooms per room type)
         $rooms = [];
         foreach ($roomTypes as $roomType) {
             for ($i = 0; $i < 3; $i++) {
@@ -64,7 +64,7 @@ class HotelSeeder extends AbstractSeed
         }
         $this->table('rooms')->insert($rooms)->saveData();
 
-        // Customers (5)
+        // Customers (4)
         $customers = [];
         for ($i = 0; $i < 4; $i++) {
             $customers[] = [
@@ -162,6 +162,21 @@ class HotelSeeder extends AbstractSeed
                     'amount' => 800.00,
                     'paid_at' => date('Y-m-d H:i:s'),
                     'reference' => strtoupper($faker->bothify('PAY###???')),
+                ]
+            ])->saveData();
+        }
+
+        // Check-Outs (1 per booking)
+        foreach ($customers as $i => $customer) {
+            $bookingId = $this->fetchRow("SELECT id FROM bookings WHERE customer_id = '{$customer['id']}'")['id'];
+            $this->table('check_outs')->insert([
+                [
+                    'id' => Uuid::uuid4()->toString(),
+                    'booking_id' => $bookingId,
+                    'checked_out_by' => $userId,
+                    'checked_out_at' => date('Y-m-d H:i:s', strtotime('+2 days')),
+                    'additional_charges' => $faker->randomFloat(2, 0, 100),
+                    'notes' => $faker->sentence,
                 ]
             ])->saveData();
         }

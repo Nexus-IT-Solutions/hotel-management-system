@@ -1,9 +1,10 @@
+
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { navLinks } from "./NavLinks";
+import { recepNavLinks } from "./RecepNavLinks";
 
-const MobileNavbar = () => {
+const RecepMobileNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
@@ -29,7 +30,7 @@ const MobileNavbar = () => {
             <X size={24} />
           </button>
 
-          {navLinks.map((item, index) => (
+          {recepNavLinks.map((item, index) => (
             <nav className="px-4" key={index}>
                 <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-5">
                   {item.title}
@@ -65,4 +66,4 @@ const MobileNavbar = () => {
   );
 };
 
-export default MobileNavbar;
+export default RecepMobileNavbar;

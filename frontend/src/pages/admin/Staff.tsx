@@ -56,8 +56,8 @@ export default function Staff(){
     }
   ];
 
-  const getRoleBadge = (role) => {
-    const styles = {
+  const getRoleBadge = (role: 'manager' | 'receptionist' | 'admin') => {
+    const styles: { [key: string]: string } = {
       'manager': 'bg-purple-100 text-purple-800',
       'receptionist': 'bg-blue-100 text-blue-800',
       'admin': 'bg-red-100 text-red-800'
@@ -70,8 +70,8 @@ export default function Staff(){
     );
   };
 
-  const getStatusBadge = (status) => {
-    const styles = {
+  const getStatusBadge = (status: 'active' | 'inactive' | 'suspended') => {
+    const styles: { [key: string]: string } = {
       'active': 'bg-green-100 text-green-800',
       'inactive': 'bg-gray-100 text-gray-800',
       'suspended': 'bg-red-100 text-red-800'
@@ -84,7 +84,7 @@ export default function Staff(){
     );
   };
 
-  const handleAddUser = (e) => {
+  const handleAddUser = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle user creation
     console.log('Creating user:', newUser);
@@ -131,7 +131,7 @@ export default function Staff(){
 
       {/* User Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-white p-6 rounded-lg shadow border-t-4 border-blue-600">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-2xl font-bold text-gray-800">4</div>
@@ -143,7 +143,7 @@ export default function Staff(){
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-white p-6 rounded-lg shadow border-b-4 border-purple-600">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-2xl font-bold text-purple-600">2</div>
@@ -155,19 +155,19 @@ export default function Staff(){
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-white p-6 rounded-lg shadow border-t-4 border-orange-600">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-2xl font-bold text-blue-600">2</div>
+              <div className="text-2xl font-bold text-orange-600">2</div>
               <div className="text-sm text-gray-600">Receptionists</div>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <User className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+              <User className="w-6 h-6 text-orange-600" />
             </div>
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-white p-6 rounded-lg shadow border-b-4 border-green-600">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-2xl font-bold text-green-600">3</div>
@@ -222,10 +222,10 @@ export default function Staff(){
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {getRoleBadge(user.role)}
+                    {getRoleBadge(user.role as "manager" | "receptionist" | "admin")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {getStatusBadge(user.status)}
+                    {getStatusBadge(user.status as "active" | "inactive" | "suspended")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {user.lastLogin}

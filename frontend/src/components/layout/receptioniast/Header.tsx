@@ -1,11 +1,12 @@
+
 import { Bell, Menu, Search } from "lucide-react"
 
-interface HeaderProps {
+interface RecepHeaderProps {
   showLabels: boolean;
   setShowLabels: (value: boolean) => void;
 }
 
-const Header = (probs: HeaderProps) => {
+const RecepHeader = (probs: RecepHeaderProps) => {
   return (
     <header className="bg-white shadow-sm border-b px-6 py-5">
           <div className="flex items-center justify-between">
@@ -38,4 +39,4 @@ const Header = (probs: HeaderProps) => {
   )
 }
 
-export default Header
+export default RecepHeader

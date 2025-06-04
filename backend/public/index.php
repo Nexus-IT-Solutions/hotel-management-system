@@ -86,7 +86,7 @@ $app->get('/', function ($request, $response) {
 });
 
 $app->get('/hello', function ($request, $response, $args) {
-    $data = ['message' => 'This is a placeholder route.'];
+    $data = ['message' => 'This is a hello route.'];
     $payload = json_encode($data);
     $response->getBody()->write($payload);
     return $response->withHeader('Content-Type', 'application/json');

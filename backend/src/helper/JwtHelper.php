@@ -10,6 +10,7 @@ class JwtHelper
 
     public static function generate(array $payload, int $expirySeconds = $_ENV['JWT_EXPIRY']): string
     {
+        
         $issuedAt = time();
         $payload['iat'] = $issuedAt;
         $payload['exp'] = $issuedAt + $expirySeconds;

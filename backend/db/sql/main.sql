@@ -1,9 +1,8 @@
 CREATE DATABASE IF NOT EXISTS hotel_db;
 USE hotel_db;
 
--- Create custom ENUMs directly in table columns
-
-CREATE TABLE IF NOT EXISTS hotels (
+-- Super admin for system wide control beyong CEO globally
+CREATE TABLE IF NOT EXISTS super_admins (
     id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
     name VARCHAR(255),
     address TEXT,
@@ -13,7 +12,7 @@ CREATE TABLE IF NOT EXISTS hotels (
     email VARCHAR(255),
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL
+    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS branches (
@@ -30,6 +29,7 @@ CREATE TABLE IF NOT EXISTS branches (
 CREATE TABLE IF NOT EXISTS room_types (
     id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
     hotel_id CHAR(36),
+    branch_id CHAR(36),
     name VARCHAR(255),
     description TEXT,
     price_per_night DECIMAL(10, 2),
@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS room_types (
 CREATE TABLE IF NOT EXISTS rooms (
     id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
     hotel_id CHAR(36),
+    branch_id CHAR(36),
     room_type_id CHAR(36),
     room_number VARCHAR(255),
     floor INT,
@@ -63,6 +64,7 @@ CREATE TABLE IF NOT EXISTS customers (
     purpose_of_visit VARCHAR(255),
     id_type VARCHAR(255),
     id_number VARCHAR(255),
+    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -81,32 +83,48 @@ CREATE TABLE IF NOT EXISTS emergency_contacts (
 CREATE TABLE IF NOT EXISTS users (
     id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
     hotel_id CHAR(36),
+    branch_id CHAR(36),
+    username VARCHAR(255) UNIQUE,
     name VARCHAR(255),
     email VARCHAR(255) NULL,
     phone VARCHAR(255),
     password_hash VARCHAR(255),
     role ENUM('receptionist', 'manager', 'ceo'),
     is_active BOOLEAN DEFAULT TRUE,
+    first_login BOOLEAN DEFAULT TRUE,
+    last_login TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (hotel_id) REFERENCES hotels(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS audit_logs (
     id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
+
     user_id CHAR(36),
-    action VARCHAR(255),
-    entity_type VARCHAR(255),
-    entity_id CHAR(36),
-    description TEXT,
-    metadata JSON,
+    hotel_id CHAR(36),
+    branch_id CHAR(36),
+    action VARCHAR(255),             -- Eg: "Updated Room Info"
+    action_type ENUM('create', 'read', 'update', 'delete', 'login', 'logout', 'access', 'other') DEFAULT 'other',
+    entity_type VARCHAR(255),        -- Eg: "room", "booking", "payment"
+    entity_id CHAR(36),              -- UUID of the affected entity
+    description TEXT,                -- Human-readable explanation
+    metadata JSON,                   -- Optional extra info (old/new values, params, etc.)
+    ip_address VARCHAR(45),          -- IPv4 or IPv6
+    user_agent TEXT,                 -- Browser, OS, device
+    success BOOLEAN DEFAULT TRUE,    -- Whether the action succeeded
     performed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (hotel_id) REFERENCES hotels(id) ON DELETE SET NULL,
+    FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE SET NULL
 );
+
 
 CREATE TABLE IF NOT EXISTS bookings (
     id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
     customer_id CHAR(36),
     room_id CHAR(36),
+    room_type_id CHAR(36),
+    branch_id CHAR(36),
     check_in_date DATE,
     check_out_date DATE,
     status ENUM('booked', 'checked_in', 'checked_out', 'cancelled') DEFAULT 'booked',

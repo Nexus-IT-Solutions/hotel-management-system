@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Mail, User, Lock, X, Loader2 } from "lucide-react";
 import Image1 from '../assets/images/image3.jpg';
+import { Link } from "react-router-dom";
 
 export default function Login() {
   const [showForgotModal, setShowForgotModal] = useState(false);
@@ -129,12 +130,12 @@ export default function Login() {
                   </div>
                 </div>
 
-                <button
+                <Link to='/admin'
                   type="submit"
                   className="w-full bg-blue-600 text-white py-3 sm:py-4 rounded-xl hover:bg-blue-500 transition duration-200 mt-4 text-sm sm:text-base"
                 >
                   Login
-                </button>
+                </Link>
 
                 
               </form>

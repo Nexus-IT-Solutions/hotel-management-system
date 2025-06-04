@@ -7,7 +7,7 @@ use Firebase\JWT\Key;
 
 class JwtHelper
 {
-    private static string $secret = $_ENV['JWT_SECRET']; // better to use env('JWT_SECRET')
+    private static $secret = $_ENV['JWT_SECRET']; 
 
     public static function generate(array $payload, int $expirySeconds = $_ENV['JWT_EXPIRY']): string
     {

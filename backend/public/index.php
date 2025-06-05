@@ -79,14 +79,14 @@ $app->add($contentLengthMiddleware);
 
 // Default welcome route
 $app->get('/', function ($request, $response) {
-    $data = ['message' => 'Welcome to NGO-Help API', 'status' => 'running'];
+    $data = ['message' => 'Welcome to Hotel Management and Booking API', 'status' => 'running'];
     $payload = json_encode($data);
     $response->getBody()->write($payload);
     return $response->withHeader('Content-Type', 'application/json');
 });
 
 $app->get('/hello', function ($request, $response, $args) {
-    $data = ['message' => 'This is a placeholder route.'];
+    $data = ['message' => 'This is a hello route.'];
     $payload = json_encode($data);
     $response->getBody()->write($payload);
     return $response->withHeader('Content-Type', 'application/json');

@@ -1,7 +1,5 @@
 <?php
 
-namespace App\Model;
-
 use PDO;
 use Ramsey\Uuid\Uuid;
 

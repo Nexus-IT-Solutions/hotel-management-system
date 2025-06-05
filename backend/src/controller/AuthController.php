@@ -1,6 +1,6 @@
 <?php
+require_once __DIR__ . '/../model/Users.php';
 
-use App\Model\Users;
 use App\Helper\MailHelper;
 use App\Helper\SmsHelper;
 use App\Helper\JwtHelper;

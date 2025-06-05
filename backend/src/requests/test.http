@@ -1,0 +1,13 @@
+###
+POST http://api.hotel.com/v1/auth/login
+Content-Type: application/json
+
+{
+    "usernameOrEmail": "kwamegilbert1114@gmail.com", 
+    "password": "1234"
+}
+###
+
+GET http://api.hotel.com
+
+###

@@ -122,8 +122,9 @@ class Users
      */
     public function login(string $usernameOrEmail, string $password): ?array
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE username = :input OR email = :input");
-        $stmt->execute(['input' => $usernameOrEmail]);
+        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE username = :username OR email = :email");
+        $stmt->execute(['username' => $usernameOrEmail, 'email' => $usernameOrEmail]);
+
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user && password_verify($password, $user['password_hash'])) {

@@ -10,9 +10,7 @@ return function ($app): void{
         $password = $data['password'] ?? '';
 
         $result = $authController->login($usernameOrEmail, $password);
-        $response->getBody()->write($result)
-            ->withStatus(200)
-            ->withHeader('Content-Type', 'application/json');
-       
+        $response->getBody()->write($result);
+        return $response->withHeader('Content-Type', 'application/json');
     });
 };

@@ -34,7 +34,7 @@ class Users
      */
     public function getAll(): array
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name}");
+        $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name}");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -47,7 +47,7 @@ class Users
      */
     public function getUserById(string $id): ?array
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE id = :id");
+        $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE id = :id");
         $stmt->execute(['id' => $id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         return $user ?: null;
@@ -61,7 +61,7 @@ class Users
      */
     public function getUserByEmail(string $email): ?array
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE email = :email");
+        $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE email = :email");
         $stmt->execute(['email' => $email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         return $user ?: null;
@@ -75,7 +75,7 @@ class Users
      */
     public function getUserByPhone(string $phone): ?array
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE phone = :phone");
+        $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE phone = :phone");
         $stmt->execute(['phone' => $phone]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         return $user ?: null;
@@ -89,7 +89,7 @@ class Users
      */
     public function getUserByUsername(string $username): ?array
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE username = :username");
+        $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE username = :username");
         $stmt->execute(['username' => $username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         return $user ?: null;
@@ -104,7 +104,7 @@ class Users
      */
     public function findByResetToken(string $token): ?array
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE reset_token = :token AND reset_token_expiry > NOW()");
+        $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE reset_token = :token AND reset_token_expiry > NOW()");
         $stmt->execute(['token' => $token]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         return $user ?: null;
@@ -122,15 +122,12 @@ class Users
     {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE username = :username OR email = :email");
         $stmt->execute(['username' => $usernameOrEmail, 'email' => $usernameOrEmail]);
-
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($user && password_verify($password, $user['password_hash'])) {
             unset($user['password_hash']);
             $this->updateLastLogin($user['id']);
             return $user;
         }
-
         return null;
     }
 
@@ -158,7 +155,6 @@ class Users
             'is_active'     => $data['is_active'] ?? true,
             'first_login'   => true,
         ]);
-
         return $uuid;
     }
 

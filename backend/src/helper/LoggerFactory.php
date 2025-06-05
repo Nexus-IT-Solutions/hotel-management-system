@@ -1,7 +1,5 @@
 <?php
 
-namespace App\Helper;
-
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\RotatingFileHandler;

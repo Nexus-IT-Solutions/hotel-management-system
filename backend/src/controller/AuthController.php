@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../model/Users.php';
 require_once __DIR__ . '/../helper/JwtHelper.php';
-require_once __DIR__ . '/../helper/SmsHelper.php';
+require_once __DIR__ . '/../helper/SMSHelper.php';
 require_once __DIR__ . '/../helper/MailHelper.php';
 
 use Ramsey\Uuid\Uuid;

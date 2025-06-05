@@ -53,7 +53,7 @@ class Database
                     $dsn .= ";sslmode=require";
                 } else if ($this->driver === 'mysql') {
                     // For MySQL
-                    $options[\PDO::MYSQL_ATTR_SSL_CA] = '/path/to/ca.pem'; // Update with your certificate path if needed
+                    $options[\PDO::MYSQL_ATTR_SSL_CA] = __DIR__ . '/ca.pem'; // Update with your certificate path if needed
                     $options[\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
                 }
             }

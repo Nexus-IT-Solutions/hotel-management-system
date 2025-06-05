@@ -1,7 +1,5 @@
 <?php
-require_once __DIR__ . '/../../../vendor/autoload.php';
-
-use App\Controller\AuthController;
+require_once __DIR__ . '/../../controller/AuthController.php';
 
 return function ($app): void{
     $authController = new AuthController();

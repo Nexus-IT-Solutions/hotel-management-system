@@ -5,9 +5,10 @@ use DI\Container;
 use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
 use Slim\Middleware\ContentLengthMiddleware;
-use App\Middleware\RequestResponseLoggerMiddleware;
+// use App\Middleware\RequestResponseLoggerMiddleware;
 // use App\Helper\LoggerFactory;
 
+require_once __DIR__ . '/../src/middleware/RequestResponseLoggerMiddleware.php';
 require_once __DIR__ . '/../src/helper/ErrorHandler.php';
 require_once __DIR__ . '/../src/helper/LoggerFactory.php';
 

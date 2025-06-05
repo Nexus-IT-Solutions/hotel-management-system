@@ -5,8 +5,6 @@ use DI\Container;
 use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
 use Slim\Middleware\ContentLengthMiddleware;
-// use App\Middleware\RequestResponseLoggerMiddleware;
-// use App\Helper\LoggerFactory;
 
 require_once __DIR__ . '/../src/middleware/RequestResponseLoggerMiddleware.php';
 require_once __DIR__ . '/../src/helper/ErrorHandler.php';
@@ -21,23 +19,18 @@ $container = new Container();
 
 if (class_exists(LoggerFactory::class)) {
     $loggerFactory = new LoggerFactory('App');
-
     // Set up application logger
     $container->set('logger', $loggerFactory->getLogger());
-
     // Set up HTTP logger specifically for requests/responses
     $container->set('httpLogger', $loggerFactory->getHttpLogger());
 }
 
 // Set the container on AppFactory
 AppFactory::setContainer($container);
-
 // Create Slim App instance
 $app = AppFactory::create();
-
 // Get environment setting
 $environment = $_ENV['ENVIRONMENT'] ?? 'production';
-
 // Add custom error handling middleware
 $errorHandler = new ErrorHandler(
     $container->get('logger'),

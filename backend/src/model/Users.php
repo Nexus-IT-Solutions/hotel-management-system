@@ -45,7 +45,7 @@ class Users
      * @param string $id The user's UUID
      * @return array|null User record or null if not found
      */
-    public function find(string $id): ?array
+    public function getUserById(string $id): ?array
     {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE id = :id");
         $stmt->execute(['id' => $id]);
@@ -59,7 +59,7 @@ class Users
      * @param string $email The user's email
      * @return array|null User record or null if not found
      */
-    public function findByEmail(string $email): ?array
+    public function getUserByEmail(string $email): ?array
     {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE email = :email");
         $stmt->execute(['email' => $email]);
@@ -73,7 +73,7 @@ class Users
      * @param string $phone The user's phone number
      * @return array|null User record or null if not found
      */
-    public function findByPhone(string $phone): ?array
+    public function getUserByPhone(string $phone): ?array
     {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE phone = :phone");
         $stmt->execute(['phone' => $phone]);
@@ -87,7 +87,7 @@ class Users
      * @param string $username The user's username
      * @return array|null User record or null if not found
      */
-    public function findByUsername(string $username): ?array
+    public function getUserByUsername(string $username): ?array
     {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE username = :username");
         $stmt->execute(['username' => $username]);
@@ -153,7 +153,7 @@ class Users
             'name'          => $data['name'],
             'email'         => $data['email'],
             'phone'         => $data['phone'],
-            'password_hash' => password_hash($data['password'], PASSWORD_BCRYPT),
+            'password_hash' => password_hash($data['password'], PASSWORD_DEFAULT),
             'role'          => $data['role'],
             'is_active'     => $data['is_active'] ?? true,
             'first_login'   => true,
@@ -215,10 +215,9 @@ class Users
         if (!$user || !password_verify($currentPassword, $user['password_hash'])) {
             return false;
         }
-
         $stmt = $this->db->prepare("UPDATE users SET password_hash = :password_hash, reset_token = NULL, reset_token_expiry = NULL, first_login = false WHERE id = :id");
         return $stmt->execute([
-            'password_hash' => password_hash($newPassword, PASSWORD_BCRYPT),
+            'password_hash' => password_hash($newPassword, PASSWORD_DEFAULT),
             'id' => $id
         ]);
     }
@@ -237,7 +236,7 @@ class Users
         $stmt = $this->db->prepare("UPDATE users SET password_hash = :password_hash, reset_token = NULL, reset_token_expiry = NULL, first_login = false WHERE id = :id");
         return $stmt->execute([
             'password_hash' => password_hash($newPassword, PASSWORD_BCRYPT),
-            'id'            => $id
+            'id' => $id
         ]);
     }
 

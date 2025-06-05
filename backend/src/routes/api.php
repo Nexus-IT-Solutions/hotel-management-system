@@ -1,6 +1,35 @@
 <?php 
 return function($app): void{ 
     // Define API routes here. This file is responsible for registering all API endpoints.
-    (require_once __DIR__ . '/v1/AuthRouter.php')($app);
-   
+    // Get the request URI
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+
+    // Map route prefixes to their router files
+    $routeMap = [
+        '/v1/auth' => __DIR__ . '/v1/AuthRouter.php',
+        '/v1/user' => __DIR__ . '/v1/UserRoute.php'
+        // Add more routes as needed
+    ];
+
+    $loaded = false;
+    // Check if the request matches any of our defined prefixes
+    foreach ($routeMap as $prefix => $routerFile) {
+        if (strpos($requestUri, $prefix) === 0) {
+            // Load only the matching router
+            if (file_exists($routerFile)) {
+                (require_once $routerFile)($app);
+                $loaded = true;
+            }
+        }
+    }
+
+    // If no specific router was loaded, load all routers as fallback
+    if (!$loaded) {
+        foreach ($routeMap as $routerFile) {
+            if (file_exists($routerFile)) {
+                (require_once $routerFile)($app);
+            }
+        }
     };
+
+};

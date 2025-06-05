@@ -71,8 +71,8 @@ class AuthController
     public function forgotPassword(string $emailOrPhone): ?string
     {
         $user = filter_var($emailOrPhone, FILTER_VALIDATE_EMAIL)
-            ? $this->userModel->findByEmail($emailOrPhone)
-            : $this->userModel->findByPhone($emailOrPhone);
+            ? $this->userModel->getUserByEmail($emailOrPhone)
+            : $this->userModel->getUserByPhone($emailOrPhone);
 
         if (!$user) {
             return json_encode([

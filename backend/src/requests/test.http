@@ -8,6 +8,6 @@ Content-Type: application/json
 }
 ###
 
-GET http://api.hotel.com
+GET https://api.hotel.com/v1/auth
 
 ###

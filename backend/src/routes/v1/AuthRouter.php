@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use App\Controller\AuthController;
 
@@ -14,6 +15,6 @@ return function ($app): void{
         $response->getBody()->write($result)
             ->withStatus(200)
             ->withHeader('Content-Type', 'application/json');
-        return $response;
+       
     });
 };

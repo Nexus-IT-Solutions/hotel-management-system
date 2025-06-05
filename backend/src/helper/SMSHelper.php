@@ -1,5 +1,5 @@
 <?php
-namespace App\Helper;
+
 class SmsHelper
 {
     private static string $apiKey = 'YOUR_ARKESEL_API_KEY';

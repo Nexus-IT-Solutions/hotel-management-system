@@ -1,9 +1,9 @@
 <?php
 require_once __DIR__ . '/../model/Users.php';
+require_once __DIR__ . '/../helper/JwtHelper.php';
+require_once __DIR__ . '/../helper/SmsHelper.php';
+require_once __DIR__ . '/../helper/MailHelper.php';
 
-use App\Helper\MailHelper;
-use App\Helper\SmsHelper;
-use App\Helper\JwtHelper;
 use Ramsey\Uuid\Uuid;
 
 /**

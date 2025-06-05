@@ -20,7 +20,7 @@ createRoot(document.getElementById('root')!).render(
       <Route path='/' element={<Login/>}/>
       {/* managers dashboard routing */}
       <Route path="/admin" element={<MainLayout />}>
-        <Route path='/admin' element={<Dashboard/>}/>
+        <Route index element={<Dashboard/>}/>
         <Route path='new-booking' element={<NewBooking/>}/>
         <Route path='bookings' element={<Bookings/>}/>
         <Route path='customers' element={<Customer/>}/>
@@ -31,7 +31,7 @@ createRoot(document.getElementById('root')!).render(
       </Route>
       {/* receptionist dashboard routing */}
       <Route path='/receptionist' element={<RecepMainLayout/>}>
-        <Route path='/receptionist' element={<RecepDashboard/>}/>
+        <Route index element={<RecepDashboard/>}/>
         <Route path='new-booking' element={<NewBooking/>}/>
         <Route path='bookings' element={<Bookings/>}/>
         <Route path='room-availability' element={<RoomAvailability/>}/>

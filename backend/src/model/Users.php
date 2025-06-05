@@ -1,6 +1,5 @@
 <?php
 
-use PDO;
 use Ramsey\Uuid\Uuid;
 
 require_once __DIR__ . '/../config/Database.php';
@@ -24,14 +23,9 @@ class Users
      */
     private $table_name = 'users';
 
-    /**
-     * Constructor - initializes the database connection
-     * 
-     * @param PDO $db Database connection object
-     */
     public function __construct()
     {
-        $database = new \Database();
+        $database = new Database();
         $this->db = $database->getConnection();
     }
 

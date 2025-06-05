@@ -88,7 +88,7 @@ $app->get('/hello', function ($request, $response, $args) {
 });
 
 // Include routes
-require_once __DIR__ . '/../src/routes/api.php';
+(require_once __DIR__ . '/../src/routes/api.php')($app);
 
 // Run the application
 $app->run();

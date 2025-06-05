@@ -1,30 +1,31 @@
-
-import { Search, Calendar, Edit, Trash2, Eye } from 'lucide-react';
+import { Search, Calendar, Edit, Trash2, Eye,Badge } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Bookings() {
-  
-  const getStatusBadge = (status: 'Confirmed' | 'Pending' | 'Checked In' | 'Checked Out' | 'Cancelled') => {
+  const getStatusBadge = (
+    status: "Confirmed" | "Pending" | "Checked In" | "Checked Out" | "Cancelled"
+  ) => {
     const styles = {
-      'Confirmed': 'bg-green-100 text-green-800',
-      'Pending': 'bg-yellow-100 text-yellow-800',
-      'Checked In': 'bg-blue-100 text-blue-800',
-      'Checked Out': 'bg-gray-100 text-gray-800',
-      'Cancelled': 'bg-red-100 text-red-800'
+      Confirmed: "bg-green-100 text-green-800",
+      Pending: "bg-yellow-100 text-yellow-800",
+      "Checked In": "bg-blue-100 text-blue-800",
+      "Checked Out": "bg-gray-100 text-gray-800",
+      Cancelled: "bg-red-100 text-red-800",
     };
-    
+
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status]}`}>
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status]}`}
+      >
         {status}
       </span>
     );
   };
 
-
   return (
     <div className="space-y-6">
       {/* welcome information */}
-      <div className="px-6 py-4">
+      <div className="md:px-6 px-2 py-4">
         <h1 className="text-2xl text-slate-800 font-bold tracking-wide">
           Bookings
         </h1>
@@ -34,7 +35,7 @@ export default function Bookings() {
       </div>
       {/* search section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-col md:flex-row gap-5 md:items-center space-x-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
@@ -66,7 +67,7 @@ export default function Bookings() {
       </div>
 
       {/* bookings tables */}
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
+      <div className="bg-white rounded-lg shadow hidden md:block">
         <div className="overflow-x-scroll w-full">
           <table className="w-full overflow-x-scroll">
             <thead className="bg-gray-50">
@@ -101,31 +102,52 @@ export default function Bookings() {
               {bookings.map((booking) => (
                 <tr key={booking.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{booking.id}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{booking.customer}</div>
-                      <div className="text-sm text-gray-500">{booking.phone}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {booking.id}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">Room {booking.room}</div>
-                      <div className="text-sm text-gray-500">{booking.roomType}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {booking.customer}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {booking.phone}
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm text-gray-900">{booking.checkIn}</div>
-                      <div className="text-sm text-gray-500">to {booking.checkOut}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        Room {booking.room}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {booking.roomType}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div>
+                      <div className="text-sm text-gray-900">
+                        {booking.checkIn}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        to {booking.checkOut}
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {booking.guests}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {getStatusBadge(booking.status as "Confirmed" | "Pending" | "Checked In" | "Checked Out" | "Cancelled")}
+                    {getStatusBadge(
+                      booking.status as
+                        | "Confirmed"
+                        | "Pending"
+                        | "Checked In"
+                        | "Checked Out"
+                        | "Cancelled"
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     ${booking.total}
@@ -148,24 +170,73 @@ export default function Bookings() {
             </tbody>
           </table>
         </div>
-         {/* Pagination */}
-         <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+        {/* Pagination */}
+        <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-700">
-              Showing <span className="font-medium">1</span> to <span className="font-medium">4</span> of{' '}
+              Showing <span className="font-medium">1</span> to{" "}
+              <span className="font-medium">4</span> of{" "}
               <span className="font-medium">{bookings.length}</span> results
             </div>
             <div className="flex items-center space-x-2">
               <button className="px-3 py-1 border border-gray-300 text-gray-500 rounded hover:bg-gray-50">
                 Previous
               </button>
-              <button className="px-3 py-1 bg-blue-600 text-white rounded">1</button>
+              <button className="px-3 py-1 bg-blue-600 text-white rounded">
+                1
+              </button>
               <button className="px-3 py-1 border border-gray-300 text-gray-500 rounded hover:bg-gray-50">
                 Next
               </button>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* mobile view */}
+      <div className="block sm:hidden space-y-1">
+        {bookings.map((booking) => (
+          <div
+            key={booking.id}
+            className="border border-gray-200 rounded-lg p-4"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1 min-w-0">
+                <h4 className="font-medium text-gray-900 truncate">
+                  {booking.customer}
+                </h4>
+                <p className="text-sm text-gray-600">
+                  {booking.phone} • {booking.roomType}
+                </p>
+              </div>
+              <Badge
+                className={
+                  booking.status === "Confirmed"
+                    ? "bg-green-100 text-green-800 hover:bg-green-100"
+                    : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
+                }
+              >
+                {booking.status}
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                Grade: {booking.room} • {booking.guests}
+              </div>
+              <div className="flex items-center space-x-2">
+                <button className="text-blue-600 hover:text-blue-900">
+                  <Eye className="w-4 h-4" />
+                </button>
+                <button className="text-yellow-600 hover:text-yellow-900">
+                  <Edit className="w-4 h-4" />
+                </button>
+                <button className="text-red-600 hover:text-red-900">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

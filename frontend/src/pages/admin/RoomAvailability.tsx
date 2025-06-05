@@ -84,7 +84,9 @@ const RoomAvailability = () => {
     },
   ];
 
-  const getStatusColor = (status: 'available' | 'occupied' | 'reserved' | 'maintenance' | 'cleaning') => {
+  const getStatusColor = (
+    status: "available" | "occupied" | "reserved" | "maintenance" | "cleaning"
+  ) => {
     const colors = {
       available: "bg-green-100 border-green-300 text-green-800",
       occupied: "bg-red-100 border-red-300 text-red-800",
@@ -147,27 +149,30 @@ const RoomAvailability = () => {
           </div>
 
           <div className="flex items-center space-x-1 gap-5 bg-gray-100 rounded-lg p-1">
-           <div>
-           <button
-              onClick={() => setViewMode("grid")}
-              className={`px-3 py-1 rounded ${
-                viewMode === "grid" ? "bg-white shadow" : ""
-              }`}
-            >
-              Grid
-            </button>
-            <button
-              onClick={() => setViewMode("list")}
-              className={`px-3 py-1 rounded ${
-                viewMode === "list" ? "bg-white shadow" : ""
-              }`}
-            >
-              List
-            </button>
-           </div>
+            <div>
+              <button
+                onClick={() => setViewMode("grid")}
+                className={`px-3 py-1 rounded ${
+                  viewMode === "grid" ? "bg-white shadow" : ""
+                }`}
+              >
+                Grid
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                className={`px-3 py-1 rounded ${
+                  viewMode === "list" ? "bg-white shadow" : ""
+                }`}
+              >
+                List
+              </button>
+            </div>
 
-            <Link to="add-room" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-600 text-white px-3 py-2 rounded text-lg">
-              <Plus className="w-5 h-5 text-white"/>
+            <Link
+              to="add-room"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-600 text-white px-3 py-2 rounded text-lg"
+            >
+              <Plus className="w-5 h-5 text-white" />
               Add Room
             </Link>
           </div>
@@ -215,7 +220,12 @@ const RoomAvailability = () => {
             <div
               key={room.number}
               className={`border-2 rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow ${getStatusColor(
-                room.status as "available" | "occupied" | "maintenance" | "reserved" | "cleaning"
+                room.status as
+                  | "available"
+                  | "occupied"
+                  | "maintenance"
+                  | "reserved"
+                  | "cleaning"
               )}`}
             >
               <div className="text-center">
@@ -239,7 +249,7 @@ const RoomAvailability = () => {
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
@@ -282,7 +292,12 @@ const RoomAvailability = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(
-                        room.status as "available" | "occupied" | "maintenance" | "reserved" | "cleaning"
+                        room.status as
+                          | "available"
+                          | "occupied"
+                          | "maintenance"
+                          | "reserved"
+                          | "cleaning"
                       )}`}
                     >
                       {room.status}
@@ -305,6 +320,39 @@ const RoomAvailability = () => {
           </table>
         </div>
       )}
+
+      {/* mobile list room */}
+      <div className="block sm:hidden space-y-2">
+        {rooms.map((room) => (
+          <div
+            key={room.number}
+            className="border border-gray-200 rounded-lg p-4"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1 min-w-0">
+                <h4 className="font-medium text-gray-900 truncate">
+                  {room.number}
+                </h4>
+                <p className="text-sm text-gray-600">
+                  {room.type} • {room.capacity}
+                </p>
+              </div>
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(
+                  room.status as
+                    | "available"
+                    | "occupied"
+                    | "maintenance"
+                    | "reserved"
+                    | "cleaning"
+                )}`}
+              >
+                {room.status}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {/* Legend */}
       <div className="bg-white p-4 rounded-lg shadow">

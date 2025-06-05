@@ -35,7 +35,7 @@ export default function Login() {
         setResetEmail("");
         setMessage({ type: "", text: "" });
       }, 2000);
-    } catch (error) {
+    } catch {
       setMessage({
         type: "error",
         text: "Sorry, we couldn't process your request. Please try again.",

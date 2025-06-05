@@ -16,8 +16,6 @@ class Users
      * Database connection instance
      */
     protected $db;
-    
-    
     /**
      * Name of the users database table
      */

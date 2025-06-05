@@ -8,8 +8,11 @@ use Firebase\JWT\Key;
 class JwtHelper
 {
 
-    public static function generate(array $payload, int $expirySeconds = $_ENV['JWT_EXPIRY']): string
+    public static function generate(array $payload, ?int $expirySeconds = null): string
     {
+        if ($expirySeconds === null) {
+            $expirySeconds = (int)$_ENV['JWT_EXPIRY'];
+        }
         
         $issuedAt = time();
         $payload['iat'] = $issuedAt;

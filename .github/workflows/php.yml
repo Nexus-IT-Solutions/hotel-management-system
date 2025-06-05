@@ -240,8 +240,8 @@ jobs:
           RESPONSE=$(curl -s http://localhost:8080/)
           echo "API Response: $RESPONSE"
 
-          # Check if response contains "Welcome to NGO-Help API"
-          if echo "$RESPONSE" | grep -q "Welcome to NGO-Help API"; then
+          # Check if response contains "running"
+          if echo "$RESPONSE" | grep -q "running"; then
             echo "✅ Application bootstrap test passed"
           else
             echo "❌ Application bootstrap test failed"

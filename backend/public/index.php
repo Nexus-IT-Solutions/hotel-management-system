@@ -5,10 +5,12 @@ use DI\Container;
 use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
 use Slim\Middleware\ContentLengthMiddleware;
-use App\Middleware\RequestResponseLoggerMiddleware;
-use App\Helper\LoggerFactory;
+// use App\Middleware\RequestResponseLoggerMiddleware;
+// use App\Helper\LoggerFactory;
 
+require_once __DIR__ . '/../src/middleware/RequestResponseLoggerMiddleware.php';
 require_once __DIR__ . '/../src/helper/ErrorHandler.php';
+require_once __DIR__ . '/../src/helper/LoggerFactory.php';
 
 // Load environment variables
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
@@ -86,7 +88,7 @@ $app->get('/hello', function ($request, $response, $args) {
 });
 
 // Include routes
-require_once __DIR__ . '/../src/routes/api.php';
+(require_once __DIR__ . '/../src/routes/api.php')($app);
 
 // Run the application
 $app->run();

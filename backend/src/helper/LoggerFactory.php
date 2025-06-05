@@ -8,6 +8,7 @@ use Monolog\Handler\RotatingFileHandler;
 use Monolog\Processor\UidProcessor;
 use Monolog\Processor\WebProcessor;
 use Monolog\Formatter\LineFormatter;
+use Monolog\LogRecord;
 
 /**
  * Logger Factory Class
@@ -18,7 +19,7 @@ class LoggerFactory
 {
     private string $name;
     private string $logPath;
-    private string $level;
+    private $level;
 
     /**
      * Constructor
@@ -99,9 +100,17 @@ class LoggerFactory
         // Get environment for context
         $environment = $_ENV['ENVIRONMENT'] ?? 'production';
 
-        // Add environment context processor
-        $logger->pushProcessor(function (array $record) use ($environment) {
-            $record['extra']['environment'] = $environment;
+        // Add environment context processor - compatible with both Monolog 2.x and 3.x
+        $logger->pushProcessor(function ($record) use ($environment) {
+            // For Monolog 3.x (LogRecord object)
+            if ($record instanceof LogRecord) {
+                $record->extra['environment'] = $environment;
+            } 
+            // For Monolog 2.x (array)
+            else if (is_array($record)) {
+                $record['extra']['environment'] = $environment;
+            }
+            
             return $record;
         });
 
@@ -140,6 +149,21 @@ class LoggerFactory
 
         // Add web request details when available
         $logger->pushProcessor(new WebProcessor());
+
+        // Add environment context processor - compatible with both Monolog 2.x and 3.x
+        $environment = $_ENV['ENVIRONMENT'] ?? 'production';
+        $logger->pushProcessor(function ($record) use ($environment) {
+            // For Monolog 3.x (LogRecord object)
+            if ($record instanceof LogRecord) {
+                $record->extra['environment'] = $environment;
+            } 
+            // For Monolog 2.x (array)
+            else if (is_array($record)) {
+                $record['extra']['environment'] = $environment;
+            }
+            
+            return $record;
+        });
 
         // Add handlers to logger
         $logger->pushHandler($fileHandler);

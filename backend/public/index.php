@@ -7,6 +7,7 @@ use Dotenv\Dotenv;
 use Slim\Middleware\ContentLengthMiddleware;
 use App\Middleware\RequestResponseLoggerMiddleware;
 use App\Helper\LoggerFactory;
+use App\Helper\ErrorHandler;
 
 // Load environment variables
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
@@ -31,31 +32,25 @@ AppFactory::setContainer($container);
 // Create Slim App instance
 $app = AppFactory::create();
 
-// Configure error middleware based on environment
+// Get environment setting
 $environment = $_ENV['ENVIRONMENT'] ?? 'production';
 
-switch ($environment) {
-    case 'development':
-        // Show all errors in development
-        $app->addErrorMiddleware(
-            displayErrorDetails: true,
-            logErrors: true,
-            logErrorDetails: true,
-            logger: $container->has('logger') ? $container->get('logger') : null
-        );
-        break;
+// Add custom error handling middleware
+$errorHandler = new ErrorHandler(
+    $container->get('logger'),
+    $environment
+);
 
-    case 'production':
-    default:
-        // Production: Don't display errors, minimal logging
-        $app->addErrorMiddleware(
-            displayErrorDetails: false,
-            logErrors: true,
-            logErrorDetails: false,
-            logger: $container->has('logger') ? $container->get('logger') : null
-        );
-        break;
-}
+// Configure error middleware with custom handler
+$errorMiddleware = $app->addErrorMiddleware(
+    displayErrorDetails: $environment === 'development',
+    logErrors: true,
+    logErrorDetails: $environment === 'development',
+    logger: $container->get('logger')
+);
+
+// Set custom error handler
+$errorMiddleware->setDefaultErrorHandler($errorHandler);
 
 // Add HTTP logger middleware if httpLogger exists
 if ($container->has('httpLogger')) {
@@ -68,14 +63,11 @@ $app->add(function ($request, $handler) {
     return $response
         ->withHeader('Access-Control-Allow-Origin', '*')
         ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
-        ->withHeader('X-Frame-Options', 'DENY')
-        ->withHeader('X-Content-Type-Options', 'nosniff');
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
 });
 
-// Add Content Length middleware
-$contentLengthMiddleware = new ContentLengthMiddleware();
-$app->add($contentLengthMiddleware);
+// Add content length middleware
+$app->add(new ContentLengthMiddleware());
 
 // Default welcome route
 $app->get('/', function ($request, $response) {
@@ -92,16 +84,8 @@ $app->get('/hello', function ($request, $response, $args) {
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-// Load routes
-$routesFile = __DIR__ . '/../src/routes/api.php';
-if (file_exists($routesFile)) {
-    (require_once $routesFile)($app);
-} else {
-    // Log missing routes file if logger is available
-    if ($container->has('logger')) {
-        $container->get('logger')->warning('API routes file not found: ' . $routesFile);
-    }
-}
+// Include routes
+require __DIR__ . '/../src/routes/api.php';
 
 // Run the application
 $app->run();

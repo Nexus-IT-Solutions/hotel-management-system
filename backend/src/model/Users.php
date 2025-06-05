@@ -15,7 +15,7 @@ class Users
     /**
      * Database connection instance
      */
-    protected PDO $db;
+    protected $db;
     
     
     /**

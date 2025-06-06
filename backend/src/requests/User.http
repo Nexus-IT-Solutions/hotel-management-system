@@ -1,4 +1,4 @@
-GET http://api.hotel.com/v1/users
+PUT http://api.hotel.com/v1/users
 
 ###
 GET http://api.hotel.com/v1/users/8931e790-54e7-4e5c-8018-5df41a892fb2
@@ -13,7 +13,7 @@ GET http://api.hotel.com/v1/users/phone/233541436414
 GET http://api.hotel.com/v1/users/username/KwameGilbert
 
 ###
-GET http://api.hotel.com/v1/users/identifier/233541436414
+GET http://api.hotel.com/v1/users/identifier/2346706020
 ###
 POST http://api.hotel.com/v1/users
 Content-Type: application/json

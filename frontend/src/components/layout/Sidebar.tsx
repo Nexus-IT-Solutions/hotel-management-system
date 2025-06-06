@@ -9,9 +9,10 @@ interface SidebarProps {
 const Sidebar = (probs: SidebarProps) => {
   return (
     <div
-      className={`bg-white shadow-lg h-screen flex-col duration-700 hidden md:flex ${
-        probs.showLabels && "w-56 duration-500"
+      className={`bg-white shadow-lg h-screen flex-col transition-all duration-700 hidden md:flex ${
+        probs.showLabels && "w-56 duration-1000"
       }`}
+      
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200">

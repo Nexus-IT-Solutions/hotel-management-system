@@ -198,7 +198,7 @@ export default function Reports (){
     </div>
 
     {/* Performance Table */}
-    <div className="bg-white rounded-lg shadow">
+    {/* <div className="bg-white rounded-lg shadow">
       <div className="p-6 border-b">
         <h3 className="text-lg font-semibold text-gray-800">Top Performing Rooms</h3>
       </div>
@@ -242,7 +242,7 @@ export default function Reports (){
           </tbody>
         </table>
       </div>
-    </div>
+    </div> */}
   </div>
   )
 }

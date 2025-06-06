@@ -115,7 +115,7 @@ export default function RecepDashboard() {
       {/* Room Overview and quick action */}
       <div className="flex flex-col lg:flex-row items-center gap-5">
         {/* room overview status  */}
-        <div className="bg-white shadow-sm rounded-md py-4 flex-1">
+        <div className="bg-white shadow-sm rounded-md py-4 md:flex-1 w-[100%]">
           <div className="border-b border-gray-300 px-4 pb-4">
             <h1 className="text-lg text-slate-800 font-medium">
               Room Status Overview
@@ -148,7 +148,7 @@ export default function RecepDashboard() {
         </div>
 
         {/* quick actions */}
-        <div className="flex-1 bg-white shadow-sm rounded-md py-4">
+        <div className="md:flex-1 w-[100%] bg-white shadow-sm rounded-md py-4">
           <div className="border-b border-gray-300 px-4 pb-4">
             <h1 className="text-lg text-slate-800 font-medium">
               Quick Actions
@@ -156,7 +156,7 @@ export default function RecepDashboard() {
           </div>
 
          
-              <div className="grid grid-cols-2 gap-4 p-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
                 <button className="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
                   <Users className="h-6 w-6 text-blue-600 mb-2" />
                   <p className="text-sm font-medium text-blue-900">

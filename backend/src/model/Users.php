@@ -96,6 +96,25 @@ class Users
     }
 
     /**
+     * Find a user by their username, email or phone number
+     * 
+     * @param string $identifier The user's username, email, or phone number
+     * @return array|null User record or null if not found
+     */
+    public function getUserByIdentifier(string $identifier): ?array
+    {
+        $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login 
+                                FROM {$this->table_name} 
+                                WHERE username = :username 
+                                   OR email = :email 
+                                   OR phone = :phone
+                                LIMIT 1");
+        $stmt->execute(['username' => $identifier, 'email' => $identifier, 'phone' => $identifier]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $user ?: null;
+    }
+
+    /**
      * Find a user by their password reset token
      * Only returns the user if the token hasn't expired
      * 

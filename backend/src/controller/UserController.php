@@ -130,6 +130,29 @@ class UserController
     }
 
     /**
+     * Find a user by their username, email or phone number
+     * 
+     * @param string $identifier The user's username, email, or phone number
+     * @return array|null User record or null if not found
+     */
+    public function getUserByIdentifier(string $identifier): ?string
+    {
+        $user = $this->userModel->getUserByIdentifier($identifier);
+        if ($user) {
+            return json_encode([
+                'status' => 'success',
+                'user' => $user
+            ], JSON_PRETTY_PRINT);
+        } else {
+            return json_encode([
+                'status' => 'error',
+                'message' => 'User not found'
+            ], JSON_PRETTY_PRINT);
+        }
+
+    }
+
+    /**
      * Create a new User
      * 
      *  @param array $data 

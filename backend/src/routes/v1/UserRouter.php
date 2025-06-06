@@ -43,6 +43,14 @@ return function ($app): void{
         return $response->withHeader('Content-Type', 'application/json');
     });
 
+    // Get user by identifier (username, email, or phone)
+    $app->get('/v1/users/identifier/{identifier}', function ($request, $response, $args) use ($userController) {
+        $identifier = $args['identifier'] ?? '';
+        $result = $userController->getUserByIdentifier($identifier);
+        $response->getBody()->write($result);
+        return $response->withHeader('Content-Type', 'application/json');
+    });
+
     // Create a new user
     $app->post('/v1/users', function ($request, $response) use ($userController) {
         $data = json_decode($request->getBody()->getContents(), true);

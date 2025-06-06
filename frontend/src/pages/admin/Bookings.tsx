@@ -221,7 +221,7 @@ export default function Bookings() {
             </div>
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-600">
-                Grade: {booking.room} • {booking.guests}
+                Room: {booking.room} • Guests: {booking.guests}
               </div>
               <div className="flex items-center space-x-2">
                 <button className="text-blue-600 hover:text-blue-900">

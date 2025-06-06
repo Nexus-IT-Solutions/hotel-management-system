@@ -56,7 +56,7 @@ export default function Customer() {
       </div>
 
       {/* customer table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-lg shadow overflow-hidden hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
@@ -133,12 +133,54 @@ export default function Customer() {
         </div>
       </div>
 
+      <div className="block sm:hidden space-y-1">
+        {customers.map((customer) => (
+          <div
+            key={customer.id}
+            className="border border-gray-200 rounded-lg p-4">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1 min-w-0">
+                <h4 className="font-medium text-gray-900 truncate">
+                  {customer.name}{" "}
+                  {/* Assuming 'name' is the correct property */}
+                </h4>
+                <p className="text-sm text-gray-600">
+                  {customer.phone} • {customer.address}{" "}
+                  {/* Ensure 'roomType' is a valid property */}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                Grade: {customer.totalBookings} • {customer.address}{" "}
+                {/* Ensure 'room' and 'guests' are valid properties */}
+              </div>
+              <div className="flex items-center space-x-2">
+                <button className="text-blue-600 hover:text-blue-900">
+                  <Eye className="w-4 h-4" />
+                </button>
+                <button className="text-yellow-600 hover:text-yellow-900">
+                  <Edit className="w-4 h-4" />
+                </button>
+                <button className="text-red-600 hover:text-red-900">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Customer Details Modal would go here */}
       <div className="bg-white rounded-lg shadow p-6 mt-5">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Customer Insights</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          Customer Insights
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <h4 className="font-medium text-gray-800 mb-2">Top Spending Customers</h4>
+            <h4 className="font-medium text-gray-800 mb-2">
+              Top Spending Customers
+            </h4>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>David Wilson</span>
@@ -154,9 +196,11 @@ export default function Customer() {
               </div>
             </div>
           </div>
-          
+
           <div>
-            <h4 className="font-medium text-gray-800 mb-2">Most Frequent Guests</h4>
+            <h4 className="font-medium text-gray-800 mb-2">
+              Most Frequent Guests
+            </h4>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>David Wilson</span>
@@ -172,7 +216,7 @@ export default function Customer() {
               </div>
             </div>
           </div>
-          
+
           <div>
             <h4 className="font-medium text-gray-800 mb-2">Customer Growth</h4>
             <div className="space-y-2">

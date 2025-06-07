@@ -11,6 +11,7 @@ import Staff from './pages/admin/Staff.tsx'
 import Reports from './pages/admin/Reports.tsx'
 import AddRoom from './pages/admin/AddRoom.tsx'
 import Login from './pages/Login.tsx'
+import Settings from './pages/admin/Settings.tsx'
 import RecepMainLayout from './components/layout/receptioniast/RecepMainLayout.tsx'
 import RecepDashboard from './pages/receptionist/Dashboard.tsx'
 
@@ -28,6 +29,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path='staff' element={<Staff/>}/>
         <Route path='reports' element={<Reports/>}/>
         <Route path='add-room' element={<AddRoom/>}/>
+        <Route path='settings' element={<Settings/>}/>
       </Route>
       {/* receptionist dashboard routing */}
       <Route path='/receptionist' element={<RecepMainLayout/>}>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, Users, Settings, Search, Plus } from "lucide-react";
+import { Calendar, Users, Settings, Search, Plus, X } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const RoomAvailability = () => {
@@ -7,6 +7,7 @@ const RoomAvailability = () => {
     new Date().toISOString().split("T")[0]
   );
   const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
+  const [selectedRoom, setSelectedRoom] = useState<any>(null);
 
   const rooms = [
     {
@@ -123,6 +124,43 @@ const RoomAvailability = () => {
     ).length,
   };
 
+  // Modal component
+  const RoomModal = ({ room, onClose }: { room: any; onClose: () => void }) => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#cfcfcf9c] bg-opacity-40">
+      <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
+        <button
+          className="absolute top-3 right-3 text-gray-400 hover:text-gray-700"
+          onClick={onClose}
+        >
+          <X className="w-6 h-6" />
+        </button>
+        <h2 className="text-xl font-bold mb-2">Room {room.number}</h2>
+        <div className="mb-2 text-gray-700">{room.type}</div>
+        <div className="mb-2 flex items-center">
+          <Users className="w-4 h-4 mr-1" /> Capacity: {room.capacity}
+        </div>
+        <div className="mb-2">
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(
+              room.status
+            )}`}
+          >
+            {room.status}
+          </span>
+        </div>
+        {room.guest && (
+          <div className="mb-2">
+            <span className="font-medium">Guest:</span> {room.guest}
+          </div>
+        )}
+        <div className="mb-2">
+          <span className="font-medium">Price:</span> ${room.price}/night
+        </div>
+        {/* Add more details or actions here if needed */}
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       {/* Header Controls */}
@@ -227,6 +265,7 @@ const RoomAvailability = () => {
                   | "reserved"
                   | "cleaning"
               )}`}
+              onClick={() => setSelectedRoom(room)}
             >
               <div className="text-center">
                 <div className="text-2xl mb-2">
@@ -278,7 +317,11 @@ const RoomAvailability = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {rooms.map((room) => (
-                <tr key={room.number} className="hover:bg-gray-50">
+                <tr
+                  key={room.number}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => setSelectedRoom(room)}
+                >
                   <td className="px-6 py-4 whitespace-nowrap font-medium">
                     Room {room.number}
                   </td>
@@ -310,7 +353,13 @@ const RoomAvailability = () => {
                     ${room.price}/night
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <button className="text-blue-600 hover:text-blue-900 mr-3">
+                    <button
+                      className="text-blue-600 hover:text-blue-900 mr-3"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedRoom(room);
+                      }}
+                    >
                       <Settings className="w-4 h-4" />
                     </button>
                   </td>
@@ -326,7 +375,8 @@ const RoomAvailability = () => {
         {rooms.map((room) => (
           <div
             key={room.number}
-            className="border border-gray-200 rounded-lg p-4"
+            className="border border-gray-200 rounded-lg p-4 cursor-pointer"
+            onClick={() => setSelectedRoom(room)}
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1 min-w-0">
@@ -380,6 +430,11 @@ const RoomAvailability = () => {
           </div>
         </div>
       </div>
+
+      {/* Room Details Modal */}
+      {selectedRoom && (
+        <RoomModal room={selectedRoom} onClose={() => setSelectedRoom(null)} />
+      )}
     </div>
   );
 };

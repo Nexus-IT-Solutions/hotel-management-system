@@ -31,6 +31,7 @@ export const navLinks = [
     menuItems: [
       { icon: Users, label: "Staff", path: "staff" },
       { icon: Settings, label: "Settings", path: "settings" },
+      { icon: Settings, label: "Logout", path: "/" },
     ],
   },
 ];

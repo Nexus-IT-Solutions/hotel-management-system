@@ -15,7 +15,7 @@ return function ($app): void{
     });
 
     // Forgot Password Route
-    $app->post('/v1/auth/forgot-password', function ($request, $response, $args) use ($authController) {
+    $app->post('/v1/auth/forgot-password', function ($request, $response) use ($authController) {
         $data = json_decode($request->getBody()->getContents(), true);
         $emailOrPhone = $data['emailOrPhone'] ?? '';
         $result = $authController->forgotPassword($emailOrPhone);

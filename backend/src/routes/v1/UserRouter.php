@@ -60,7 +60,7 @@ return function ($app): void{
     });
 
     // Update user by ID
-    $app->put('/v1/users/{id}', function ($request, $response, $args) use ($userController) {
+    $app->patch('/v1/users/{id}', function ($request, $response, $args) use ($userController) {
         $id = $args['id'] ?? '';
         $data = json_decode($request->getBody()->getContents(), true);
         $result = $userController->updateUser($id, $data);

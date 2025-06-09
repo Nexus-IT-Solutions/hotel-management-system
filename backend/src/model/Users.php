@@ -1,9 +1,5 @@
 <?php
-
 use Ramsey\Uuid\Uuid;
-// use PDO;
-// use PDOException;
-
 require_once __DIR__ . '/../config/Database.php';
 
 /**
@@ -287,7 +283,7 @@ class Users
     {
         try {
             // Validate required fields
-            $requiredFields = ['username', 'name', 'email', 'phone', 'password', 'role'];
+            $requiredFields = ['username', 'name', 'phone', 'password', 'role'];
             foreach ($requiredFields as $field) {
                 if (empty($data[$field])) {
                     $this->lastError = "Missing required field: $field";

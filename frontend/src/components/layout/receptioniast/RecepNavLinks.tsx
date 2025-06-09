@@ -22,7 +22,7 @@ export const recepNavLinks = [
   {
     title: "REPORTS",
     menuItems: [
-      { icon: ChartBar, label: 'Make Report', path: 'reports', role: 'manager' },
+      { icon: ChartBar, label: 'Report Issue', path: 'make-reports', role: 'manager' },
       { icon: Bed, label: "Logout", path: "/" },
     ],
   },

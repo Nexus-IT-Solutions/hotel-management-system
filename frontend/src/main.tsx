@@ -14,6 +14,7 @@ import Login from './pages/Login.tsx'
 import Settings from './pages/admin/Settings.tsx'
 import RecepMainLayout from './components/layout/receptioniast/RecepMainLayout.tsx'
 import RecepDashboard from './pages/receptionist/Dashboard.tsx'
+import ReportIssueForm from './pages/receptionist/ReportIssueForm.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
@@ -39,6 +40,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path='bookings' element={<Bookings/>}/>
         <Route path='room-availability' element={<RoomAvailability/>}/>
         <Route path='customers' element={<Customer/>}/>
+        <Route path='make-reports' element={<ReportIssueForm/>}/>
       </Route>
     </Routes>
   </BrowserRouter>

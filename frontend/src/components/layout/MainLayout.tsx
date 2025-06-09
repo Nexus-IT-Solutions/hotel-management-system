@@ -27,9 +27,9 @@ const MainLayout = () => {
           </main>
           {/* Footer */}
           <footer className="bg-white text-slate-500 py-1">
-            <div className="container mx-auto px-4 text-center text-[10px]">
+            <div className="text-center text-[13px] flex items-center justify-around">
               <p>&copy; {new Date().getFullYear()} Hotel Management System</p>
-              <p>Developed by: Nolex Prime</p>
+              <p>Developed by: Nolex Prime <p>Contact Us: 0550807914/0541436414</p></p>
             </div>
           </footer>
         </div>

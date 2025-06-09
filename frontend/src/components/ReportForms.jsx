@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
-function ReportForm() {
+export default function ReportForm (){
   const [form, setForm] = useState({
     reportType: "",
     description: "",
@@ -159,6 +159,5 @@ function ReportForm() {
       </form>
     </div>
   );
-}
+};
 
-export default ReportForm;

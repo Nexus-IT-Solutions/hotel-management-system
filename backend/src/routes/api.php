@@ -6,8 +6,10 @@ return function($app): void{
 
     // Map route prefixes to their router files
     $routeMap = [
-        '/v1/auth' => __DIR__ . '/v1/AuthRouter.php',
-        '/v1/users' => __DIR__ . '/v1/UserRouter.php'
+        '/v1/auth' => __DIR__ . '/v1/AuthRoute.php',
+        '/v1/users' => __DIR__ . '/v1/UserRoute.php',
+        '/v1/hotels' => __DIR__ . '/v1/HotelRoute.php',
+        'v1/room-types' => __DIR__ . '/v1/RoomTypeRoute.php',
         // Add more routes as needed
     ];
 

@@ -54,7 +54,7 @@ class UserController
         return json_encode([
             'status' => $user ? 'success' : 'error',
             'user' => $user,
-            'message' => !$user ? 'User not found' : null
+            'message' => !$user ? "User not found with id {$id}" : null
         ], JSON_PRETTY_PRINT);
     }
 

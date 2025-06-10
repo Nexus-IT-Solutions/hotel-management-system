@@ -240,20 +240,47 @@ class Users
     public function login(string $usernameOrEmail, string $password): ?array
     {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE username = :username OR email = :email");
-            if (!$this->executeQuery($stmt, ['username' => $usernameOrEmail, 'email' => $usernameOrEmail])) {
+            // Check for empty inputs
+            if (empty($usernameOrEmail) || empty($password)) {
+                $this->lastError = "Username/email and password are required";
+                return null;
+            }
+            
+            // Find user by username OR email
+            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE username = :identifier OR email = :identifier");
+            if (!$this->executeQuery($stmt, ['identifier' => $usernameOrEmail])) {
+                $this->lastError = "Database error during login";
                 return null;
             }
             
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Check if user exists
             if (!$user) {
                 $this->lastError = "User not found";
                 return null;
             }
             
+            // Check if user account is active
+            if (!$user['is_active']) {
+                $this->lastError = "Account is inactive";
+                return null;
+            }
+            
+            // Verify password
             if (!password_verify($password, $user['password_hash'])) {
                 $this->lastError = "Invalid password";
+                
+                // Optional: Track failed login attempts here
+                // $this->recordFailedLoginAttempt($user['id']);
+                
                 return null;
+            }
+            
+            // Password is valid, check if needs rehash (if PHP's password_hash defaults have changed)
+            if (password_needs_rehash($user['password_hash'], PASSWORD_DEFAULT)) {
+                // Update password hash with new algorithm/cost
+                $this->updatePasswordHash($user['id'], $password);
             }
             
             // Remove sensitive data before returning
@@ -261,7 +288,7 @@ class Users
             unset($user['reset_token']);
             unset($user['reset_token_expiry']);
             
-            // Update last login
+            // Update last login timestamp
             $this->updateLastLogin($user['id']);
             
             return $user;
@@ -269,6 +296,51 @@ class Users
             $this->lastError = "Login failed: " . $e->getMessage();
             error_log($this->lastError);
             return null;
+        }
+    }
+
+    /**
+     * Updates the password hash if the hashing algorithm parameters have changed
+     * 
+     * @param string $userId The user's ID
+     * @param string $password The plain text password to rehash
+     * @return bool Whether the operation was successful
+     */
+    private function updatePasswordHash(string $userId, string $password): bool
+    {
+        try {
+            $newHash = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $this->db->prepare("UPDATE {$this->table_name} SET password_hash = :hash WHERE id = :id");
+            return $this->executeQuery($stmt, [
+                'hash' => $newHash,
+                'id' => $userId
+            ]);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to update password hash: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
+    }
+
+    /**
+     * Records a failed login attempt (optional security feature)
+     * 
+     * @param string $userId The user's ID
+     * @return bool Whether the operation was successful
+     */
+    private function recordFailedLoginAttempt(string $userId): bool
+    {
+        try {
+            // Update failed login attempts counter and timestamp
+            $stmt = $this->db->prepare("UPDATE {$this->table_name} SET 
+                                 failed_login_attempts = COALESCE(failed_login_attempts, 0) + 1,
+                                 last_failed_login = CURRENT_TIMESTAMP
+                                 WHERE id = :id");
+            return $this->executeQuery($stmt, ['id' => $userId]);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to record login attempt: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
         }
     }
 

@@ -36,29 +36,83 @@ class AuthController
      * 
      * @param string $usernameOrEmail The user's username or email
      * @param string $password The user's password
-     * @return array|null User data on successful login or null on failure
+     * @return string JSON response with login result
      */
-    public function login(string $usernameOrEmail, string $password): ?string
+    public function login(string $usernameOrEmail, string $password): string
     {
+        // Input validation
+        if (empty($usernameOrEmail) || empty($password)) {
+            return json_encode([
+                'status' => 'error',
+                'message' => 'Username/email and password are required',
+                'code' => 400
+            ]);
+        }
+        
+        // Attempt login
         $user = $this->userModel->login($usernameOrEmail, $password);
-
-        if ($user && $user['is_active']) {
+        
+        // Check if login failed
+        if (!$user) {
+            // Get the specific error from the model
+            $errorMessage = $this->userModel->getLastError();
+            $code = 401;
+            
+            if ($errorMessage === "User not found") {
+                $code = 404;
+            } else if ($errorMessage === "Account is inactive") {
+                $code = 403;
+            }
+            
+            return json_encode([
+                'status' => 'error',
+                'message' => $errorMessage ?: 'Invalid username or password',
+                'code' => $code
+            ]);
+        }
+        
+        // Check if account is active
+        if (!$user['is_active']) {
+            return json_encode([
+                'status' => 'error',
+                'message' => 'Your account has been deactivated. Please contact support.',
+                'code' => 403
+            ]);
+        }
+        
+        // Generate JWT token
+        try {
             $payload = $user;
-            $payload['id'] = Uuid::uuid4()->toString(); // Generate a unique ID for the JWT
-
-            $jwt = JwtHelper::generate($payload, $_ENV['JWT_EXPIRY']);
-
+            // Use the existing user ID instead of generating a new UUID
+            // This ensures consistent user identification in the token
+            
+            // Set token expiration from environment or use a default
+            $expiry = isset($_ENV['JWT_EXPIRY']) ? intval($_ENV['JWT_EXPIRY']) : 3600;
+            
+            $jwt = JwtHelper::generate($payload, $expiry);
+            
+            // Return success response
             return json_encode([
                 'status' => 'success',
                 'message' => 'Login successful',
+                'user' => [
+                    'id' => $user['id'],
+                    'username' => $user['username'],
+                    'name' => $user['name'],
+                    'email' => $user['email'],
+                    'role' => $user['role'],
+                    'first_login' => (bool)$user['first_login']
+                ],
                 'token' => $jwt,
-                'expires_in' => $_ENV['JWT_EXPIRY']
-            ], 200);
-        } else {
+                'expires_in' => $expiry
+            ]);
+        } catch (Exception $e) {
+            error_log("JWT generation error: " . $e->getMessage());
             return json_encode([
                 'status' => 'error',
-                'message' => 'Invalid username or password'
-            ], 401);
+                'message' => 'Authentication error occurred',
+                'code' => 500
+            ]);
         }
     }
 

@@ -2,17 +2,35 @@ import React, { useState } from "react";
 import { Mail, User, Lock, X, Loader2 } from "lucide-react";
 import Image1 from '../assets/images/image3.jpg';
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 export default function Login() {
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
   const [message, setMessage] = useState({ type: "", text: "" });
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login submitted");
+    // Hitting the endpoint using axios
+    axios.post("https://hotel-management-system-hqbw.onrender.com/v1/auth/login", {
+      "username": username,
+      "password": password
+    })
+    .then((res) => {
+      // Checking status code
+      console.log(res)
+      if (res.status === 200) {
+        localStorage.setItem("token", res.data.token);
+        window.location.href = "/dashboard";
+      }
+    })
+    .catch((error) => {
+      alert("OOPs!!!. An error occurred");
+    });
+    
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -104,6 +122,8 @@ export default function Login() {
                       type="text"
                       className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 focus:ring-1  placeholder-gray-400 text-sm"
                       placeholder="Username"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
                     />
                   </div>
                 </div>
@@ -117,6 +137,8 @@ export default function Login() {
                       type="password"
                       className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 focus:ring-1  placeholder-gray-400 text-sm"
                       placeholder="Password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
                   <div className="flex justify-end mt-2">

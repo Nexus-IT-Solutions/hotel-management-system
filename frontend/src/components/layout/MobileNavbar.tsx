@@ -36,11 +36,11 @@ const MobileNavbar = () => {
                 </h3>
               <ul>
                 {item.menuItems.map((link) => {
-                  const isActive = location.pathname === link.to;
+                  const isActive = location.pathname === link.path;
                   return (
-                    <li key={link.to}>
+                    <li key={link.path}>
                       <Link
-                        to={link.to}
+                        to={link.path}
                         className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
                           isActive
                             ? "bg-gold text-maroon font-medium"

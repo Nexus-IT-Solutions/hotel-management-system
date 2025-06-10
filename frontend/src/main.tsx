@@ -6,15 +6,41 @@ import Dashboard from './pages/admin/Dashboard.tsx'
 import NewBooking from './pages/admin/NewBooking.tsx'
 import Bookings from './pages/admin/Bookings.tsx'
 import Customer from './pages/admin/Customer.tsx'
+import RoomAvailability from './pages/admin/RoomAvailability.tsx'
+import Staff from './pages/admin/Staff.tsx'
+import Reports from './pages/admin/Reports.tsx'
+import AddRoom from './pages/admin/AddRoom.tsx'
+import Login from './pages/Login.tsx'
+import Settings from './pages/admin/Settings.tsx'
+import RecepMainLayout from './components/layout/receptioniast/RecepMainLayout.tsx'
+import RecepDashboard from './pages/receptionist/Dashboard.tsx'
+import ReportIssueForm from './pages/receptionist/ReportIssueForm.tsx'
+
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<MainLayout />}>
-        <Route path='/' element={<Dashboard/>}/>
-        <Route path='/new-booking' element={<NewBooking/>}/>
-        <Route path='/bookings' element={<Bookings/>}/>
-        <Route path='/customers' element={<Customer/>}/>
+      <Route path='/' element={<Login/>}/>
+      {/* managers dashboard routing */}
+      <Route path="/admin" element={<MainLayout />}>
+        <Route index element={<Dashboard/>}/>
+        <Route path='new-booking' element={<NewBooking/>}/>
+        <Route path='bookings' element={<Bookings/>}/>
+        <Route path='customers' element={<Customer/>}/>
+        <Route path='room-availability' element={<RoomAvailability/>}/>
+        <Route path='staff' element={<Staff/>}/>
+        <Route path='reports' element={<Reports/>}/>
+        <Route path='add-room' element={<AddRoom/>}/>
+        <Route path='settings' element={<Settings/>}/>
+      </Route>
+      {/* receptionist dashboard routing */}
+      <Route path='/receptionist' element={<RecepMainLayout/>}>
+        <Route index element={<RecepDashboard/>}/>
+        <Route path='new-booking' element={<NewBooking/>}/>
+        <Route path='bookings' element={<Bookings/>}/>
+        <Route path='room-availability' element={<RoomAvailability/>}/>
+        <Route path='customers' element={<Customer/>}/>
+        <Route path='make-reports' element={<ReportIssueForm/>}/>
       </Route>
     </Routes>
   </BrowserRouter>

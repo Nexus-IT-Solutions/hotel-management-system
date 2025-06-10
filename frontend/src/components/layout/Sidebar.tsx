@@ -2,12 +2,17 @@ import { navLinks } from "./NavLinks";
 import { NavLink } from "react-router-dom";
 import { Bed } from "lucide-react";
 
-const Sidebar = (probs: any) => {
+interface SidebarProps {
+  showLabels: boolean;
+}
+
+const Sidebar = (probs: SidebarProps) => {
   return (
     <div
-      className={`bg-white shadow-lg h-screen flex-col duration-700 hidden md:flex ${
-        probs.showLabels && "w-56 duration-500"
+      className={`bg-white shadow-lg h-screen flex-col transition-all duration-700 hidden md:flex ${
+        probs.showLabels && "w-56 duration-1000"
       }`}
+      
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
@@ -40,10 +45,11 @@ const Sidebar = (probs: any) => {
                 {item.menuItems.map((item, index) => (
                   <NavLink to={item.path}
                     key={index}
+                    end={item.path === '/'}
                     className={({ isActive }) =>
                       `w-full flex items-center gap-3 text-slate-800 px-3 py-2 rounded-lg text-left transition-colors ${
                         isActive
-                          ? 'bg-blue-200 text-blue-800'
+                          ? 'bg-blue-100 text-blue-800 border-l-2 border-indigo-700'
                           : 'hover:bg-blue-100 hover:text-blue-700'
                       }`}
                   >
@@ -58,6 +64,8 @@ const Sidebar = (probs: any) => {
           </div>
         ))}
       </div>
+
+      
     </div>
   );
 };

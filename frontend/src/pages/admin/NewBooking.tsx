@@ -12,7 +12,7 @@ export default function NewBooking() {
 
       {/* forms */}
        <div className="p-6">
-        <BookingForm/>
+        <BookingForm/> 
        </div>
     </div>
   );

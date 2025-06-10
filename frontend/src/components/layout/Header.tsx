@@ -1,6 +1,11 @@
 import { Bell, Menu, Search } from "lucide-react"
 
-const Header = (probs:any) => {
+interface HeaderProps {
+  showLabels: boolean;
+  setShowLabels: (value: boolean) => void;
+}
+
+const Header = (probs: HeaderProps) => {
   return (
     <header className="bg-white shadow-sm border-b px-6 py-5">
           <div className="flex items-center justify-between">

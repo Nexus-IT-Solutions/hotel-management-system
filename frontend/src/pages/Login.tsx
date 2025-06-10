@@ -30,6 +30,7 @@ export default function Login() {
     })
     .catch((error) => {
       alert("OOPs!!!. An error occurred");
+      setIsLoading(false)
     });
     
   };

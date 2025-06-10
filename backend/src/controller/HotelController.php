@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../models/Hotel.php';
+require_once __DIR__ . '/../model/Hotel.php';
 
 /**
  * HotelController Class

@@ -24,6 +24,7 @@ export default function Login() {
       console.log(res)
       if (res.status === 200) {
         localStorage.setItem("token", res.data.token);
+        setIsLoading(false);
         window.location.href = "/dashboard";
       }
     })
@@ -152,12 +153,14 @@ export default function Login() {
                   </div>
                 </div>
 
-                <Link to='/admin'
-                  type="submit"
-                  className="w-full bg-blue-600 text-white py-3 sm:py-4 rounded-xl hover:bg-blue-500 transition duration-200 mt-4 text-sm sm:text-base"
+                <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-3 sm:py-4 rounded-xl hover:bg-blue-500 transition duration-200 mt-4 text-sm sm:text-base"
+                onClick={() => setIsLoading(true)}
                 >
-                  Login
-                </Link>
+                  {isLoading ? "Logging In..." : "Login"}
+                </button>
+
 
                 
               </form>

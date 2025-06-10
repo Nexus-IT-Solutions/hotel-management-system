@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../models/RoomType.php';
+require_once __DIR__ . '/../model/RoomType.php';
 
 /**
  * RoomTypeController

@@ -28,7 +28,7 @@ return function ($app): void {
     });
 
     // Update an existing hotel
-    $app->put('/v1/hotels/{id}', function ($request, $response, $args) use ($hotelController) {
+    $app->patch('/v1/hotels/{id}', function ($request, $response, $args) use ($hotelController) {
         $id = $args['id'] ?? '';
         $data = json_decode($request->getBody()->getContents(), true);
         $result = $hotelController->updateHotel($id, $data);

@@ -25,7 +25,7 @@ export default function Login() {
       if (res.status === 200) {
         localStorage.setItem("token", res.data.token);
         setIsLoading(false);
-        window.location.href = "/dashboard";
+        window.location.href = "/admin";
       }
     })
     .catch((error) => {

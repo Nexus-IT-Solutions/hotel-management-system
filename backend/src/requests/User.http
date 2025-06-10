@@ -1,0 +1,52 @@
+PUT http://api.hotel.com/v1/users
+
+###
+GET http://api.hotel.com/v1/users/8931e790-54e7-4e5c-8018-5df41a892fb2
+
+###
+GET http://api.hotel.com/v1/users/email/kwamegibert1114@gmail.com
+
+###
+GET http://api.hotel.com/v1/users/phone/241436414
+
+###
+GET http://api.hotel.com/v1/users/username/KweGilbert
+
+###
+GET http://api.hotel.com/v1/users/identifier/23467020
+###
+POST http://api.hotel.com/v1/users
+Content-Type: application/json
+
+{
+    "hotel_id": "ae8cadec-41f4-11f0-83de-30f7723aa35c",
+    "branch_id": null,
+    "username": "KobbyDalton1",
+    "name": "Anthony Afriyie",
+    "email": "kobby.dalton1@gmail.com",
+    "phone": "2335421436414",
+    "password": "1234",
+    "role": "receptionist",
+    "is_active": true
+}
+
+###
+PATCH http://api.hotel.com/api.hotel.com/v1/users/a38bfd78-41f6-11f0-83de-30f7723aa35c
+Content-Type: application/json
+
+{
+    "hotel_id": "ae8cadec-41f4-11f0-83de-30f7723aa35c",
+    "branch_id": null,
+    "username": "KobbyDalton",
+    "name": "Anthony Afriyie",
+    "email": "kobby.dalton@gmail.com",
+    "phone": "233246706020",
+    "password": "1234",
+    "role": "receptionist",
+    "is_active": true
+}
+
+###
+DELETE http://api.hotel.com/api.hotel.com/v1/users/a38bfd78-41f6-11f0-83de-30f7723aa35c
+
+###

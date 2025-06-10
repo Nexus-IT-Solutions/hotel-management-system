@@ -5,8 +5,6 @@ use DI\Container;
 use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
 use Slim\Middleware\ContentLengthMiddleware;
-// use App\Middleware\RequestResponseLoggerMiddleware;
-// use App\Helper\LoggerFactory;
 
 require_once __DIR__ . '/../src/middleware/RequestResponseLoggerMiddleware.php';
 require_once __DIR__ . '/../src/helper/ErrorHandler.php';
@@ -21,23 +19,18 @@ $container = new Container();
 
 if (class_exists(LoggerFactory::class)) {
     $loggerFactory = new LoggerFactory('App');
-
     // Set up application logger
     $container->set('logger', $loggerFactory->getLogger());
-
     // Set up HTTP logger specifically for requests/responses
     $container->set('httpLogger', $loggerFactory->getHttpLogger());
 }
 
 // Set the container on AppFactory
 AppFactory::setContainer($container);
-
 // Create Slim App instance
 $app = AppFactory::create();
-
 // Get environment setting
 $environment = $_ENV['ENVIRONMENT'] ?? 'production';
-
 // Add custom error handling middleware
 $errorHandler = new ErrorHandler(
     $container->get('logger'),
@@ -66,7 +59,15 @@ $app->add(function ($request, $handler) {
     return $response
         ->withHeader('Access-Control-Allow-Origin', '*')
         ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
+        ->withHeader('Access-Control-Allow-Credentials', 'true')
+        ->withHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        ->withHeader('Access-Control-Max-Age', '86400');
+});
+
+// Handle preflight OPTIONS requests
+$app->options('/{routes:.+}', function ($request, $response) {
+    return $response;
 });
 
 // Add content length middleware

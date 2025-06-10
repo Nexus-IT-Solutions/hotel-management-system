@@ -1,44 +1,94 @@
 <?php
-
 use Ramsey\Uuid\Uuid;
-
 require_once __DIR__ . '/../config/Database.php';
+
 /**
  * Users Model Class
  * 
  * This class handles all database operations related to user management in the hotel management system.
  * It provides methods for creating, retrieving, updating, and deleting user records,
  * as well as authentication and password management functionality.
+ * 
+ * Error handling is implemented throughout to properly catch and log database exceptions.
  */
 class Users
 {
     /**
      * Database connection instance
      */
-    protected PDO $db;
-    
+    protected $db;
     
     /**
      * Name of the users database table
      */
     private $table_name = 'users';
+    
+    /**
+     * Error message from the last operation
+     */
+    private $lastError = '';
 
+    /**
+     * Constructor - initializes the database connection
+     */
     public function __construct()
     {
-        $database = new Database();
-        $this->db = $database->getConnection();
+        try {
+            $database = new Database();
+            $this->db = $database->getConnection();
+        } catch (PDOException $e) {
+            $this->lastError = "Database connection failed: " . $e->getMessage();
+            error_log($this->lastError);
+            throw $e;
+        }
+    }
+
+    /**
+     * Get the last error message
+     * 
+     * @return string The last error message
+     */
+    public function getLastError(): string
+    {
+        return $this->lastError;
+    }
+
+    /**
+     * Execute a query with proper error handling
+     * 
+     * @param \PDOStatement $stmt The prepared statement to execute
+     * @param array $params The parameters for the prepared statement
+     * @return bool Whether the query executed successfully
+     */
+    protected function executeQuery(\PDOStatement $stmt, array $params = []): bool
+    {
+        try {
+            return $stmt->execute($params);
+        } catch (PDOException $e) {
+            $this->lastError = "Query execution failed: " . $e->getMessage();
+            error_log($this->lastError . " - SQL: " . $stmt->queryString);
+            return false;
+        }
     }
 
     /**
      * Get all users from the database
      * 
-     * @return array List of all user records
+     * @return array List of all user records or empty array on failure
      */
     public function getAll(): array
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name}");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name}");
+            if (!$this->executeQuery($stmt)) {
+                return [];
+            }
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to get users: " . $e->getMessage();
+            error_log($this->lastError);
+            return [];
+        }
     }
 
     /**
@@ -47,12 +97,20 @@ class Users
      * @param string $id The user's UUID
      * @return array|null User record or null if not found
      */
-    public function find(string $id): ?array
+    public function getUserById(string $id): ?array
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE id = :id");
-        $stmt->execute(['id' => $id]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $user ?: null;
+        try {
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE id = :id");
+            if (!$this->executeQuery($stmt, ['id' => $id])) {
+                return null;
+            }
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $user ?: null;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to get user by ID: " . $e->getMessage();
+            error_log($this->lastError);
+            return null;
+        }
     }
 
     /**
@@ -61,12 +119,20 @@ class Users
      * @param string $email The user's email
      * @return array|null User record or null if not found
      */
-    public function findByEmail(string $email): ?array
+    public function getUserByEmail(string $email): ?array
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE email = :email");
-        $stmt->execute(['email' => $email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $user ?: null;
+        try {
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE email = :email");
+            if (!$this->executeQuery($stmt, ['email' => $email])) {
+                return null;
+            }
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $user ?: null;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to get user by email: " . $e->getMessage();
+            error_log($this->lastError);
+            return null;
+        }
     }
 
     /**
@@ -75,12 +141,20 @@ class Users
      * @param string $phone The user's phone number
      * @return array|null User record or null if not found
      */
-    public function findByPhone(string $phone): ?array
+    public function getUserByPhone(string $phone): ?array
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE phone = :phone");
-        $stmt->execute(['phone' => $phone]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $user ?: null;
+        try {
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE phone = :phone");
+            if (!$this->executeQuery($stmt, ['phone' => $phone])) {
+                return null;
+            }
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $user ?: null;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to get user by phone: " . $e->getMessage();
+            error_log($this->lastError);
+            return null;
+        }
     }
 
     /**
@@ -89,12 +163,47 @@ class Users
      * @param string $username The user's username
      * @return array|null User record or null if not found
      */
-    public function findByUsername(string $username): ?array
+    public function getUserByUsername(string $username): ?array
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE username = :username");
-        $stmt->execute(['username' => $username]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $user ?: null;
+        try {
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE username = :username");
+            if (!$this->executeQuery($stmt, ['username' => $username])) {
+                return null;
+            }
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $user ?: null;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to get user by username: " . $e->getMessage();
+            error_log($this->lastError);
+            return null;
+        }
+    }
+
+    /**
+     * Find a user by their username, email or phone number
+     * 
+     * @param string $identifier The user's username, email, or phone number
+     * @return array|null User record or null if not found
+     */
+    public function getUserByIdentifier(string $identifier): ?array
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login 
+                                    FROM {$this->table_name} 
+                                    WHERE username = :identifier 
+                                       OR email = :identifier 
+                                       OR phone = :identifier
+                                    LIMIT 1");
+            if (!$this->executeQuery($stmt, ['identifier' => $identifier])) {
+                return null;
+            }
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $user ?: null;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to get user by identifier: " . $e->getMessage();
+            error_log($this->lastError);
+            return null;
+        }
     }
 
     /**
@@ -106,10 +215,18 @@ class Users
      */
     public function findByResetToken(string $token): ?array
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE reset_token = :token AND reset_token_expiry > NOW()");
-        $stmt->execute(['token' => $token]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $user ?: null;
+        try {
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE reset_token = :token AND reset_token_expiry > NOW()");
+            if (!$this->executeQuery($stmt, ['token' => $token])) {
+                return null;
+            }
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $user ?: null;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to get user by reset token: " . $e->getMessage();
+            error_log($this->lastError);
+            return null;
+        }
     }
 
     /**
@@ -122,17 +239,109 @@ class Users
      */
     public function login(string $usernameOrEmail, string $password): ?array
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE username = :input OR email = :input");
-        $stmt->execute(['input' => $usernameOrEmail]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($user && password_verify($password, $user['password_hash'])) {
+        try {
+            // Check for empty inputs
+            if (empty($usernameOrEmail) || empty($password)) {
+                $this->lastError = "Username/email and password are required";
+                return null;
+            }
+            
+            // Find user by username OR email
+            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE username = :identifier OR email = :identifier");
+            if (!$this->executeQuery($stmt, ['identifier' => $usernameOrEmail])) {
+                $this->lastError = "Database error during login";
+                return null;
+            }
+            
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Check if user exists
+            if (!$user) {
+                $this->lastError = "User not found";
+                return null;
+            }
+            
+            // Check if user account is active
+            if (!$user['is_active']) {
+                $this->lastError = "Account is inactive";
+                return null;
+            }
+            
+            // Verify password
+            if (!password_verify($password, $user['password_hash'])) {
+                $this->lastError = "Invalid password";
+                
+                // Optional: Track failed login attempts here
+                // $this->recordFailedLoginAttempt($user['id']);
+                
+                return null;
+            }
+            
+            // Password is valid, check if needs rehash (if PHP's password_hash defaults have changed)
+            if (password_needs_rehash($user['password_hash'], PASSWORD_DEFAULT)) {
+                // Update password hash with new algorithm/cost
+                $this->updatePasswordHash($user['id'], $password);
+            }
+            
+            // Remove sensitive data before returning
             unset($user['password_hash']);
+            unset($user['reset_token']);
+            unset($user['reset_token_expiry']);
+            
+            // Update last login timestamp
             $this->updateLastLogin($user['id']);
+            
             return $user;
+        } catch (PDOException $e) {
+            $this->lastError = "Login failed: " . $e->getMessage();
+            error_log($this->lastError);
+            return null;
         }
+    }
 
-        return null;
+    /**
+     * Updates the password hash if the hashing algorithm parameters have changed
+     * 
+     * @param string $userId The user's ID
+     * @param string $password The plain text password to rehash
+     * @return bool Whether the operation was successful
+     */
+    private function updatePasswordHash(string $userId, string $password): bool
+    {
+        try {
+            $newHash = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $this->db->prepare("UPDATE {$this->table_name} SET password_hash = :hash WHERE id = :id");
+            return $this->executeQuery($stmt, [
+                'hash' => $newHash,
+                'id' => $userId
+            ]);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to update password hash: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
+    }
+
+    /**
+     * Records a failed login attempt (optional security feature)
+     * 
+     * @param string $userId The user's ID
+     * @return bool Whether the operation was successful
+     */
+    private function recordFailedLoginAttempt(string $userId): bool
+    {
+        try {
+            // Update failed login attempts counter and timestamp
+            $stmt = $this->db->prepare("UPDATE {$this->table_name} SET 
+                                 failed_login_attempts = COALESCE(failed_login_attempts, 0) + 1,
+                                 last_failed_login = CURRENT_TIMESTAMP
+                                 WHERE id = :id");
+            return $this->executeQuery($stmt, ['id' => $userId]);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to record login attempt: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
     }
 
     /**
@@ -144,23 +353,51 @@ class Users
      */
     public function create(array $data): string|false
     {
-        $stmt = $this->db->prepare("INSERT INTO users (id, hotel_id, branch_id, username, name, email, phone, password_hash, role, is_active, first_login) VALUES (:id, :hotel_id, :branch_id, :username, :name, :email, :phone, :password_hash, :role, :is_active, :first_login)");
-        $uuid = $data['id'] ?? Uuid::uuid4()->toString();
-        $stmt->execute([
-            'id'            => $uuid,
-            'hotel_id'      => $data['hotel_id'],
-            'branch_id'     => $data['branch_id'],
-            'username'      => $data['username'],
-            'name'          => $data['name'],
-            'email'         => $data['email'],
-            'phone'         => $data['phone'],
-            'password_hash' => password_hash($data['password'], PASSWORD_BCRYPT),
-            'role'          => $data['role'],
-            'is_active'     => $data['is_active'] ?? true,
-            'first_login'   => true,
-        ]);
-
-        return $uuid;
+        try {
+            // Validate required fields
+            $requiredFields = ['username', 'name', 'phone', 'password', 'role'];
+            foreach ($requiredFields as $field) {
+                if (empty($data[$field])) {
+                    $this->lastError = "Missing required field: $field";
+                    return false;
+                }
+            }
+            
+            // Check if user already exists
+            if ($this->getUserByEmail($data['email']) || $this->getUserByUsername($data['username']) || $this->getUserByPhone($data['phone'])) {
+                $this->lastError = "User already exists with this email, username, or phone";
+                return false;
+            }
+            
+            $uuid = $data['id'] ?? Uuid::uuid4()->toString();
+            
+            $stmt = $this->db->prepare("INSERT INTO {$this->table_name} (id, hotel_id, branch_id, username, name, email, phone, password_hash, role, is_active, first_login) 
+                                     VALUES (:id, :hotel_id, :branch_id, :username, :name, :email, :phone, :password_hash, :role, :is_active, :first_login)");
+            
+            $params = [
+                'id'            => $uuid,
+                'hotel_id'      => $data['hotel_id'] ?? null,
+                'branch_id'     => $data['branch_id'] ?? null,
+                'username'      => $data['username'],
+                'name'          => $data['name'],
+                'email'         => $data['email'],
+                'phone'         => $data['phone'],
+                'password_hash' => password_hash($data['password'], PASSWORD_DEFAULT),
+                'role'          => $data['role'],
+                'is_active'     => $data['is_active'] ?? true,
+                'first_login'   => true,
+            ];
+            
+            if (!$this->executeQuery($stmt, $params)) {
+                return false;
+            }
+            
+            return $uuid;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to create user: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
     }
 
     /**
@@ -172,18 +409,42 @@ class Users
      */
     public function update(string $id, array $data): bool
     {
-        $stmt = $this->db->prepare("UPDATE users SET hotel_id = :hotel_id, branch_id = :branch_id, username = :username, name = :name, email = :email, phone = :phone, role = :role, is_active = :is_active WHERE id = :id");
-        return $stmt->execute([
-            'hotel_id'  => $data['hotel_id'],
-            'branch_id' => $data['branch_id'],
-            'username'  => $data['username'],
-            'name'      => $data['name'],
-            'email'     => $data['email'],
-            'phone'     => $data['phone'],
-            'role'      => $data['role'],
-            'is_active' => $data['is_active'],
-            'id'        => $id,
-        ]);
+        try {
+            // Check if user exists
+            if (!$this->getUserById($id)) {
+                $this->lastError = "User not found";
+                return false;
+            }
+            
+            $stmt = $this->db->prepare("UPDATE {$this->table_name} SET 
+                                     hotel_id = :hotel_id, 
+                                     branch_id = :branch_id, 
+                                     username = :username, 
+                                     name = :name, 
+                                     email = :email, 
+                                     phone = :phone, 
+                                     role = :role, 
+                                     is_active = :is_active 
+                                     WHERE id = :id");
+            
+            $params = [
+                'hotel_id'  => $data['hotel_id'] ?? null,
+                'branch_id' => $data['branch_id'] ?? null,
+                'username'  => $data['username'] ?? '',
+                'name'      => $data['name'] ?? '',
+                'email'     => $data['email'] ?? '',
+                'phone'     => $data['phone'] ?? '',
+                'role'      => $data['role'] ?? '',
+                'is_active' => $data['is_active'] ?? true,
+                'id'        => $id,
+            ];
+            
+            return $this->executeQuery($stmt, $params);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to update user: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
     }
 
     /**
@@ -194,8 +455,14 @@ class Users
      */
     public function updateLastLogin(string $id): bool
     {
-        $stmt = $this->db->prepare("UPDATE users SET last_login = CURRENT_TIMESTAMP, first_login = false WHERE id = :id");
-        return $stmt->execute(['id' => $id]);
+        try {
+            $stmt = $this->db->prepare("UPDATE {$this->table_name} SET last_login = CURRENT_TIMESTAMP, first_login = false WHERE id = :id");
+            return $this->executeQuery($stmt, ['id' => $id]);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to update last login: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
     }
 
     /**
@@ -209,19 +476,45 @@ class Users
      */
     public function updatePasswordWithConfirmation(string $id, string $currentPassword, string $newPassword): bool
     {
-        $stmt = $this->db->prepare("SELECT password_hash FROM users WHERE id = :id");
-        $stmt->execute(['id' => $id]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$user || !password_verify($currentPassword, $user['password_hash'])) {
+        try {
+            // Validate password requirements
+            if (strlen($newPassword) < 8) {
+                $this->lastError = "Password must be at least 8 characters";
+                return false;
+            }
+            
+            $stmt = $this->db->prepare("SELECT password_hash FROM {$this->table_name} WHERE id = :id");
+            if (!$this->executeQuery($stmt, ['id' => $id])) {
+                return false;
+            }
+            
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$user) {
+                $this->lastError = "User not found";
+                return false;
+            }
+            
+            if (!password_verify($currentPassword, $user['password_hash'])) {
+                $this->lastError = "Current password is incorrect";
+                return false;
+            }
+            
+            $stmt = $this->db->prepare("UPDATE {$this->table_name} SET 
+                                     password_hash = :password_hash, 
+                                     reset_token = NULL, 
+                                     reset_token_expiry = NULL, 
+                                     first_login = false 
+                                     WHERE id = :id");
+            
+            return $this->executeQuery($stmt, [
+                'password_hash' => password_hash($newPassword, PASSWORD_DEFAULT),
+                'id' => $id
+            ]);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to update password: " . $e->getMessage();
+            error_log($this->lastError);
             return false;
         }
-
-        $stmt = $this->db->prepare("UPDATE users SET password_hash = :password_hash, reset_token = NULL, reset_token_expiry = NULL, first_login = false WHERE id = :id");
-        return $stmt->execute([
-            'password_hash' => password_hash($newPassword, PASSWORD_BCRYPT),
-            'id' => $id
-        ]);
     }
 
     /**
@@ -235,11 +528,29 @@ class Users
      */
     public function updatePassword(string $id, string $newPassword): bool
     {
-        $stmt = $this->db->prepare("UPDATE users SET password_hash = :password_hash, reset_token = NULL, reset_token_expiry = NULL, first_login = false WHERE id = :id");
-        return $stmt->execute([
-            'password_hash' => password_hash($newPassword, PASSWORD_BCRYPT),
-            'id'            => $id
-        ]);
+        try {
+            // Validate password requirements
+            if (strlen($newPassword) < 8) {
+                $this->lastError = "Password must be at least 8 characters";
+                return false;
+            }
+            
+            $stmt = $this->db->prepare("UPDATE {$this->table_name} SET 
+                                     password_hash = :password_hash, 
+                                     reset_token = NULL, 
+                                     reset_token_expiry = NULL, 
+                                     first_login = false 
+                                     WHERE id = :id");
+            
+            return $this->executeQuery($stmt, [
+                'password_hash' => password_hash($newPassword, PASSWORD_DEFAULT),
+                'id' => $id
+            ]);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to update password: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
     }
 
     /**
@@ -252,12 +563,28 @@ class Users
      */
     public function setResetToken(string $email, string $token, string $expiry): bool
     {
-        $stmt = $this->db->prepare("UPDATE users SET reset_token = :token, reset_token_expiry = :expiry WHERE email = :email");
-        return $stmt->execute([
-            'token'  => $token,
-            'expiry' => $expiry,
-            'email'  => $email,
-        ]);
+        try {
+            // Check if user exists
+            if (!$this->getUserByEmail($email)) {
+                $this->lastError = "User not found";
+                return false;
+            }
+            
+            $stmt = $this->db->prepare("UPDATE {$this->table_name} SET 
+                                     reset_token = :token, 
+                                     reset_token_expiry = :expiry 
+                                     WHERE email = :email");
+            
+            return $this->executeQuery($stmt, [
+                'token'  => $token,
+                'expiry' => $expiry,
+                'email'  => $email,
+            ]);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to set reset token: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
     }
 
     /**
@@ -268,7 +595,19 @@ class Users
      */
     public function delete(string $id): bool
     {
-        $stmt = $this->db->prepare("DELETE FROM users WHERE id = :id");
-        return $stmt->execute(['id' => $id]);
+        try {
+            // Check if user exists
+            if (!$this->getUserById($id)) {
+                $this->lastError = "User not found";
+                return false;
+            }
+            
+            $stmt = $this->db->prepare("DELETE FROM {$this->table_name} WHERE id = :id");
+            return $this->executeQuery($stmt, ['id' => $id]);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to delete user: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
     }
 }

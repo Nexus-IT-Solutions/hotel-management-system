@@ -415,30 +415,37 @@ class Users
                 $this->lastError = "User not found";
                 return false;
             }
-            
-            $stmt = $this->db->prepare("UPDATE {$this->table_name} SET 
-                                     hotel_id = :hotel_id, 
-                                     branch_id = :branch_id, 
-                                     username = :username, 
-                                     name = :name, 
-                                     email = :email, 
-                                     phone = :phone, 
-                                     role = :role, 
-                                     is_active = :is_active 
-                                     WHERE id = :id");
-            
-            $params = [
-                'hotel_id'  => $data['hotel_id'] ?? null,
-                'branch_id' => $data['branch_id'] ?? null,
-                'username'  => $data['username'] ?? '',
-                'name'      => $data['name'] ?? '',
-                'email'     => $data['email'] ?? '',
-                'phone'     => $data['phone'] ?? '',
-                'role'      => $data['role'] ?? '',
-                'is_active' => $data['is_active'] ?? true,
-                'id'        => $id,
+
+            // Allowed fields to be updated
+            $allowedFields = [
+                'hotel_id',
+                'branch_id',
+                'username',
+                'name',
+                'email',
+                'phone',
+                'role',
+                'is_active'
             ];
-            
+
+            $fields = [];
+            $params = [':id' => $id];
+
+            foreach ($data as $key => $value) {
+                if (in_array($key, $allowedFields)) {
+                    $fields[] = "$key = :$key";
+                    $params[":$key"] = $value;
+                }
+            }
+
+            if (empty($fields)) {
+                $this->lastError = "No valid fields provided for update.";
+                return false;
+            }
+
+            $sql = "UPDATE {$this->table_name} SET " . implode(', ', $fields) . " WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+
             return $this->executeQuery($stmt, $params);
         } catch (PDOException $e) {
             $this->lastError = "Failed to update user: " . $e->getMessage();
@@ -446,6 +453,7 @@ class Users
             return false;
         }
     }
+
 
     /**
      * Update a user's last login timestamp and mark as not first login

@@ -7,7 +7,7 @@ use Ramsey\Uuid\Uuid;
  * Setting Model Class
  * Handles all database operations related to the `settings` table.
  */
-class Setting
+class Settings
 {
     protected $db;
     private $table_name = 'settings';

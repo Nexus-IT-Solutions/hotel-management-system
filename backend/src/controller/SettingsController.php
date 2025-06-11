@@ -1,17 +1,17 @@
 <?php
-require_once __DIR__ . '/../model/Setting.php';
+require_once __DIR__ . '/../model/Settings.php';
 
 /**
  * SettingController
  * Handles HTTP requests related to settings.
  */
-class SettingController
+class SettingsController
 {
     private $settingModel;
 
     public function __construct()
     {
-        $this->settingModel = new Setting();
+        $this->settingModel = new Settings();
     }
 
     /**

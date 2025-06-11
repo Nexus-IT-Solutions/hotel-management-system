@@ -18,16 +18,16 @@ class RoomTypeController
     /**
      * Get all room types for a specific hotel
      */
-    public function getAllHotelRoomTypes(string $hotel_id): string
+    public function getAllBranchRoomTypes(string $branch_id): string
     {
-        if (empty($hotel_id)) {
+        if (empty($branch_id)) {
             return json_encode([
                 'status' => 'error',
-                'message' => 'Hotel ID is required'
+                'message' => 'Branch ID is required'
             ], JSON_PRETTY_PRINT);
         }
 
-        $roomTypes = $this->roomTypeModel->getAllHotelRoomTypes($hotel_id);
+        $roomTypes = $this->roomTypeModel->getAllBranchRoomTypes($branch_id);
         return json_encode([
             'status' => 'success',
             'data' => $roomTypes

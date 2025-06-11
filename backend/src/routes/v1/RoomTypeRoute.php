@@ -5,9 +5,9 @@ return function ($app): void {
     $roomTypeController = new RoomTypeController();
 
     // Get all room types for a specific hotel
-    $app->get('/v1/hotels/{hotel_id}/room-types', function ($request, $response, $args) use ($roomTypeController) {
-        $hotel_id = $args['hotel_id'] ?? '';
-        $result = $roomTypeController->getAllHotelRoomTypes($hotel_id);
+    $app->get('/v1/hotels/{branch_id}/room-types', function ($request, $response, $args) use ($roomTypeController) {
+        $branch_id = $args['branch_id'] ?? '';
+        $result = $roomTypeController->getAllBranchRoomTypes($branch_id);
         $response->getBody()->write($result);
         return $response->withHeader('Content-Type', 'application/json');
     });
@@ -29,7 +29,7 @@ return function ($app): void {
     });
 
     // Update an existing room type
-    $app->put('/v1/room-types/{id}', function ($request, $response, $args) use ($roomTypeController) {
+    $app->patch('/v1/room-types/{id}', function ($request, $response, $args) use ($roomTypeController) {
         $id = $args['id'] ?? '';
         $data = json_decode($request->getBody()->getContents(), true);
         $result = $roomTypeController->updateRoomType($id, $data);

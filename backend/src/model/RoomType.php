@@ -42,11 +42,11 @@ class RoomType
         }
     }
 
-    public function getAllHotelRoomTypes(string $hotel_id): array
+    public function getAllBranchRoomTypes(string $branch_id): array
     {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE hotel_id = ?");
-            if (!$this->executeQuery($stmt, [$hotel_id])) {
+            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE branch_id = ?");
+            if (!$this->executeQuery($stmt, [$branch_id])) {
                 return [];
             }
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

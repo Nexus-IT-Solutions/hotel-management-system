@@ -45,11 +45,42 @@ class Room
     public function getAllBranchRooms(string $branch_id): array
     {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE branch_id = ?");
+            $sql = "SELECT 
+                        r.*, 
+                        rt.id AS room_type_id, rt.name AS room_type_name, rt.description AS room_type_description, 
+                        rt.price_per_night, rt.max_occupancy, rt.amenities
+                    FROM {$this->table_name} r
+                    LEFT JOIN room_types rt ON r.room_type_id = rt.id
+                    WHERE r.branch_id = ?";
+            $stmt = $this->db->prepare($sql);
             if (!$this->executeQuery($stmt, [$branch_id])) {
                 return [];
             }
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Group by room_type_id
+            $grouped = [];
+            foreach ($rooms as $room) {
+                $typeId = $room['room_type_id'];
+                if (!isset($grouped[$typeId])) {
+                    $grouped[$typeId] = [
+                        'room_type' => [
+                            'id' => $room['room_type_id'],
+                            'name' => $room['room_type_name'],
+                            'description' => $room['room_type_description'],
+                            'price_per_night' => $room['price_per_night'],
+                            'max_occupancy' => $room['max_occupancy'],
+                            'amenities' => $room['amenities'] ? json_decode($room['amenities'], true) : [],
+                        ],
+                        'rooms' => []
+                    ];
+                }
+                // Remove duplicated room_type fields from room
+                unset($room['room_type_name'], $room['room_type_description'], $room['price_per_night'], $room['max_occupancy'], $room['amenities']);
+                $grouped[$typeId]['rooms'][] = $room;
+            }
+            // Re-index as array
+            return array_values($grouped);
         } catch (PDOException $e) {
             $this->lastError = "Failed to get rooms: " . $e->getMessage();
             error_log($this->lastError);
@@ -60,11 +91,31 @@ class Room
     public function getById(string $id): ?array
     {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE id = ?");
+            $sql = "SELECT 
+                        r.*, 
+                        rt.id AS room_type_id, rt.name AS room_type_name, rt.description AS room_type_description, 
+                        rt.price_per_night, rt.max_occupancy, rt.amenities
+                    FROM {$this->table_name} r
+                    LEFT JOIN room_types rt ON r.room_type_id = rt.id
+                    WHERE r.id = ?";
+            $stmt = $this->db->prepare($sql);
             if (!$this->executeQuery($stmt, [$id])) {
                 return null;
             }
-            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+            $room = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$room) return null;
+
+            // Attach room_type as nested object
+            $room['room_type'] = [
+                'id' => $room['room_type_id'],
+                'name' => $room['room_type_name'],
+                'description' => $room['room_type_description'],
+                'price_per_night' => $room['price_per_night'],
+                'max_occupancy' => $room['max_occupancy'],
+                'amenities' => $room['amenities'] ? json_decode($room['amenities'], true) : [],
+            ];
+            unset($room['room_type_id'], $room['room_type_name'], $room['room_type_description'], $room['price_per_night'], $room['max_occupancy'], $room['amenities']);
+            return $room;
         } catch (PDOException $e) {
             $this->lastError = "Failed to get room: " . $e->getMessage();
             error_log($this->lastError);

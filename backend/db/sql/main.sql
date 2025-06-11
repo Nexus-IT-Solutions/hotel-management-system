@@ -219,10 +219,3 @@ CREATE TABLE IF NOT EXISTS settings (
     FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE SET NULL
 );
 
-CREATE TABLE IF NOT EXISTS phinxlog (
-    version BIGINT NOT NULL PRIMARY KEY,
-    migration_name VARCHAR(100),
-    start_time TIMESTAMP,
-    end_time TIMESTAMP,
-    breakpoint BOOLEAN DEFAULT FALSE
-);

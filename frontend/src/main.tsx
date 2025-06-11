@@ -15,6 +15,8 @@ import Settings from './pages/admin/Settings.tsx'
 import RecepMainLayout from './components/layout/receptioniast/RecepMainLayout.tsx'
 import RecepDashboard from './pages/receptionist/Dashboard.tsx'
 import ReportIssueForm from './pages/receptionist/ReportIssueForm.tsx'
+import Issues from './pages/admin/Issues.tsx'
+import MakeReport from './pages/admin/MakeReport.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
@@ -32,6 +34,8 @@ createRoot(document.getElementById('root')!).render(
         <Route path='reports' element={<Reports/>}/>
         <Route path='add-room' element={<AddRoom/>}/>
         <Route path='settings' element={<Settings/>}/>
+        <Route path='issues' element={<Issues/>}/>
+        <Route path='make-reports-admin' element={<MakeReport/>}/>
       </Route>
       {/* receptionist dashboard routing */}
       <Route path='/receptionist' element={<RecepMainLayout/>}>

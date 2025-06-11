@@ -42,11 +42,11 @@ class RoomType
         }
     }
 
-    public function getAll(): array
+    public function getAllHotelRoomTypes(string $hotel_id): array
     {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name}");
-            if (!$this->executeQuery($stmt)) {
+            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE hotel_id = ?");
+            if (!$this->executeQuery($stmt, [$hotel_id])) {
                 return [];
             }
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -74,6 +74,14 @@ class RoomType
 
     public function create(array $data): bool
     {
+        $requiredFields = ['hotel_id', 'branch_id', 'name', 'description', 'price_per_night', 'max_occupancy', 'amenities'];
+        foreach ($requiredFields as $field) {
+            if (empty($data[$field])) {
+                $this->lastError = "Missing required field: $field";
+                return false;
+            }
+        }
+
         $id = Uuid::uuid4()->toString();
         $stmt = $this->db->prepare("INSERT INTO {$this->table_name} 
             (id, hotel_id, branch_id, name, description, price_per_night, max_occupancy, amenities) 
@@ -81,13 +89,13 @@ class RoomType
 
         $params = [
             ':id' => $id,
-            ':hotel_id' => $data['hotel_id'] ?? null,
-            ':branch_id' => $data['branch_id'] ?? null,
-            ':name' => $data['name'] ?? null,
-            ':description' => $data['description'] ?? null,
-            ':price_per_night' => $data['price_per_night'] ?? null,
-            ':max_occupancy' => $data['max_occupancy'] ?? null,
-            ':amenities' => isset($data['amenities']) ? json_encode($data['amenities']) : null,
+            ':hotel_id' => $data['hotel_id'],
+            ':branch_id' => $data['branch_id'],
+            ':name' => $data['name'],
+            ':description' => $data['description'],
+            ':price_per_night' => $data['price_per_night'],
+            ':max_occupancy' => $data['max_occupancy'],
+            ':amenities' => json_encode($data['amenities']),
         ];
 
         return $this->executeQuery($stmt, $params);

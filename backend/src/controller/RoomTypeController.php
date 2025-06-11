@@ -16,12 +16,22 @@ class RoomTypeController
     }
 
     /**
-     * Get all room types
+     * Get all room types for a specific hotel
      */
-    public function getAllRoomTypes(): string
+    public function getAllHotelRoomTypes(string $hotel_id): string
     {
-        $roomTypes = $this->roomTypeModel->getAll();
-        return json_encode($roomTypes);
+        if (empty($hotel_id)) {
+            return json_encode([
+                'status' => 'error',
+                'message' => 'Hotel ID is required'
+            ], JSON_PRETTY_PRINT);
+        }
+
+        $roomTypes = $this->roomTypeModel->getAllHotelRoomTypes($hotel_id);
+        return json_encode([
+            'status' => 'success',
+            'data' => $roomTypes
+        ], JSON_PRETTY_PRINT);
     }
 
     /**
@@ -38,7 +48,10 @@ class RoomTypeController
             ], JSON_PRETTY_PRINT);
         }
 
-        return json_encode($roomType, JSON_PRETTY_PRINT);
+        return json_encode([
+            'status' => 'success',
+            'data' => $roomType
+        ], JSON_PRETTY_PRINT);
     }
 
     /**

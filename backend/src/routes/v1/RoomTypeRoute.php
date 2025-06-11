@@ -4,9 +4,10 @@ require_once __DIR__ . '/../../controller/RoomTypeController.php';
 return function ($app): void {
     $roomTypeController = new RoomTypeController();
 
-    // Get all room types
-    $app->get('/v1/room-types', function ($request, $response) use ($roomTypeController) {
-        $result = $roomTypeController->getAllRoomTypes();
+    // Get all room types for a specific hotel
+    $app->get('/v1/hotels/{hotel_id}/room-types', function ($request, $response, $args) use ($roomTypeController) {
+        $hotel_id = $args['hotel_id'] ?? '';
+        $result = $roomTypeController->getAllHotelRoomTypes($hotel_id);
         $response->getBody()->write($result);
         return $response->withHeader('Content-Type', 'application/json');
     });

@@ -1,0 +1,42 @@
+[
+  {
+    "title": "Today's Bookings",
+    "value": "10",
+    "change": "+12%",
+    "changeColor": "text-green-600",
+    "description": "18 confirmed, 6 pending",
+    "borderColor": "border-blue-500",
+    "iconBg": "bg-blue-500",
+    "iconName": "CalendarDays"
+  },
+  {
+    "title": "Available Rooms",
+    "value": "24",
+    "change": "-5 from yesterday",
+    "changeColor": "text-blue-600",
+    "description": "Out of 50 total rooms",
+    "borderColor": "border-green-500",
+    "iconBg": "bg-green-500",
+    "iconName": "Bed"
+  },
+  {
+    "title": "Today's Revenue",
+    "value": "$24,679",
+    "change": "+8%",
+    "changeColor": "text-green-600",
+    "description": "Target: $15,000",
+    "borderColor": "border-purple-500",
+    "iconBg": "bg-purple-500",
+    "iconName": "DollarSignIcon"
+  },
+  {
+    "title": "Today's Check-ins",
+    "value": "6",
+    "change": "+8%",
+    "changeColor": "text-green-600",
+    "description": "Target: $15,000",
+    "borderColor": "border-orange-500",
+    "iconBg": "bg-orange-400",
+    "iconName": "CalendarMinus2"
+  }
+]

@@ -197,52 +197,7 @@ export default function Reports (){
       </div>
     </div>
 
-    {/* Performance Table */}
-    {/* <div className="bg-white rounded-lg shadow">
-      <div className="p-6 border-b">
-        <h3 className="text-lg font-semibold text-gray-800">Top Performing Rooms</h3>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Room</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bookings</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Revenue</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Occupancy</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rating</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            <tr>
-              <td className="px-6 py-4 whitespace-nowrap font-medium">Room 301</td>
-              <td className="px-6 py-4 whitespace-nowrap">Suite</td>
-              <td className="px-6 py-4 whitespace-nowrap">28</td>
-              <td className="px-6 py-4 whitespace-nowrap">$8,400</td>
-              <td className="px-6 py-4 whitespace-nowrap">95%</td>
-              <td className="px-6 py-4 whitespace-nowrap">4.8</td>
-            </tr>
-            <tr>
-              <td className="px-6 py-4 whitespace-nowrap font-medium">Room 201</td>
-              <td className="px-6 py-4 whitespace-nowrap">Deluxe</td>
-              <td className="px-6 py-4 whitespace-nowrap">32</td>
-              <td className="px-6 py-4 whitespace-nowrap">$5,760</td>
-              <td className="px-6 py-4 whitespace-nowrap">92%</td>
-              <td className="px-6 py-4 whitespace-nowrap">4.7</td>
-            </tr>
-            <tr>
-              <td className="px-6 py-4 whitespace-nowrap font-medium">Room 401</td>
-              <td className="px-6 py-4 whitespace-nowrap">Executive</td>
-              <td className="px-6 py-4 whitespace-nowrap">18</td>
-              <td className="px-6 py-4 whitespace-nowrap">$8,100</td>
-              <td className="px-6 py-4 whitespace-nowrap">88%</td>
-              <td className="px-6 py-4 whitespace-nowrap">4.9</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div> */}
+   
   </div>
   )
 }

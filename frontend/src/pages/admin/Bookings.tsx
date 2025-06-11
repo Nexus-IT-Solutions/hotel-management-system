@@ -108,7 +108,8 @@ export default function Bookings() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="
+                      ">
                         {booking.customer}
                       </div>
                       <div className="text-sm text-gray-500">

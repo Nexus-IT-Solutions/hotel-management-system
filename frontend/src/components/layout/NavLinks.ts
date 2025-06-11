@@ -5,7 +5,8 @@ import {
   Users,
   ChartBar,  
   Settings, 
-  Book
+  Book,
+  ChartAreaIcon
 } from "lucide-react";
 
 export const navLinks = [
@@ -18,12 +19,15 @@ export const navLinks = [
       { icon: Bed, label: 'Room Availability', path: 'room-availability', role: 'receptionist' },
       { icon: Users, label: "Customer", path: "customers" },
       { icon: Bed, label: "Add Room", path: "add-room" },
+      { icon: Bed, label: "Add Room Type", path: "add-room-type" },
     ],
   },
   {
     title: "REPORTS",
     menuItems: [
       { icon: ChartBar, label: 'Reports', path: 'reports', role: 'manager' },
+      { icon: ChartAreaIcon, label: 'My Issues', path: 'issues', role: 'manager' },
+      { icon: ChartAreaIcon, label: 'Make Report', path: 'make-reports-admin', role: 'manager' },
     ],
   },
   {

@@ -7,7 +7,16 @@ const RoomAvailability = () => {
     new Date().toISOString().split("T")[0]
   );
   const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
-  const [selectedRoom, setSelectedRoom] = useState<any>(null);
+  interface Room {
+    number: string;
+    type: string;
+    capacity: number;
+    status: string;
+    price: number;
+    guest?: string;
+  }
+
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
 
   const rooms = [
     {

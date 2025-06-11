@@ -1,0 +1,249 @@
+{
+  "dashboardStats": [
+    {
+      "title": "Today's Bookings",
+      "value": "10",
+      "change": "+12%",
+      "changeColor": "text-green-600",
+      "description": "18 confirmed, 6 pending",
+      "borderColor": "border-blue-500",
+      "iconBg": "bg-blue-500",
+      "iconName": "CalendarDays"
+    },
+    {
+      "title": "Available Rooms",
+      "value": "24",
+      "change": "-5 from yesterday",
+      "changeColor": "text-blue-600",
+      "description": "Out of 50 total rooms",
+      "borderColor": "border-green-500",
+      "iconBg": "bg-green-500",
+      "iconName": "Bed"
+    },
+    {
+      "title": "Today's Revenue",
+      "value": "$24,679",
+      "change": "+8%",
+      "changeColor": "text-green-600",
+      "description": "Target: $15,000",
+      "borderColor": "border-purple-500",
+      "iconBg": "bg-purple-500",
+      "iconName": "DollarSignIcon"
+    },
+    {
+      "title": "Today's Check-ins",
+      "value": "6",
+      "change": "+8%",
+      "changeColor": "text-green-600",
+      "description": "Target: $15,000",
+      "borderColor": "border-orange-500",
+      "iconBg": "bg-orange-400",
+      "iconName": "CalendarMinus2"
+    }
+  ],
+
+  "roomTypes": [
+    {
+      "id": 1,
+      "name": "Deluxe Room",
+      "beds": 2,
+      "bathrooms": 1,
+      "price": 200,
+      "imageKey": "Deluxe"
+    },
+    {
+      "id": 2,
+      "name": "Executive Suite",
+      "beds": 2,
+      "bathrooms": 1,
+      "price": 300,
+      "imageKey": "Executive"
+    },
+    {
+      "id": 3,
+      "name": "Standard Room",
+      "beds": 2,
+      "bathrooms": 1,
+      "price": 450,
+      "imageKey": "Standard"
+    },
+    {
+      "id": 4,
+      "name": "Family Suite",
+      "beds": 2,
+      "bathrooms": 1,
+      "price": 700,
+      "imageKey": "Family"
+    }
+  ],
+
+  "addRoomForm": [
+    {
+      "roomNumber": "101",
+      "roomType": "Deluxe Room",
+      "roomFloor": "First Floor",
+      "roomPrice": "150",
+      "roomCapacity": "2",
+      "amenities": ["Air Condition", "Television", "Refrigerator"]
+    }
+  ],
+  "bookingForm": [
+    {
+      "customerName": "John Doe",
+      "phone": "+1 (555) 123-4567",
+      "email": "johndoe@example.com",
+      "paymentMethod": "Credit Card",
+      "checkIn": "2025-06-15",
+      "checkOut": "2025-06-19",
+      "roomType": "deluxe",
+      "guests": 2,
+      "specialRequests": "High floor room, non-smoking",
+      "summary": {
+        "nights": 4,
+        "totalAmount": 234
+      }
+    }
+  ],
+  "bookings":[
+    {
+      "id": "BK001",
+      "customer": "Alice Johnson",
+      "phone": "+1234567890",
+      "room": "201",
+      "roomType": "Deluxe",
+      "checkIn": "2024-01-15",
+      "checkOut": "2024-01-18",
+      "guests": 2,
+      "status": "Confirmed",
+      "total": 540
+    },
+    {
+      "id": "BK002",
+      "customer": "Bob Smith",
+      "phone": "+1234567891",
+      "room": "305",
+      "roomType": "Suite",
+      "checkIn": "2024-01-16",
+      "checkOut": "2024-01-20",
+      "guests": 4,
+      "status": "Checked In",
+      "total": 1200
+    },
+    {
+      "id": "BK003",
+      "customer": "Carol Davis",
+      "phone": "+1234567892",
+      "room": "120",
+      "roomType": "Standard",
+      "checkIn": "2024-01-17",
+      "checkOut": "2024-01-19",
+      "guests": 1,
+      "status": "Pending",
+      "total": 240
+    },
+    {
+      "id": "BK004",
+      "customer": "David Wilson",
+      "phone": "+1234567893",
+      "room": "408",
+      "roomType": "Executive Suite",
+      "checkIn": "2024-01-18",
+      "checkOut": "2024-01-22",
+      "guests": 3,
+      "status": "Confirmed",
+      "total": 1800
+    },
+    {
+      "id": "BK005",
+      "customer": "Alice Johnson",
+      "phone": "+1234567890",
+      "room": "201",
+      "roomType": "Deluxe",
+      "checkIn": "2024-01-15",
+      "checkOut": "2024-01-18",
+      "guests": 2,
+      "status": "Confirmed",
+      "total": 540
+    }
+  ],
+  "roomAvailability": [
+    {
+      "number": "101",
+      "type": "Standard",
+      "capacity": 2,
+      "status": "available",
+      "guest": "Anthony Smith",
+      "price": 120
+    },
+    {
+      "number": "102",
+      "type": "Standard",
+      "capacity": 2,
+      "status": "occupied",
+      "guest": "John Doe",
+      "price": 120
+    },
+    {
+      "number": "103",
+      "type": "Standard",
+      "capacity": 2,
+      "status": "maintenance",
+      "price": 120
+    },
+    {
+      "number": "201",
+      "type": "Deluxe",
+      "capacity": 3,
+      "status": "available",
+      "price": 180
+    },
+    {
+      "number": "202",
+      "type": "Deluxe",
+      "capacity": 3,
+      "status": "reserved",
+      "guest": "Alice Johnson",
+      "price": 180
+    },
+    {
+      "number": "203",
+      "type": "Deluxe",
+      "capacity": 3,
+      "status": "available",
+      "price": 180
+    },
+    {
+      "number": "301",
+      "type": "Suite",
+      "capacity": 4,
+      "status": "occupied",
+      "guest": "Bob Smith",
+      "price": 300
+    },
+    {
+      "number": "302",
+      "type": "Suite",
+      "capacity": 4,
+      "status": "available",
+      "guest": "Bob Smith",
+      "price": 300
+    },
+    {
+      "number": "401",
+      "type": "Executive",
+      "capacity": 6,
+      "status": "available",
+      "guest": "Carol Davis",
+      "price": 450
+    },
+    {
+      "number": "402",
+      "type": "Executive",
+      "capacity": 6,
+      "status": "cleaning",
+      "guest": "Carol Davis",
+      "price": 450
+    }
+  ]
+  
+}

@@ -1,11 +1,12 @@
 
 import { useState, useEffect } from 'react';
-import { CalendarDays, Bed, DollarSignIcon, CalendarMinus2, Plus, Trash2Icon, Wrench, DoorClosedLockedIcon  } from 'lucide-react';
+import { CalendarDays, Bed, Plus, Trash2Icon, Wrench, DoorClosedLockedIcon  } from 'lucide-react';
 import { RevenueChart } from '../../components/Revenue';
 import Image1 from '../../assets/images/image1.jpg';
 import Image2 from '../../assets/images/image2.jpg';
 import Image3 from '../../assets/images/image3.jpg';
 import Image4 from '../../assets/images/image4.jpg';
+import DashboardStat from '../../components/admin-components/DashboardStat';
 
 export default function Dashboard(){
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -31,69 +32,9 @@ export default function Dashboard(){
           </div>
         </div>
       </div>
-
+      
       {/* overview stat */}
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5'>
-        {/* today's check in */}
-        <div className='bg-white shadow-md rounded-xl px-6 py-3 flex items-center gap-5 border-b-4 border-blue-500'>
-          <div className='flex-2'>
-            <p className='text-[14px]'>Today's Bookings</p>
-            <p className='text-3xl font-bold py-2'>10</p>
-            <p className='text-green-600 text-sm'>+12%</p>
-            <p className='text-sm text-gray-600 mt-1'>18 confirmed, 6 pending</p>
-          </div>
-          <div>
-            <p className='bg-blue-500 w-12 h-12 rounded-md flex items-center justify-center'>
-              <CalendarDays className='w-8 h-8 text-white'/>
-            </p>
-          </div>
-        </div>
-
-        {/* Available rooms */}
-        <div className='bg-white shadow-md rounded-xl px-6 py-3 flex items-center gap-5 border-b-4 border-green-500'>
-          <div className='flex-2'>
-            <p className='text-[14px]'>Available Rooms</p>
-            <p className='text-3xl font-bold py-2'>24</p>
-            <p className='text-blue-600 text-sm'>-5 from yesterday</p>
-            <p className='text-sm text-gray-600 mt-1'>Out of 50 total rooms</p>
-          </div>
-          <div>
-            <p className='bg-green-500 w-12 h-12 rounded-md flex items-center justify-center'>
-              <Bed className='w-8 h-8 text-white'/>
-            </p>
-          </div>
-        </div>
-
-        {/* Today's revenue */}
-        <div className='bg-white shadow-md rounded-xl px-6 py-3 flex items-center gap-5 border-b-4 border-purple-500'>
-          <div className='flex-2'>
-            <p className='text-[14px]'>Today's Revenue</p>
-            <p className='text-3xl font-bold py-2'>$24,679</p>
-            <p className='text-green-600 text-sm'>+8%</p>
-            <p className='text-sm text-gray-600 mt-1'>Target: $15,000</p>
-          </div>
-          <div>
-            <p className='bg-purple-500 w-12 h-12 rounded-md flex items-center justify-center'>
-              <DollarSignIcon className='w-8 h-8 text-white'/>
-            </p>
-          </div>
-        </div>
-
-        {/* Today's check in */}
-        <div className='bg-white shadow-md rounded-xl px-6 py-3 flex items-center gap-5 border-b-4 border-orange-500'>
-          <div className='flex-2'>
-            <p className='text-[14px]'>Today's Check-ins</p>
-            <p className='text-3xl font-bold py-2'>6</p>
-            <p className='text-green-600 text-sm'>+8%</p>
-            <p className='text-sm text-gray-600 mt-1'>Target: $15,000</p>
-          </div>
-          <div>
-            <p className='bg-orange-400 w-12 h-12 rounded-md flex items-center justify-center'>
-              <CalendarMinus2 className='w-8 h-8 text-white'/>
-            </p>
-          </div>
-        </div>
-      </div>
+      <DashboardStat/>
 
       {/* today's check in and room status */}
       <div className='flex flex-col lg:flex-row items-center gap-5'>

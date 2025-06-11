@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Mail, User, Lock, X, Loader2 } from "lucide-react";
 import Image1 from '../assets/images/image3.jpg';
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import axios from "axios";
 
 export default function Login() {
@@ -28,7 +28,7 @@ export default function Login() {
         window.location.href = "/admin";
       }
     })
-    .catch((error) => {
+    .catch(() => {
       alert("OOPs!!!. An error occurred");
       setIsLoading(false)
     });

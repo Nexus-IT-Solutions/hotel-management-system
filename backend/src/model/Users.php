@@ -79,7 +79,7 @@ class Users
     public function getAll(): array
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name}");
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login, created_at FROM {$this->table_name}");
             if (!$this->executeQuery($stmt)) {
                 return [];
             }
@@ -100,7 +100,7 @@ class Users
     public function getUserById(string $id): ?array
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE id = :id");
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login, created_at FROM {$this->table_name} WHERE id = :id");
             if (!$this->executeQuery($stmt, ['id' => $id])) {
                 return null;
             }
@@ -122,7 +122,7 @@ class Users
     public function getUserByEmail(string $email): ?array
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE email = :email");
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login, created_at FROM {$this->table_name} WHERE email = :email");
             if (!$this->executeQuery($stmt, ['email' => $email])) {
                 return null;
             }
@@ -144,7 +144,7 @@ class Users
     public function getUserByPhone(string $phone): ?array
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE phone = :phone");
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login, created_at FROM {$this->table_name} WHERE phone = :phone");
             if (!$this->executeQuery($stmt, ['phone' => $phone])) {
                 return null;
             }
@@ -166,7 +166,7 @@ class Users
     public function getUserByUsername(string $username): ?array
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE username = :username");
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login, created_at FROM {$this->table_name} WHERE username = :username");
             if (!$this->executeQuery($stmt, ['username' => $username])) {
                 return null;
             }
@@ -188,7 +188,7 @@ class Users
     public function getUserByIdentifier(string $identifier): ?array
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login 
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login , created_at
                                     FROM {$this->table_name} 
                                     WHERE username = :identifier 
                                        OR email = :identifier 
@@ -216,7 +216,7 @@ class Users
     public function findByResetToken(string $token): ?array
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE reset_token = :token AND reset_token_expiry > NOW()");
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login, created_at FROM {$this->table_name} WHERE reset_token = :token AND reset_token_expiry > NOW()");
             if (!$this->executeQuery($stmt, ['token' => $token])) {
                 return null;
             }

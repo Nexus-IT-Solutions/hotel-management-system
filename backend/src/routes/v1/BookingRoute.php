@@ -5,7 +5,7 @@ return function ($app): void {
     $bookingController = new BookingController();
 
     // Get all bookings
-    $app->get('/v1/bookings', function ($request, $response) use ($bookingController) {
+    $app->get('/v1/bookings/summary', function ($request, $response) use ($bookingController) {
         $result = $bookingController->getAllBookings();
         $response->getBody()->write($result);
         return $response->withHeader('Content-Type', 'application/json');

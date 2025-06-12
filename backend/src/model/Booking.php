@@ -44,14 +44,42 @@ class Booking
     public function getAll(): array
     {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name}");
+            // Construct the SQL query with LEFT JOINs and aliases
+            $query = "
+                SELECT
+                    b.id AS id,
+                    c.full_name AS customer,
+                    c.phone AS phone,
+                    r.room_number AS room,
+                    rt.name AS roomType,
+                    b.check_in_date AS checkIn,
+                    b.check_out_date AS checkOut,
+                    b.number_of_guests AS guests,
+                    b.status AS status,
+                    b.total_amount AS total
+                FROM
+                    " . $this->table_name . " b
+                LEFT JOIN
+                    customers c ON b.customer_id = c.id
+                LEFT JOIN
+                    rooms r ON b.room_id = r.id
+                LEFT JOIN
+                    room_types rt ON b.room_type_id = rt.id
+                ORDER BY
+                    b.created_at DESC; -- Or b.check_in_date DESC, depending on desired order
+            ";
+
+            $stmt = $this->db->prepare($query);
+
             if (!$this->executeQuery($stmt)) {
+                // executeQuery already logs the error and sets $this->lastError
                 return [];
             }
+
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            $this->lastError = "Failed to get bookings: " . $e->getMessage();
-            error_log($this->lastError);
+            $this->lastError = "Failed to retrieve all bookings: " . $e->getMessage();
+            error_log($this->lastError); // Log the detailed error
             return [];
         }
     }

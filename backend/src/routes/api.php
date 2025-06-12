@@ -19,6 +19,7 @@ return function($app): void{
         '/v1/payments' => __DIR__ . '/v1/PaymentRoute.php',
         '/v1/payment-methods' => __DIR__ . '/v1/PaymentMethodRoute.php',
         'v1/settings' => __DIR__ . '/v1/SettingsRoute.php',
+        'v1/dashboard' => __DIR__ . '/v1/DashboardRoute.php',
         // 'v1/notifications' => __DIR__ . '/v1/NotificationRoute.php'
 
         // Add more routes as needed

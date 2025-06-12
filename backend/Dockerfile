@@ -50,11 +50,11 @@ RUN chown -R www-data:www-data /var/www/html/public && \
 RUN if [ -f .env ]; then chmod 644 /var/www/html/.env && chown www-data:www-data /var/www/html/.env; fi && \
   chmod 755 /var/www/html
 
-# Expose port 80 for Apache
-EXPOSE 80
-
 # Run composer dump-autoload after everything is set up
 RUN composer dump-autoload --optimize
-
+  
+# Expose port 80 for Apache
+EXPOSE 80
+EXPOSE 10000
 # Start Apache in the foreground
 CMD ["apache2-foreground"]

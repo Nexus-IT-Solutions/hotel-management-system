@@ -36,7 +36,7 @@ class CustomerController
         $summary = $this->customerModel->getCustomersSummary();
         return json_encode([
             'status' => !empty($summary) ? 'success' : 'error',
-            'customerSummary' => $summary,
+            'customersSummary' => $summary,
             'message' => !empty($summary) ? null : 'No customer summary found'
         ], JSON_PRETTY_PRINT);
     }

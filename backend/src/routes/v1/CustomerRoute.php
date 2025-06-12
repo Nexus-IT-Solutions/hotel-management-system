@@ -11,6 +11,13 @@ return function ($app): void {
         return $response->withHeader('Content-Type', 'application/json');
     });
 
+    // Get customer summary
+    $app->get('/v1/customers/summary', function ($request, $response) use ($customerController) {
+        $result = $customerController->getCustomersSummary();
+        $response->getBody()->write($result);
+        return $response->withHeader('Content-Type', 'application/json');
+    });
+
     // Get a single customer by ID
     $app->get('/v1/customers/{id}', function ($request, $response, $args) use ($customerController) {
         $id = $args['id'] ?? '';

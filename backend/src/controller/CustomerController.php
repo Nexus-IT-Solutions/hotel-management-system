@@ -29,6 +29,20 @@ class CustomerController
     }
 
     /**
+     * Get customer summary
+     */
+    public function getCustomersSummary(): string
+    {
+        $summary = $this->customerModel->getCustomersSummary();
+        return json_encode([
+            'status' => !empty($summary) ? 'success' : 'error',
+            'customerSummary' => $summary,
+            'message' => !empty($summary) ? null : 'No customer summary found'
+        ], JSON_PRETTY_PRINT);
+    }
+
+
+    /**
      * Get a single customer by ID
      */
     public function getCustomerById(string $id): string

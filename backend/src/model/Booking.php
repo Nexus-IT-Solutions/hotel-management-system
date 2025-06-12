@@ -41,7 +41,7 @@ class Booking
         }
     }
 
-    public function getAll(): array
+    public function getAllBookingSummary(): array
     {
         try {
             // Construct the SQL query with LEFT JOINs and aliases

@@ -55,6 +55,6 @@ RUN composer dump-autoload --optimize
   
 # Expose port 80 for Apache
 EXPOSE 80
-EXPOSE 10000
+
 # Start Apache in the foreground
 CMD ["apache2-foreground"]

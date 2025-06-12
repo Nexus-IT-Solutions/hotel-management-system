@@ -247,8 +247,8 @@ class Users
             }
             
             // Find user by username OR email
-            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE username = :identifier OR email = :identifier");
-            if (!$this->executeQuery($stmt, ['identifier' => $usernameOrEmail])) {
+            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE username = :username OR email = :email");
+            if (!$this->executeQuery($stmt, ['username' => $usernameOrEmail, 'email' => $usernameOrEmail])) {
                 $this->lastError = "Database error during login";
                 return null;
             }

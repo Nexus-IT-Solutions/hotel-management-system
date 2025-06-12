@@ -3,10 +3,15 @@ require_once __DIR__ . '/../config/Database.php';
 
 use Ramsey\Uuid\Uuid;
 
-class Payment
+/**
+ * EmergencyContact Model Class
+ * 
+ * Handles all database operations related to the emergency_contacts table.
+ */
+class EmergencyContact
 {
     protected $db;
-    private string $table_name = 'payments';
+    private string $table_name = 'emergency_contacts';
     private string $lastError = '';
 
     public function __construct()
@@ -39,21 +44,35 @@ class Payment
 
     public function getById(string $id): ?array
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE id = ?");
-        if (!$this->executeQuery($stmt, [$id])) return null;
-        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE id = ?");
+            if (!$this->executeQuery($stmt, [$id])) {
+                return null;
+            }
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to fetch contact: " . $e->getMessage();
+            return null;
+        }
     }
 
-    public function getAllByBooking(string $booking_id): array
+    public function getAllByCustomer(string $customer_id): array
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE booking_id = ?");
-        if (!$this->executeQuery($stmt, [$booking_id])) return [];
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE customer_id = ?");
+            if (!$this->executeQuery($stmt, [$customer_id])) {
+                return [];
+            }
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to fetch emergency contacts: " . $e->getMessage();
+            return [];
+        }
     }
 
     public function create(array $data): bool
     {
-        $required = ['hotel_id', 'branch_id', 'booking_id', 'payment_method_id', 'amount', 'status'];
+        $required = ['customer_id', 'name', 'relationship', 'phone'];
         foreach ($required as $field) {
             if (empty($data[$field])) {
                 $this->lastError = "Missing required field: $field";
@@ -63,19 +82,16 @@ class Payment
 
         $id = Uuid::uuid4()->toString();
         $stmt = $this->db->prepare("INSERT INTO {$this->table_name} 
-            (id, hotel_id, branch_id, booking_id, payment_method_id, amount, reference, status, notes)
-            VALUES (:id, :hotel_id, :branch_id, :booking_id, :payment_method_id, :amount, :reference, :status, :notes)");
+            (id, customer_id, name, relationship, phone, email) 
+            VALUES (:id, :customer_id, :name, :relationship, :phone, :email)");
 
         $params = [
             ':id' => $id,
-            ':hotel_id' => $data['hotel_id'],
-            ':branch_id' => $data['branch_id'],
-            ':booking_id' => $data['booking_id'],
-            ':payment_method_id' => $data['payment_method_id'],
-            ':amount' => $data['amount'],
-            ':reference' => $data['reference'] ?? null,
-            ':status' => $data['status'],
-            ':notes' => $data['notes'] ?? null,
+            ':customer_id' => $data['customer_id'],
+            ':name' => $data['name'],
+            ':relationship' => $data['relationship'],
+            ':phone' => $data['phone'],
+            ':email' => $data['email'] ?? null
         ];
 
         return $this->executeQuery($stmt, $params);

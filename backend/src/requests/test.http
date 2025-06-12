@@ -11,3 +11,5 @@ Content-Type: application/json
 GET https://api.hotel.com/v1/auth
 
 ###
+
+

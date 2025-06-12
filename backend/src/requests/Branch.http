@@ -1,0 +1,83 @@
+✅ POST /v1/branches — Create a new branch
+json
+Copy
+Edit
+{
+  "hotel_id": "uuid-of-the-hotel",
+  "name": "Branch Name",
+  "description": "Optional description of the branch",
+  "address": "123 Main Street, City, Country"
+}
+✅ PUT /v1/branches/{id} — Update an existing branch
+Same format as POST, but only send fields you want to update (except hotel_id, which typically stays fixed).
+
+json
+Copy
+Edit
+{
+  "name": "Updated Branch Name",
+  "description": "Updated description",
+  "address": "New address"
+}
+✅ GET /v1/branches/hotel/{hotel_id} — Get all branches of a hotel
+No payload needed. You just call the endpoint with the hotel’s ID in the URL.
+
+✅ GET /v1/branches/{id} — Get one branch
+No payload. Just call the URL with the branch ID.
+
+✅ DELETE /v1/branches/{id} — Delete a branch
+No payload. Just hit the endpoint with the branch ID in the URL.
+
+
+
+✅ Example: API Service for Branches in React using Axios
+First, install Axios (if not already):
+
+bash
+Copy
+Edit
+npm install axios
+📁 services/api.js
+js
+Copy
+Edit
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'https://your-backend-url.com/v1', // Change to your API base
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export default api;
+📁 services/branchService.js
+js
+Copy
+Edit
+import api from './api';
+
+// Get all branches for a hotel
+export const getHotelBranches = (hotelId) => {
+  return api.get(`/branches/hotel/${hotelId}`);
+};
+
+// Get a specific branch
+export const getBranchById = (id) => {
+  return api.get(`/branches/${id}`);
+};
+
+// Create a new branch
+export const createBranch = (branchData) => {
+  return api.post('/branches', branchData);
+};
+
+// Update a branch
+export const updateBranch = (id, updateData) => {
+  return api.put(`/branches/${id}`, updateData);
+};
+
+// Delete a branch
+export const deleteBranch = (id) => {
+  return api.delete(`/branches/${id}`);
+};

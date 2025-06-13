@@ -5,6 +5,26 @@ import BookingsTable from "../../components/admin-components/BookingsTable";
 export default function Bookings() {
   
 
+//   const handleDelete = () => {
+//     Swal.fire({
+//   title: "Are you sure?",
+//   text: "You won't be able to revert this!",
+//   icon: "warning",
+//   showCancelButton: true,
+//   confirmButtonColor: "#d33",
+//   cancelButtonColor: "#B3B3B3",
+//   confirmButtonText: "Yes, delete it!"
+// }).then((result) => {
+//   if (result.isConfirmed) {
+//     Swal.fire({
+//       title: "Deleted!",
+//       text: "Your record has been deleted.",
+//       icon: "success"
+//     });
+//   }
+// });
+//   }
+
   return (
     <div className="space-y-6">
       {/* welcome information */}
@@ -40,7 +60,7 @@ export default function Bookings() {
 
         <div className="flex items-center space-x-3">
           <Link
-            to="/new-booking"
+            to="../new-booking"
             className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 transition-colors"
           >
             <Calendar className="w-4 h-4" />

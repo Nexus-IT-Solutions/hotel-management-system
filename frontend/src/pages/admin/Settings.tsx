@@ -1,8 +1,57 @@
-import { Printer, User2Icon, Globe, Upload, LockIcon } from "lucide-react";
-import { useState } from "react";
+import { Globe, LockIcon, User2Icon, Upload, Printer } from "lucide-react";
+import React, { useState } from "react";
+import Swal from "sweetalert2"
 
+
+ 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("general");
+  const [profile, setProfile] = useState({
+    name: "Admin User",
+    email: "admin@example.com",
+    password: "",
+  });
+  const [preferences, setPreferences] = useState({
+    theme: "light",
+    notifications: true,
+  });
+
+  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProfile({ ...profile, [e.target.name]: e.target.value });
+  };
+
+
+
+  const handlePreferencesChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    setPreferences({
+      ...preferences,
+      [name]: type === "checkbox" && "checked" in e.target
+        ? (e.target as HTMLInputElement).checked
+        : value,
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+ 
+     Swal.fire({
+  title: "Do you want to save the changes?",
+  showDenyButton: true,
+  showCancelButton: true,
+  confirmButtonText: "Save",
+  denyButtonText: `Don't save`
+}).then((result) => {
+  /* Read more about isConfirmed, isDenied below */
+  if (result.isConfirmed) {
+    Swal.fire("Saved!", "", "success");
+  } else if (result.isDenied) {
+    Swal.fire("Changes are not saved", "", "info");
+  }
+});
+    
+  };
+
   return (
     <div className="flex flex-col py-5">
       {/* top information */}
@@ -245,10 +294,11 @@ export default function Settings() {
       </main>
     </div>
   );
-}
+};
+
 
 const tabs = [
   { id: "general", label: "General", icon: Globe },
   { id: "profile", label: "Profile", icon: User2Icon },
-  { id: "password", label: "Change Password", icon: LockIcon },
+  { id: "password", label: "Change Password", icon: LockIcon }
 ];

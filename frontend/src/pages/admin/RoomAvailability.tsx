@@ -7,7 +7,7 @@ const RoomAvailability = () => {
     new Date().toISOString().split("T")[0]
   );
   const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
-  interface Room {
+  interface RoomType {
     number: string;
     type: string;
     capacity: number;
@@ -16,7 +16,7 @@ const RoomAvailability = () => {
     guest?: string;
   }
 
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<RoomType | null>(null);
 
   const rooms = [
     {
@@ -134,41 +134,173 @@ const RoomAvailability = () => {
   };
 
   // Modal component
-  const RoomModal = ({ room, onClose }: { room: any; onClose: () => void }) => (
+  // const RoomModal = ({ room, onClose }: { room: any; onClose: () => void }) => (
+  //   <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#cfcfcf9c] bg-opacity-40">
+  //     <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
+  //       <button
+  //         className="absolute top-3 right-3 text-gray-400 hover:text-gray-700"
+  //         onClick={onClose}
+  //       >
+  //         <X className="w-6 h-6" />
+  //       </button>
+  //       <h2 className="text-xl font-bold mb-2">Room {room.number}</h2>
+  //       <div className="mb-2 text-gray-700">{room.type}</div>
+  //       <div className="mb-2 flex items-center">
+  //         <Users className="w-4 h-4 mr-1" /> Capacity: {room.capacity}
+  //       </div>
+  //       <div className="mb-2">
+  //         <span
+  //           className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(
+  //             room.status
+  //           )}`}
+  //         >
+  //           {room.status}
+  //         </span>
+  //       </div>
+  //       {room.guest && (
+  //         <div className="mb-2">
+  //           <span className="font-medium">Guest:</span> {room.guest}
+  //         </div>
+  //       )}
+  //       <div className="mb-2">
+  //         <span className="font-medium">Price:</span> ${room.price}/night
+  //       </div>
+  //       {/* Add more details or actions here if needed */}
+  //     </div>
+  //   </div>
+  // );
+
+type RoomStatus = "available" | "occupied" | "reserved" | "maintenance" | "cleaning";
+type Room = {
+  number: string;
+  type: string;
+  capacity: number;
+  status: RoomStatus;
+  price: number;
+  guest?: string;
+};
+
+const RoomModal = ({
+  room,
+  onClose,
+}: {
+  room: Room;
+  onClose: () => void;
+}) => {
+  // Helper to get status color and icon
+  const statusMap: Record<RoomStatus, { color: string; icon: string; label: string }> = {
+    available: {
+      color: "bg-green-100 border-green-400 text-green-800",
+      icon: "✓",
+      label: "Available",
+    },
+    occupied: {
+      color: "bg-red-100 border-red-400 text-red-800",
+      icon: "👤",
+      label: "Occupied",
+    },
+    reserved: {
+      color: "bg-yellow-100 border-yellow-400 text-yellow-800",
+      icon: "📅",
+      label: "Reserved",
+    },
+    maintenance: {
+      color: "bg-gray-100 border-gray-400 text-gray-800",
+      icon: "🔧",
+      label: "Maintenance",
+    },
+    cleaning: {
+      color: "bg-blue-100 border-blue-400 text-blue-800",
+      icon: "🧹",
+      label: "Cleaning",
+    },
+  };
+  const status = statusMap[room.status] || statusMap.available;
+
+  return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#cfcfcf9c] bg-opacity-40">
-      <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
-        <button
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-700"
-          onClick={onClose}
-        >
-          <X className="w-6 h-6" />
-        </button>
-        <h2 className="text-xl font-bold mb-2">Room {room.number}</h2>
-        <div className="mb-2 text-gray-700">{room.type}</div>
-        <div className="mb-2 flex items-center">
-          <Users className="w-4 h-4 mr-1" /> Capacity: {room.capacity}
-        </div>
-        <div className="mb-2">
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(
-              room.status
-            )}`}
-          >
-            {room.status}
-          </span>
-        </div>
-        {room.guest && (
-          <div className="mb-2">
-            <span className="font-medium">Guest:</span> {room.guest}
+      <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-0 relative overflow-hidden">
+        {/* Top colored bar */}
+        <div className={`h-2 w-full ${status.color}`} />
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 pt-6 pb-2 border-b">
+          <div className="flex items-center gap-3">
+            <span
+              className={`flex items-center justify-center rounded-full w-10 h-10 text-2xl border ${status.color}`}
+              title={status.label}
+            >
+              {status.icon}
+            </span>
+            <div>
+              <h2 className="text-2xl font-bold leading-tight">
+                Room {room.number}
+              </h2>
+              <div className="text-sm text-gray-500 capitalize">{room.type}</div>
+            </div>
           </div>
-        )}
-        <div className="mb-2">
-          <span className="font-medium">Price:</span> ${room.price}/night
+          <button
+            className="text-gray-400 hover:text-gray-700 transition"
+            onClick={onClose}
+            aria-label="Close"
+          >
+            <X className="w-7 h-7" />
+          </button>
         </div>
-        {/* Add more details or actions here if needed */}
+        {/* Content */}
+        <div className="px-6 py-5 space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1 text-gray-700">
+              <Users className="w-5 h-5" />
+              <span className="font-medium">Capacity:</span>
+              <span>{room.capacity}</span>
+            </div>
+            <div>
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-semibold capitalize border ${status.color}`}
+              >
+                {status.label}
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="text-gray-500 text-xs uppercase mb-1">Guest</div>
+              <div className="text-gray-800 font-medium">
+                {room.guest || <span className="italic text-gray-400">None</span>}
+              </div>
+            </div>
+            <div className="flex-1">
+              <div className="text-gray-500 text-xs uppercase mb-1">Price</div>
+              <div className="text-gray-800 font-medium">
+                ${room.price}
+                <span className="text-gray-400 text-xs ml-1">/night</span>
+              </div>
+            </div>
+          </div>
+          {/* Add more details or actions here */}
+        </div>
+        {/* Footer Actions */}
+        <div className="flex justify-end gap-2 px-6 py-3 bg-gray-50 border-t">
+          <button
+            className="flex items-center gap-1 px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition text-sm font-medium"
+            // onClick={handleEdit} // Placeholder for future action
+            disabled
+            title="Edit (coming soon)"
+          >
+            <Settings className="w-4 h-4" />
+            Edit
+          </button>
+          <button
+            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-medium"
+            onClick={onClose}
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
   );
+};
 
   return (
     <div className="space-y-6">
@@ -216,7 +348,7 @@ const RoomAvailability = () => {
             </div>
 
             <Link
-              to="add-room"
+              to="../add-room"
               className="flex items-center gap-2 bg-blue-600 hover:bg-blue-600 text-white px-3 py-2 rounded text-lg"
             >
               <Plus className="w-5 h-5 text-white" />
@@ -442,7 +574,7 @@ const RoomAvailability = () => {
 
       {/* Room Details Modal */}
       {selectedRoom && (
-        <RoomModal room={selectedRoom} onClose={() => setSelectedRoom(null)} />
+        <RoomModal room={{ ...selectedRoom, status: selectedRoom.status as RoomStatus }} onClose={() => setSelectedRoom(null)} />
       )}
     </div>
   );

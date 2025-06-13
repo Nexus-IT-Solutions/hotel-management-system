@@ -2,6 +2,9 @@ import { Search } from "lucide-react";
 import CustomersTable from "../../components/admin-components/CustomersTable";
 
 export default function Customer() {
+
+ 
+
   return (
     <div>
       {/* header section */}

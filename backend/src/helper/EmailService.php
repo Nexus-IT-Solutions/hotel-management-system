@@ -58,6 +58,7 @@ class EmailService
             return true;
         } catch (Exception $e) {
             error_log("Failed to send OTP email to {$toEmail}: {$mail->ErrorInfo}");
+            echo "Mailer Error: {$mail->ErrorInfo}";
             return false;
         }
     }

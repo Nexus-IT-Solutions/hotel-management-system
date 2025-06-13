@@ -1,29 +1,53 @@
-import React, { useState } from "react";
-import { Mail, User, Lock, X, Loader2 } from "lucide-react";
+import React, { useState, useRef } from "react";
+import { Mail, User, Lock, X, ArrowLeft, CheckCircle, Eye, EyeOff } from "lucide-react";
 import Image1 from "../assets/images/image3.jpg";
-// import { Link } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 
 export default function Login() {
   const [showForgotModal, setShowForgotModal] = useState(false);
-  const [resetEmail, setResetEmail] = useState("");
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState({ type: "", text: "" });
+
+  // Forgot password modal states
+  const [forgotPasswordState, setForgotPasswordState] = useState({
+    email: "",
+    isLoading: false,
+    isSubmitted: false,
+    error: "",
+  });
+
+  // OTP modal state
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otpError, setOtpError] = useState("");
+  const otpInputs = useRef<Array<HTMLInputElement | null>>([]);
+
+  // Reset password modal state
+  const [resetState, setResetState] = useState({
+    password: "",
+    confirmPassword: "",
+    isLoading: false,
+    error: "",
+    showPassword: false,
+    showConfirmPassword: false,
+  });
+
+  // Track modal stack for back navigation
+  const [modalStack, setModalStack] = useState<string[]>([]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Hitting the endpoint using axios
+    setIsLoading(true);
+
     axios
       .post("https://hotel-management-system-5gk8.onrender.com/v1/auth/login", {
         usernameOrEmail: username,
         password: password,
-       })
+      })
       .then((res) => {
-        // Checking status code
-        console.log(res);
         if (res.status === 200) {
           localStorage.setItem(
             "userData",
@@ -39,7 +63,6 @@ export default function Login() {
               text: "Welcome back, Admin!",
               icon: "success",
             });
-            // Redirect to admin dashboard
             window.location.href = "/admin";
           } else if (res.data.user.role === "receptionist") {
             Swal.fire({
@@ -47,7 +70,6 @@ export default function Login() {
               text: "Welcome back, Receptionist!",
               icon: "success",
             });
-            // Redirect to user dashboard
             window.location.href = "/receptionist";
           } else if (res.data.user.role === "ceo") {
             Swal.fire({
@@ -55,65 +77,203 @@ export default function Login() {
               text: "Welcome back, CEO!",
               icon: "success",
             });
-            // Redirect to manager dashboard
             window.location.href = "/ceo";
           }
         }
       })
       .catch((error) => {
-        if(error.status === 401) {
+        if (error.status === 401) {
           Swal.fire({
             title: "Error",
             text: "Incorrect username or password. Please try again.",
             icon: "error",
           });
           setIsLoading(false);
-        }else{
-        Swal.fire({
-          title: "Error",
-          text: "An error occurred while logging in. Please check your network connection and other settings and try again.",
-          icon: "error",
-        });
-        setIsLoading(false);
-      }
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: "An error occurred while logging in. Please check your network connection and other settings and try again.",
+            icon: "error",
+          });
+          setIsLoading(false);
+        }
       });
   };
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Forgot Password Submit
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage({ type: "", text: "" });
-    setIsLoading(true);
+
+    if (!forgotPasswordState.email.trim()) {
+      setForgotPasswordState((prev) => ({
+        ...prev,
+        error: "Email is required",
+      }));
+      return;
+    }
+
+    if (!validateEmail(forgotPasswordState.email)) {
+      setForgotPasswordState((prev) => ({
+        ...prev,
+        error: "Please enter a valid email address",
+      }));
+      return;
+    }
+
+    setForgotPasswordState((prev) => ({
+      ...prev,
+      isLoading: true,
+      error: "",
+    }));
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      setMessage({
-        type: "success",
-        text: "Password reset link has been sent to your email!",
-      });
-
-      // Close modal after success
-      setTimeout(() => {
-        setShowForgotModal(false);
-        setResetEmail("");
-        setMessage({ type: "", text: "" });
-      }, 2000);
-    } catch {
-      setMessage({
-        type: "error",
-        text: "Sorry, we couldn't process your request. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
+      // TODO: Call API to send OTP to email
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      setForgotPasswordState((prev) => ({
+        ...prev,
+        isLoading: false,
+        isSubmitted: true,
+      }));
+      // Open OTP modal and push to stack
+      setShowForgotModal(false);
+      setShowOtpModal(true);
+      setModalStack((prev) => [...prev, "forgot"]);
+    } catch (error) {
+      setForgotPasswordState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: "Network error. Please try again.",
+      }));
     }
   };
 
-  const closeForgotModal = () => {
+  // OTP Modal Handlers
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return; // Only allow digits
+    const newOtp = [...otp];
+    newOtp[index] = value.slice(-1);
+    setOtp(newOtp);
+
+    // Move to next input if value entered
+    if (value && index < 5) {
+      otpInputs.current[index + 1]?.focus();
+    }
+    // Move to previous input if deleted
+    if (!value && index > 0) {
+      otpInputs.current[index - 1]?.focus();
+    }
+    setOtpError("");
+  };
+
+  const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pasted = e.clipboardData.getData("Text").replace(/\D/g, "").slice(0, 6);
+    if (pasted.length === 6) {
+      setOtp(pasted.split(""));
+      otpInputs.current[5]?.focus();
+    }
+  };
+
+  const handleOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otp.join("").length !== 6) {
+      setOtpError("Please enter the 6-digit OTP.");
+      return;
+    }
+    // TODO: Call API to verify OTP
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    setShowOtpModal(false);
+    setShowResetModal(true);
+    setModalStack((prev) => [...prev, "otp"]);
+  };
+
+  // Reset Password Modal Handlers
+  const handleResetPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetState.password || !resetState.confirmPassword) {
+      setResetState((prev) => ({
+        ...prev,
+        error: "Please fill in all fields.",
+      }));
+      return;
+    }
+    if (resetState.password.length < 6) {
+      setResetState((prev) => ({
+        ...prev,
+        error: "Password must be at least 6 characters.",
+      }));
+      return;
+    }
+    if (resetState.password !== resetState.confirmPassword) {
+      setResetState((prev) => ({
+        ...prev,
+        error: "Passwords do not match.",
+      }));
+      return;
+    }
+    setResetState((prev) => ({
+      ...prev,
+      isLoading: true,
+      error: "",
+    }));
+    // TODO: Call API to reset password
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    setResetState({
+      password: "",
+      confirmPassword: "",
+      isLoading: false,
+      error: "",
+      showPassword: false,
+      showConfirmPassword: false,
+    });
+    setShowResetModal(false);
+    setModalStack([]);
+    Swal.fire({
+      title: "Password Reset Successful",
+      text: "You can now log in with your new password.",
+      icon: "success",
+    });
+  };
+
+  // Modal Navigation
+  const handleBack = () => {
+    if (modalStack.length === 0) return;
+    const prev = modalStack[modalStack.length - 1];
+    setModalStack((stack) => stack.slice(0, -1));
+    if (showResetModal) {
+      setShowResetModal(false);
+      if (prev === "otp") setShowOtpModal(true);
+    } else if (showOtpModal) {
+      setShowOtpModal(false);
+      if (prev === "forgot") setShowForgotModal(true);
+    }
+  };
+
+  const closeAllModals = () => {
     setShowForgotModal(false);
-    setResetEmail("");
-    setMessage({ type: "", text: "" });
-    setIsLoading(false);
+    setShowOtpModal(false);
+    setShowResetModal(false);
+    setModalStack([]);
+    setForgotPasswordState({
+      email: "",
+      isLoading: false,
+      isSubmitted: false,
+      error: "",
+    });
+    setOtp(["", "", "", "", "", ""]);
+    setOtpError("");
+    setResetState({
+      password: "",
+      confirmPassword: "",
+      isLoading: false,
+      error: "",
+      showPassword: false,
+      showConfirmPassword: false,
+    });
   };
 
   return (
@@ -172,6 +332,7 @@ export default function Login() {
                       placeholder="Username"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
+                      required
                     />
                   </div>
                 </div>
@@ -187,6 +348,7 @@ export default function Login() {
                       placeholder="Password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      required
                     />
                   </div>
                   <div className="flex justify-end mt-2">
@@ -202,8 +364,8 @@ export default function Login() {
 
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 text-white py-3 sm:py-4 rounded-xl hover:bg-blue-500 transition duration-200 mt-4 text-sm sm:text-base"
-                  onClick={() => setIsLoading(true)}
+                  disabled={isLoading}
+                  className="w-full bg-blue-600 text-white py-3 sm:py-4 rounded-xl hover:bg-blue-500 transition duration-200 mt-4 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? "Logging In..." : "Login"}
                 </button>
@@ -222,68 +384,246 @@ export default function Login() {
 
       {/* Forgot Password Modal */}
       {showForgotModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 opacity-100 transition-all duration-300">
-          <div className="bg-white rounded-2xl w-full max-w-md mx-4 relative transform translate-y-0 opacity-100 transition-all duration-300">
-            {/* Close Button */}
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
+          <div className="bg-white rounded-2xl w-full max-w-md mx-4 relative max-h-[90vh] overflow-y-auto shadow-2xl">
             <button
-              className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors duration-200"
-              onClick={closeForgotModal}
+              className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors duration-200 z-10"
+              onClick={closeAllModals}
               aria-label="Close modal"
             >
               <X className="h-6 w-6" />
             </button>
-
-            {/* Modal Body */}
             <div className="p-8">
-              <h2 className="text-2xl font-bold mb-6">Forgot Password</h2>
-
-              <p className="text-gray-600 text-sm mb-8">
-                Enter your email below. A link will be sent to your email to
-                reset your password to a new one
-              </p>
-
-              {/* Success Message */}
-              {message.type === "success" && (
-                <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm opacity-100 transform translate-y-0 transition-all duration-300">
-                  {message.text}
+              <div className="text-center mb-8">
+                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-6">
+                  <Mail className="h-8 w-8 text-blue-600" />
                 </div>
-              )}
-
-              {/* Error Message */}
-              {message.type === "error" && (
-                <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm opacity-100 transform translate-y-0 transition-all duration-300">
-                  {message.text}
-                </div>
-              )}
-
-              <form onSubmit={handleForgotPassword} className="space-y-6">
-                {/* Email Input */}
-                <div className="relative">
-                  <div className="relative flex items-center">
-                    <span className="absolute left-4 text-gray-400">
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                  Forgot Password?
+                </h2>
+                <p className="text-gray-600">
+                  No worries! Enter your email address and we'll send you a link to reset your password.
+                </p>
+              </div>
+              <form onSubmit={handleForgotPasswordSubmit} className="space-y-6">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Mail className="h-5 w-5" />
-                    </span>
+                    </div>
                     <input
+                      id="email"
+                      name="email"
                       type="email"
-                      value={resetEmail}
-                      onChange={(e) => setResetEmail(e.target.value)}
-                      placeholder="Email Address"
-                      className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#6B001F] focus:border-[#6B001F] text-sm placeholder-gray-400 transition-all duration-200"
+                      autoComplete="email"
+                      className="block w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 focus:ring-1 placeholder-gray-400 text-sm"
+                      placeholder="Enter your email"
+                      value={forgotPasswordState.email}
+                      onChange={e =>
+                        setForgotPasswordState(prev => ({
+                          ...prev,
+                          email: e.target.value,
+                          error: "",
+                        }))
+                      }
                       required
+                      disabled={forgotPasswordState.isLoading}
                     />
                   </div>
+                  {forgotPasswordState.error && (
+                    <div className="flex items-center text-red-600 text-xs mt-2">
+                      <span className="mr-1">!</span>
+                      {forgotPasswordState.error}
+                    </div>
+                  )}
                 </div>
-
-                {/* Submit Button */}
                 <button
                   type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-[#6B001F] text-white py-3.5 rounded-xl hover:bg-[#590019] transition-all duration-200 text-sm flex items-center justify-center disabled:opacity-50"
+                  disabled={forgotPasswordState.isLoading}
+                  className="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-500 transition duration-200 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span>{isLoading ? "Sending..." : "Send link to Email"}</span>
-                  {isLoading && (
-                    <Loader2 className="animate-spin ml-2 h-4 w-4" />
-                  )}
+                  {forgotPasswordState.isLoading ? "Sending..." : "Send Reset OTP"}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* OTP Modal */}
+      {showOtpModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
+          <div className="bg-white rounded-2xl w-full max-w-md mx-4 relative shadow-2xl">
+            <button
+              className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors duration-200 z-10"
+              onClick={closeAllModals}
+              aria-label="Close modal"
+            >
+              <X className="h-6 w-6" />
+            </button>
+            <div className="p-8">
+              <div className="flex items-center mb-6">
+                <button
+                  className="mr-3 text-blue-600 hover:text-blue-800 transition"
+                  onClick={handleBack}
+                  aria-label="Back"
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </button>
+                <h2 className="text-2xl font-bold text-gray-900 flex-1 text-center">
+                  Enter OTP
+                </h2>
+              </div>
+              <p className="text-gray-500 mb-6 text-center text-sm">
+                Enter the 6-digit code sent to your email.
+              </p>
+              <form onSubmit={handleOtpSubmit} className="flex flex-col items-center">
+                <div className="flex gap-2 mb-4">
+                  {otp.map((digit, idx) => (
+                    <input
+                      key={idx}
+                      ref={el => { otpInputs.current[idx] = el; }}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      className="w-12 h-12 text-center text-xl border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 transition font-mono"
+                      value={digit}
+                      onChange={e => handleOtpChange(idx, e.target.value)}
+                      onPaste={handleOtpPaste}
+                      autoFocus={idx === 0}
+                    />
+                  ))}
+                </div>
+                {otpError && (
+                  <div className="text-red-500 text-sm mb-2">{otpError}</div>
+                )}
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition mb-2"
+                >
+                  Verify OTP
+                </button>
+              </form>
+              <button
+                type="button"
+                className="text-blue-500 hover:underline text-sm mt-2"
+                onClick={() => {
+                  // TODO: Resend OTP API
+                  Swal.fire("OTP resent!", "Check your email for a new code.", "info");
+                }}
+              >
+                Resend OTP
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset Password Modal */}
+      {showResetModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
+          <div className="bg-white rounded-2xl w-full max-w-md mx-4 relative shadow-2xl">
+            <button
+              className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors duration-200 z-10"
+              onClick={closeAllModals}
+              aria-label="Close modal"
+            >
+              <X className="h-6 w-6" />
+            </button>
+            <div className="p-8">
+              <div className="flex items-center mb-6">
+                <button
+                  className="mr-3 text-blue-600 hover:text-blue-800 transition"
+                  onClick={handleBack}
+                  aria-label="Back"
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </button>
+                <h2 className="text-2xl font-bold text-gray-900 flex-1 text-center">
+                  Reset Password
+                </h2>
+              </div>
+              <form onSubmit={handleResetPasswordSubmit} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    New Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={resetState.showPassword ? "text" : "password"}
+                      className="w-full pl-4 pr-10 py-3 rounded-xl border border-gray-300 focus:ring-1 placeholder-gray-400 text-sm"
+                      placeholder="Enter new password"
+                      value={resetState.password}
+                      onChange={e =>
+                        setResetState(prev => ({
+                          ...prev,
+                          password: e.target.value,
+                          error: "",
+                        }))
+                      }
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      onClick={() =>
+                        setResetState(prev => ({
+                          ...prev,
+                          showPassword: !prev.showPassword,
+                        }))
+                      }
+                      tabIndex={-1}
+                    >
+                      {resetState.showPassword ? <EyeOff /> : <Eye />}
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={resetState.showConfirmPassword ? "text" : "password"}
+                      className="w-full pl-4 pr-10 py-3 rounded-xl border border-gray-300 focus:ring-1 placeholder-gray-400 text-sm"
+                      placeholder="Confirm new password"
+                      value={resetState.confirmPassword}
+                      onChange={e =>
+                        setResetState(prev => ({
+                          ...prev,
+                          confirmPassword: e.target.value,
+                          error: "",
+                        }))
+                      }
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      onClick={() =>
+                        setResetState(prev => ({
+                          ...prev,
+                          showConfirmPassword: !prev.showConfirmPassword,
+                        }))
+                      }
+                      tabIndex={-1}
+                    >
+                      {resetState.showConfirmPassword ? <EyeOff /> : <Eye />}
+                    </button>
+                  </div>
+                </div>
+                {resetState.error && (
+                  <div className="text-red-500 text-sm">{resetState.error}</div>
+                )}
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition"
+                  disabled={resetState.isLoading}
+                >
+                  {resetState.isLoading ? "Resetting..." : "Reset Password"}
                 </button>
               </form>
             </div>

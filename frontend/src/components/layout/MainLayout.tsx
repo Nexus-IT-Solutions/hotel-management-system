@@ -1,11 +1,13 @@
 import Sidebar from "./Sidebar";
 import MobileNavbar from "./MobileNavbar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 
 const MainLayout = () => {
   const [showLabels, setShowLabels] = useState(true);
+ 
+
 
   return (
     <div className="flex h-screen bg-[#faf8f8de]">

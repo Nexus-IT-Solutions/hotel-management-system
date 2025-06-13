@@ -43,6 +43,24 @@ class UserController
     }
 
     /**
+     * Get all branch users
+     * 
+     * @param string $branchId Branch ID
+     * @return string JSON response with users or error message
+     */
+    public function getBranchUsers(string $branchId): string
+    {
+        $users = $this->userModel->getBranchUsers($branchId);
+
+        return json_encode([
+            'status' => !empty($users) ? 'success' : 'error',
+            'branch_id' => $branchId,
+            'branchUsers' => $users,
+            'message' => empty($users) ? 'No users found for this branch' : null
+        ], JSON_PRETTY_PRINT);
+    }
+
+    /**
      * Get user profile by ID
      * 
      * @param string $id User ID

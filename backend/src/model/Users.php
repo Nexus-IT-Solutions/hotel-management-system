@@ -1,14 +1,14 @@
 <?php
+
 use Ramsey\Uuid\Uuid;
+
 require_once __DIR__ . '/../config/Database.php';
 
 /**
  * Users Model Class
- * 
- * This class handles all database operations related to user management in the hotel management system.
+ * * This class handles all database operations related to user management in the hotel management system.
  * It provides methods for creating, retrieving, updating, and deleting user records,
  * as well as authentication and password management functionality.
- * 
  * Error handling is implemented throughout to properly catch and log database exceptions.
  */
 class Users
@@ -17,12 +17,12 @@ class Users
      * Database connection instance
      */
     protected $db;
-    
+
     /**
      * Name of the users database table
      */
     private $table_name = 'users';
-    
+
     /**
      * Error message from the last operation
      */
@@ -45,8 +45,7 @@ class Users
 
     /**
      * Get the last error message
-     * 
-     * @return string The last error message
+     * * @return string The last error message
      */
     public function getLastError(): string
     {
@@ -55,8 +54,7 @@ class Users
 
     /**
      * Execute a query with proper error handling
-     * 
-     * @param \PDOStatement $stmt The prepared statement to execute
+     * * @param \PDOStatement $stmt The prepared statement to execute
      * @param array $params The parameters for the prepared statement
      * @return bool Whether the query executed successfully
      */
@@ -73,8 +71,7 @@ class Users
 
     /**
      * Get all users from the database
-     * 
-     * @return array List of all user records or empty array on failure
+     * * @return array List of all user records or empty array on failure
      */
     public function getAll(): array
     {
@@ -92,9 +89,28 @@ class Users
     }
 
     /**
+     * Get All branch users
+     */
+    public function getBranchUsers(string $branchId): array
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login, created_at 
+                                         FROM {$this->table_name} 
+                                         WHERE branch_id = :branch_id");
+            if (!$this->executeQuery($stmt, ['branch_id' => $branchId])) {
+                return [];
+            }
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to get branch users: " . $e->getMessage();
+            error_log($this->lastError);
+            return [];
+        }
+    }
+
+    /**
      * Find a user by their ID
-     * 
-     * @param string $id The user's UUID
+     * * @param string $id The user's UUID
      * @return array|null User record or null if not found
      */
     public function getUserById(string $id): ?array
@@ -115,8 +131,7 @@ class Users
 
     /**
      * Find a user by their email address
-     * 
-     * @param string $email The user's email
+     * * @param string $email The user's email
      * @return array|null User record or null if not found
      */
     public function getUserByEmail(string $email): ?array
@@ -137,8 +152,7 @@ class Users
 
     /**
      * Find a user by their phone number
-     * 
-     * @param string $phone The user's phone number
+     * * @param string $phone The user's phone number
      * @return array|null User record or null if not found
      */
     public function getUserByPhone(string $phone): ?array
@@ -159,8 +173,7 @@ class Users
 
     /**
      * Find a user by their username
-     * 
-     * @param string $username The user's username
+     * * @param string $username The user's username
      * @return array|null User record or null if not found
      */
     public function getUserByUsername(string $username): ?array
@@ -181,19 +194,18 @@ class Users
 
     /**
      * Find a user by their username, email or phone number
-     * 
-     * @param string $identifier The user's username, email, or phone number
+     * * @param string $identifier The user's username, email, or phone number
      * @return array|null User record or null if not found
      */
     public function getUserByIdentifier(string $identifier): ?array
     {
         try {
             $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login , created_at
-                                    FROM {$this->table_name} 
-                                    WHERE username = :identifier 
-                                       OR email = :identifier 
-                                       OR phone = :identifier
-                                    LIMIT 1");
+                                         FROM {$this->table_name} 
+                                         WHERE username = :identifier 
+                                           OR email = :identifier 
+                                           OR phone = :identifier
+                                         LIMIT 1");
             if (!$this->executeQuery($stmt, ['identifier' => $identifier])) {
                 return null;
             }
@@ -207,33 +219,9 @@ class Users
     }
 
     /**
-     * Find a user by their password reset token
-     * Only returns the user if the token hasn't expired
-     * 
-     * @param string $token The reset token
-     * @return array|null User record or null if not found or token expired
-     */
-    public function findByResetToken(string $token): ?array
-    {
-        try {
-            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login, created_at FROM {$this->table_name} WHERE reset_token = :token AND reset_token_expiry > NOW()");
-            if (!$this->executeQuery($stmt, ['token' => $token])) {
-                return null;
-            }
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            return $user ?: null;
-        } catch (PDOException $e) {
-            $this->lastError = "Failed to get user by reset token: " . $e->getMessage();
-            error_log($this->lastError);
-            return null;
-        }
-    }
-
-    /**
      * Authenticate a user by username/email and password
      * Updates the last login timestamp upon successful login
-     * 
-     * @param string $usernameOrEmail The username or email for login
+     * * @param string $usernameOrEmail The username or email for login
      * @param string $password The user's password
      * @return array|null User record on successful login or null on failure
      */
@@ -245,52 +233,50 @@ class Users
                 $this->lastError = "Username/email and password are required";
                 return null;
             }
-            
+
             // Find user by username OR email
             $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE username = :username OR email = :email");
             if (!$this->executeQuery($stmt, ['username' => $usernameOrEmail, 'email' => $usernameOrEmail])) {
                 $this->lastError = "Database error during login";
                 return null;
             }
-            
+
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
             // Check if user exists
             if (!$user) {
                 $this->lastError = "User not found";
                 return null;
             }
-            
+
             // Check if user account is active
             if (!$user['is_active']) {
                 $this->lastError = "Account is inactive";
                 return null;
             }
-            
+
             // Verify password
             if (!password_verify($password, $user['password_hash'])) {
                 $this->lastError = "Invalid password";
-                
                 // Optional: Track failed login attempts here
                 // $this->recordFailedLoginAttempt($user['id']);
-                
                 return null;
             }
-            
+
             // Password is valid, check if needs rehash (if PHP's password_hash defaults have changed)
             if (password_needs_rehash($user['password_hash'], PASSWORD_DEFAULT)) {
                 // Update password hash with new algorithm/cost
                 $this->updatePasswordHash($user['id'], $password);
             }
-            
-            // Remove sensitive data before returning
+
+            // Remove sensitive data before returning (otp_code and otp_expiry will be cleared by updatePassword)
             unset($user['password_hash']);
-            unset($user['reset_token']);
-            unset($user['reset_token_expiry']);
-            
+            unset($user['otp_code']);
+            unset($user['otp_expiry']);
+
             // Update last login timestamp
             $this->updateLastLogin($user['id']);
-            
+
             return $user;
         } catch (PDOException $e) {
             $this->lastError = "Login failed: " . $e->getMessage();
@@ -301,8 +287,7 @@ class Users
 
     /**
      * Updates the password hash if the hashing algorithm parameters have changed
-     * 
-     * @param string $userId The user's ID
+     * * @param string $userId The user's ID
      * @param string $password The plain text password to rehash
      * @return bool Whether the operation was successful
      */
@@ -324,8 +309,7 @@ class Users
 
     /**
      * Records a failed login attempt (optional security feature)
-     * 
-     * @param string $userId The user's ID
+     * * @param string $userId The user's ID
      * @return bool Whether the operation was successful
      */
     private function recordFailedLoginAttempt(string $userId): bool
@@ -346,34 +330,33 @@ class Users
 
     /**
      * Create a new user in the database
-     * 
-     * @param array $data User data including hotel_id, branch_id, username, name, email, 
-     *                    phone, password, role, and is_active status
+     * * @param array $data User data including hotel_id, branch_id, username, name, email, 
+     * phone, password, role, and is_active status
      * @return string|false The UUID of the created user or false on failure
      */
     public function create(array $data): string|false
     {
         try {
             // Validate required fields
-            $requiredFields = ['username', 'name', 'phone', 'password', 'role'];
+            $requiredFields = ['hotel_id','branch_id','username', 'name', 'phone', 'password', 'role'];
             foreach ($requiredFields as $field) {
                 if (empty($data[$field])) {
                     $this->lastError = "Missing required field: $field";
                     return false;
                 }
             }
-            
+
             // Check if user already exists
             if ($this->getUserByEmail($data['email']) || $this->getUserByUsername($data['username']) || $this->getUserByPhone($data['phone'])) {
                 $this->lastError = "User already exists with this email, username, or phone";
                 return false;
             }
-            
+
             $uuid = $data['id'] ?? Uuid::uuid4()->toString();
-            
+
             $stmt = $this->db->prepare("INSERT INTO {$this->table_name} (id, hotel_id, branch_id, username, name, email, phone, password_hash, role, is_active, first_login) 
-                                     VALUES (:id, :hotel_id, :branch_id, :username, :name, :email, :phone, :password_hash, :role, :is_active, :first_login)");
-            
+                                         VALUES (:id, :hotel_id, :branch_id, :username, :name, :email, :phone, :password_hash, :role, :is_active, :first_login)");
+
             $params = [
                 'id'            => $uuid,
                 'hotel_id'      => $data['hotel_id'] ?? null,
@@ -387,11 +370,11 @@ class Users
                 'is_active'     => $data['is_active'] ?? true,
                 'first_login'   => true,
             ];
-            
+
             if (!$this->executeQuery($stmt, $params)) {
                 return false;
             }
-            
+
             return $uuid;
         } catch (PDOException $e) {
             $this->lastError = "Failed to create user: " . $e->getMessage();
@@ -402,8 +385,7 @@ class Users
 
     /**
      * Update a user's information
-     * 
-     * @param string $id The user's UUID
+     * * @param string $id The user's UUID
      * @param array $data Updated user data
      * @return bool True on success, false on failure
      */
@@ -454,11 +436,9 @@ class Users
         }
     }
 
-
     /**
      * Update a user's last login timestamp and mark as not first login
-     * 
-     * @param string $id The user's UUID
+     * * @param string $id The user's UUID
      * @return bool True on success, false on failure
      */
     public function updateLastLogin(string $id): bool
@@ -475,9 +455,8 @@ class Users
 
     /**
      * Update user's password after confirming the current password
-     * Also clears any password reset tokens
-     * 
-     * @param string $id The user's UUID
+     * Also clears any OTPs
+     * * @param string $id The user's UUID
      * @param string $currentPassword The current password for verification
      * @param string $newPassword The new password to set
      * @return bool True if password updated, false if current password is incorrect
@@ -490,30 +469,30 @@ class Users
                 $this->lastError = "Password must be at least 8 characters";
                 return false;
             }
-            
+
             $stmt = $this->db->prepare("SELECT password_hash FROM {$this->table_name} WHERE id = :id");
             if (!$this->executeQuery($stmt, ['id' => $id])) {
                 return false;
             }
-            
+
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
             if (!$user) {
                 $this->lastError = "User not found";
                 return false;
             }
-            
+
             if (!password_verify($currentPassword, $user['password_hash'])) {
                 $this->lastError = "Current password is incorrect";
                 return false;
             }
-            
+
             $stmt = $this->db->prepare("UPDATE {$this->table_name} SET 
-                                     password_hash = :password_hash, 
-                                     reset_token = NULL, 
-                                     reset_token_expiry = NULL, 
-                                     first_login = false 
-                                     WHERE id = :id");
-            
+                                        password_hash = :password_hash, 
+                                        otp_code = NULL, 
+                                        otp_expiry = NULL, 
+                                        first_login = false 
+                                        WHERE id = :id");
+
             return $this->executeQuery($stmt, [
                 'password_hash' => password_hash($newPassword, PASSWORD_DEFAULT),
                 'id' => $id
@@ -526,11 +505,33 @@ class Users
     }
 
     /**
+     * Find a user by their OTP code
+     * Only returns the user if the OTP hasn't expired
+     *
+     * @param string $otp The OTP code
+     * @return array|null User record or null if not found or OTP expired
+     */
+    public function findByOtpCode(string $otp): ?array
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login, created_at FROM {$this->table_name} WHERE otp_code = :otp AND otp_expiry > NOW()");
+            if (!$this->executeQuery($stmt, ['otp' => $otp])) {
+                return null;
+            }
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $user ?: null;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to get user by OTP: " . $e->getMessage();
+            error_log($this->lastError);
+            return null;
+        }
+    }
+
+    /**
      * Update user's password without requiring the current password
-     * Used for admin resets and password reset flows
-     * Also clears any password reset tokens
-     * 
-     * @param string $id The user's UUID
+     * Used for admin resets and password reset flows (after OTP verification)
+     * Also clears any OTPs
+     * * @param string $id The user's UUID
      * @param string $newPassword The new password to set
      * @return bool True on success, false on failure
      */
@@ -542,14 +543,14 @@ class Users
                 $this->lastError = "Password must be at least 8 characters";
                 return false;
             }
-            
+
             $stmt = $this->db->prepare("UPDATE {$this->table_name} SET 
-                                     password_hash = :password_hash, 
-                                     reset_token = NULL, 
-                                     reset_token_expiry = NULL, 
-                                     first_login = false 
-                                     WHERE id = :id");
-            
+                                        password_hash = :password_hash, 
+                                        otp_code = NULL, 
+                                        otp_expiry = NULL, 
+                                        first_login = false 
+                                        WHERE id = :id");
+
             return $this->executeQuery($stmt, [
                 'password_hash' => password_hash($newPassword, PASSWORD_DEFAULT),
                 'id' => $id
@@ -562,43 +563,51 @@ class Users
     }
 
     /**
-     * Set a password reset token for a user
-     * 
-     * @param string $email The user's email
-     * @param string $token The reset token
-     * @param string $expiry The expiration timestamp
+     * Set an OTP code for a user
+     * * @param string $email The user's email
+     * @param string $otpCode The OTP code (6-digit number)
+     * @param string $expiry The expiration timestamp (e.g., 'YYYY-MM-DD HH:MM:SS')
      * @return bool True on success, false on failure
      */
-    public function setResetToken(string $email, string $token, string $expiry): bool
+    public function setOtpCode(string $email, string $otpCode, string $expiry): bool
     {
         try {
             // Check if user exists
             if (!$this->getUserByEmail($email)) {
-                $this->lastError = "User not found";
+                $this->lastError = "User not found with this email.";
                 return false;
             }
-            
             $stmt = $this->db->prepare("UPDATE {$this->table_name} SET 
-                                     reset_token = :token, 
-                                     reset_token_expiry = :expiry 
-                                     WHERE email = :email");
-            
+                                        otp_code = :otp_code, 
+                                        otp_expiry = :expiry 
+                                        WHERE email = :email");
+
             return $this->executeQuery($stmt, [
-                'token'  => $token,
+                'otp_code' => $otpCode,
                 'expiry' => $expiry,
-                'email'  => $email,
+                'email' => $email,
             ]);
         } catch (PDOException $e) {
-            $this->lastError = "Failed to set reset token: " . $e->getMessage();
+            $this->lastError = "Failed to set OTP code: " . $e->getMessage();
             error_log($this->lastError);
             return false;
         }
     }
 
     /**
+     * Generates a 6-digit numeric OTP.
+     *
+     * @return string The generated 6-digit OTP.
+     */
+    public function generateOtp(): string
+    {
+        // Generate a random number between 100,000 and 999,999 (inclusive)
+        return str_pad(random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
+    }
+
+    /**
      * Delete a user from the database
-     * 
-     * @param string $id The user's UUID
+     * * @param string $id The user's UUID
      * @return bool True on success, false on failure
      */
     public function delete(string $id): bool
@@ -609,7 +618,7 @@ class Users
                 $this->lastError = "User not found";
                 return false;
             }
-            
+
             $stmt = $this->db->prepare("DELETE FROM {$this->table_name} WHERE id = :id");
             return $this->executeQuery($stmt, ['id' => $id]);
         } catch (PDOException $e) {

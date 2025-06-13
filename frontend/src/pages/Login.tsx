@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { Mail, User, Lock, X, Loader2 } from "lucide-react";
 import Image1 from "../assets/images/image3.jpg";
 // import { Link } from "react-router-dom";
@@ -31,7 +31,7 @@ export default function Login() {
               user: res.data.user,
               token: res.data.token,
             })
-          );
+          ); 
           setIsLoading(false);
           if (res.data.user.role === "manager") {
             Swal.fire({

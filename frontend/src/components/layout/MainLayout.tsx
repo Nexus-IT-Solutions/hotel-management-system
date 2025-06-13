@@ -21,7 +21,7 @@ const MainLayout = () => {
           {/* Header */}
           <Header setShowLabels={setShowLabels} showLabels={showLabels} />
 
-          <main className="flex-1 overflow-y-auto p-5">
+          <main className="flex-1 overflow-y-auto px-5 py-3">
             {/* Main content */}
             <Outlet />
           </main>

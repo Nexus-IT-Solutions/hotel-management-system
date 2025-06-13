@@ -88,6 +88,91 @@ class Room
         }
     }
 
+    /**
+     * Get room availability
+     * @param string $branch_id
+     * @return array
+     */
+    public function getRoomAvailability(string $branchId): array
+    {
+        try {
+            $query = "
+                WITH RoomCurrentStatus AS (
+                    -- CTE to find the most relevant active booking for each room for today
+                    SELECT
+                        r.id AS room_id,
+                        r.room_number,
+                        r.status AS room_physical_status, -- Status from the rooms table
+                        rt.name AS room_type_name,
+                        rt.max_occupancy,
+                        rt.price_per_night,
+                        (SELECT b.id
+                         FROM bookings b
+                         WHERE b.room_id = r.id
+                           AND b.branch_id = :branch_id_sub_booking -- Filter bookings by branch_id
+                           AND CURDATE() BETWEEN b.check_in_date AND b.check_out_date
+                           AND b.status IN ('booked', 'checked_in') -- Only consider confirmed/checked-in bookings
+                         -- Prioritize 'checked_in' over 'booked' if multiple active bookings exist
+                         ORDER BY FIELD(b.status, 'checked_in', 'booked') DESC, b.created_at DESC
+                         LIMIT 1
+                        ) AS active_booking_id
+                    FROM
+                        " . $this->table_name . " r
+                    JOIN
+                        room_types rt ON r.room_type_id = rt.id
+                    WHERE
+                        r.branch_id = :branch_id_main_room -- Filter rooms by branch_id
+                )
+                SELECT
+                    rcs.room_number AS number,
+                    rcs.room_type_name AS type,
+                    rcs.max_occupancy AS capacity,
+                    -- The status in the output is derived:
+                    CASE
+                        WHEN rcs.room_physical_status = 'occupied' THEN 'occupied'
+                        WHEN rcs.room_physical_status = 'maintenance' THEN 'maintenance'
+                        WHEN rcs.room_physical_status = 'dirty' THEN 'cleaning' -- Mapping 'dirty' to 'cleaning'
+                        WHEN rcs.active_booking_id IS NOT NULL THEN
+                            -- If room is physically 'available' but has an active booking for today
+                            (SELECT
+                                CASE
+                                    WHEN b.status = 'booked' THEN 'reserved'
+                                    WHEN b.status = 'checked_in' THEN 'occupied'
+                                    ELSE 'available' -- Fallback, though ideally won't hit this with IN ('booked', 'checked_in')
+                                END
+                            FROM bookings b WHERE b.id = rcs.active_booking_id)
+                        ELSE 'available' -- Room is physically 'available' and has no active bookings for today
+                    END AS status,
+                    -- Get the guest name if there's an active booking for today
+                    CASE
+                        WHEN rcs.active_booking_id IS NOT NULL THEN
+                            (SELECT c.full_name
+                             FROM bookings b
+                             JOIN customers c ON b.customer_id = c.id
+                             WHERE b.id = rcs.active_booking_id)
+                        ELSE NULL
+                    END AS guest,
+                    rcs.price_per_night AS price
+                FROM
+                    RoomCurrentStatus rcs
+                ORDER BY
+                    rcs.room_number ASC;
+            ";
+            $stmt = $this->db->prepare($query);
+            // Bind the branchId parameter to both placeholders in the query
+            $stmt->bindParam(':branch_id_main_room', $branchId, PDO::PARAM_INT);
+            $stmt->bindParam(':branch_id_sub_booking', $branchId, PDO::PARAM_INT);
+            if (!$this->executeQuery($stmt)) {
+                return [];
+            }
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to retrieve room availability for branch " . $branchId . ": " . $e->getMessage();
+            error_log($this->lastError); // Log the detailed error
+            return [];
+        }
+    }
+
     public function getById(string $id): ?array
     {
         try {

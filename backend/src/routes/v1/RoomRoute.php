@@ -12,6 +12,14 @@ return function ($app): void {
         return $response->withHeader('Content-Type', 'application/json');
     });
 
+    // Get room availability by branch ID
+    $app->get('/v1/rooms/availability/branch/{branch_id}', function ($request, $response, $args) use ($roomController) {
+        $branchId = $args['branch_id'] ?? '';
+        $result = $roomController->getRoomAvailability($branchId);
+        $response->getBody()->write($result);
+        return $response->withHeader('Content-Type', 'application/json');
+    });
+
     // Get room by ID
     $app->get('/v1/rooms/{id}', function ($request, $response, $args) use ($roomController) {
         $id = $args['id'] ?? '';

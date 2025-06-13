@@ -339,7 +339,7 @@ class Users
     {
         try {
             // Validate required fields
-            $requiredFields = ['username', 'name', 'phone', 'password', 'role'];
+            $requiredFields = ['hotel_id','branch_id','username', 'name', 'phone', 'password', 'role'];
             foreach ($requiredFields as $field) {
                 if (empty($data[$field])) {
                     $this->lastError = "Missing required field: $field";

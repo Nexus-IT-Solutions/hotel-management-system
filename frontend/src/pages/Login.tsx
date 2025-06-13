@@ -1,39 +1,82 @@
 import React, { useState } from "react";
 import { Mail, User, Lock, X, Loader2 } from "lucide-react";
-import Image1 from '../assets/images/image3.jpg';
-
+import Image1 from "../assets/images/image3.jpg";
+// import { Link } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default function Login() {
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [message, setMessage] = useState({ type: "", text: "" });
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // Hitting the endpoint using axios
-    axios.post("https://hotel-management-system-5gk8.onrender.com/v1/auth/login", {
-      "username": username,
-      "password": password
-    })
-    .then((res) => {
-      // Checking status code
-      console.log(res)
-      if (res.status === 200) {
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("username", res?.data?.user?.name || "");
+    axios
+      .post("https://hotel-management-system-5gk8.onrender.com/v1/auth/login", {
+        usernameOrEmail: username,
+        password: password,
+       })
+      .then((res) => {
+        // Checking status code
+        console.log(res);
+        if (res.status === 200) {
+          localStorage.setItem(
+            "userData",
+            JSON.stringify({
+              user: res.data.user,
+              token: res.data.token,
+            })
+          );
+          setIsLoading(false);
+          if (res.data.user.role === "manager") {
+            Swal.fire({
+              title: "Login Successful",
+              text: "Welcome back, Admin!",
+              icon: "success",
+            });
+            // Redirect to admin dashboard
+            window.location.href = "/admin";
+          } else if (res.data.user.role === "receptionist") {
+            Swal.fire({
+              title: "Login Successful",
+              text: "Welcome back, Receptionist!",
+              icon: "success",
+            });
+            // Redirect to user dashboard
+            window.location.href = "/receptionist";
+          } else if (res.data.user.role === "ceo") {
+            Swal.fire({
+              title: "Login Successful",
+              text: "Welcome back, CEO!",
+              icon: "success",
+            });
+            // Redirect to manager dashboard
+            window.location.href = "/ceo";
+          }
+        }
+      })
+      .catch((error) => {
+        if(error.status === 401) {
+          Swal.fire({
+            title: "Error",
+            text: "Incorrect username or password. Please try again.",
+            icon: "error",
+          });
+          setIsLoading(false);
+        }else{
+        Swal.fire({
+          title: "Error",
+          text: "An error occurred while logging in. Please check your network connection and other settings and try again.",
+          icon: "error",
+        });
         setIsLoading(false);
-        window.location.href = "/admin";
       }
-    })
-    .catch(() => {
-      alert("OOPs!!!. An error occurred");
-      setIsLoading(false)
-    });
-    
+      });
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -79,9 +122,11 @@ export default function Login() {
         {/* Left side - Image section */}
         <div className="hidden md:flex md:w-1/2 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/50"></div>
-           <img src={Image1} alt="" className='object-cover w-full h-full'/>
+          <img src={Image1} alt="" className="object-cover w-full h-full" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white z-10 text-center px-4 sm:px-8">
-            <h1 className="text-3xl md:text-5xl font-bold mb-20">Hotel Name Here</h1>
+            <h1 className="text-3xl md:text-5xl font-bold mb-20">
+              Hotel Name Here
+            </h1>
             <div className="mb-6 w-16 md:w-24 lg:w-28 h-16 md:h-24 lg:h-28 bg-white/20 rounded-full flex items-center justify-center">
               <div className="w-8 md:w-12 lg:w-14 h-8 md:h-12 lg:h-14 bg-white rounded-full"></div>
             </div>
@@ -98,7 +143,7 @@ export default function Login() {
         <div className="md:hidden flex justify-center items-center pt-8 pb-4 relative">
           <div className=" rounded-full flex items-center justify-center">
             <div className="w-20 h-20 rounded-full">
-              <img src={Image1} alt="" className="w-full h-full rounded-full"/>
+              <img src={Image1} alt="" className="w-full h-full rounded-full" />
             </div>
           </div>
         </div>
@@ -156,15 +201,12 @@ export default function Login() {
                 </div>
 
                 <button
-                type="submit"
-                className="w-full bg-blue-600 text-white py-3 sm:py-4 rounded-xl hover:bg-blue-500 transition duration-200 mt-4 text-sm sm:text-base"
-                onClick={() => setIsLoading(true)}
+                  type="submit"
+                  className="w-full bg-blue-600 text-white py-3 sm:py-4 rounded-xl hover:bg-blue-500 transition duration-200 mt-4 text-sm sm:text-base"
+                  onClick={() => setIsLoading(true)}
                 >
                   {isLoading ? "Logging In..." : "Login"}
                 </button>
-
-
-                
               </form>
             </div>
           </div>
@@ -176,8 +218,6 @@ export default function Login() {
             </div>
           </footer>
         </div>
-
-        
       </div>
 
       {/* Forgot Password Modal */}

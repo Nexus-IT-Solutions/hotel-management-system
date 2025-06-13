@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Swal from "sweetalert2"
 
 const Settings = () => {
   const [profile, setProfile] = useState({
@@ -15,6 +16,8 @@ const Settings = () => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
 
+
+
   const handlePreferencesChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     setPreferences({
@@ -28,7 +31,21 @@ const Settings = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // TODO: Save settings logic here
-    alert("Settings saved!");
+     Swal.fire({
+  title: "Do you want to save the changes?",
+  showDenyButton: true,
+  showCancelButton: true,
+  confirmButtonText: "Save",
+  denyButtonText: `Don't save`
+}).then((result) => {
+  /* Read more about isConfirmed, isDenied below */
+  if (result.isConfirmed) {
+    Swal.fire("Saved!", "", "success");
+  } else if (result.isDenied) {
+    Swal.fire("Changes are not saved", "", "info");
+  }
+});
+    
   };
 
   return (

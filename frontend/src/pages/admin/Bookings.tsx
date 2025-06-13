@@ -1,5 +1,6 @@
 import { Search, Calendar, Edit, Trash2, Eye,Badge } from "lucide-react";
 import { Link } from "react-router-dom";
+import Swal from 'sweetalert2'
 
 export default function Bookings() {
   const getStatusBadge = (
@@ -21,6 +22,26 @@ export default function Bookings() {
       </span>
     );
   };
+
+  const handleDelete = () => {
+    Swal.fire({
+  title: "Are you sure?",
+  text: "You won't be able to revert this!",
+  icon: "warning",
+  showCancelButton: true,
+  confirmButtonColor: "#d33",
+  cancelButtonColor: "#B3B3B3",
+  confirmButtonText: "Yes, delete it!"
+}).then((result) => {
+  if (result.isConfirmed) {
+    Swal.fire({
+      title: "Deleted!",
+      text: "Your record has been deleted.",
+      icon: "success"
+    });
+  }
+});
+  }
 
   return (
     <div className="space-y-6">
@@ -57,7 +78,7 @@ export default function Bookings() {
 
         <div className="flex items-center space-x-3">
           <Link
-            to="/new-booking"
+            to="../new-booking"
             className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 transition-colors"
           >
             <Calendar className="w-4 h-4" />
@@ -161,7 +182,7 @@ export default function Bookings() {
                         <Edit className="w-4 h-4" />
                       </button>
                       <button className="text-red-600 hover:text-red-900">
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" onClick={handleDelete} />
                       </button>
                     </div>
                   </td>

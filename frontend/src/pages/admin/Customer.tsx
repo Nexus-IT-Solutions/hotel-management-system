@@ -1,6 +1,28 @@
 import { Search, Eye, Edit, Trash2, Mail, Phone } from "lucide-react";
+import Swal from "sweetalert2";
 
 export default function Customer() {
+
+  const handleDelete = () => {
+      Swal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#B3B3B3",
+    confirmButtonText: "Yes, delete it!"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      Swal.fire({
+        title: "Deleted!",
+        text: "Your record has been deleted.",
+        icon: "success"
+      });
+    }
+  });
+    }
+
   return (
     <div>
       {/* header section */}
@@ -122,7 +144,7 @@ export default function Customer() {
                         <Edit className="w-4 h-4" />
                       </button>
                       <button className="text-red-600 hover:text-yellow-900">
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" onClick={handleDelete} />
                       </button>
                     </div>
                   </td>

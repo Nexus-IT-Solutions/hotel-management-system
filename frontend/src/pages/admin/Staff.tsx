@@ -1,7 +1,28 @@
 import  { useState } from 'react';
 import { Plus, Edit, Trash2, Shield, User, Settings } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 export default function Staff(){
+
+  const handleDelete = () => {
+      Swal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#D3D3D3",
+    confirmButtonText: "Yes, delete it!"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      Swal.fire({
+        title: "Deleted!",
+        text: "Your record has been deleted.",
+        icon: "success"
+      });
+    }
+  });
+    }
 
 
   const [showAddUser, setShowAddUser] = useState(false);
@@ -239,7 +260,7 @@ export default function Staff(){
                         <Edit className="w-4 h-4" />
                       </button>
                       <button className="text-red-600 hover:text-red-900">
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" onClick={() => handleDelete()} />
                       </button>
                     </div>
                   </td>

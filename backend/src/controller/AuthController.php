@@ -95,14 +95,7 @@ class AuthController
             return json_encode([
                 'status' => 'success',
                 'message' => 'Login successful',
-                'user' => [
-                    'id' => $user['id'],
-                    'username' => $user['username'],
-                    'name' => $user['name'],
-                    'email' => $user['email'],
-                    'role' => $user['role'],
-                    'first_login' => (bool)$user['first_login']
-                ],
+                'user' => $user,
                 'token' => $jwt,
                 'expires_in' => $expiry
             ]);
@@ -117,13 +110,14 @@ class AuthController
     }
 
     /**
-     * Initiates the password reset process for a user
+     * Initiates the password reset process for a user using OTP
      * 
      * @param string $emailOrPhone The user's email or phone number
-     * @return bool True if reset process initiated, false if user not found
+     * @return string JSON response
      */
     public function forgotPassword(string $emailOrPhone): ?string
     {
+        // Find user by email or phone
         $user = filter_var($emailOrPhone, FILTER_VALIDATE_EMAIL)
             ? $this->userModel->getUserByEmail($emailOrPhone)
             : $this->userModel->getUserByPhone($emailOrPhone);
@@ -135,43 +129,69 @@ class AuthController
             ], 404);
         }
 
-        $token = bin2hex(random_bytes(32));
-        $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
+        // Generate OTP and expiry
+        $otp = $this->userModel->generateOtp();
+        $expiry = date('Y-m-d H:i:s', strtotime('+10 minutes'));
 
-        $this->userModel->setResetToken($user['email'], $token, $expiry);
+        // Store OTP in the database
+        $setOtp = $this->userModel->setOtpCode($user['email'], $otp, $expiry);
 
+        if (!$setOtp) {
+            return json_encode([
+                'status' => 'error',
+                'message' => 'Failed to generate OTP. Please try again.'
+            ], 500);
+        }
+
+        // Send OTP via email or SMS
         $success = false;
         if (filter_var($emailOrPhone, FILTER_VALIDATE_EMAIL)) {
-            $success = MailHelper::sendPasswordResetEmail($user['email'], $user['name'], $token);
+            // $success = MailHelper::sendPasswordResetEmail($user['email'], $user['name'], $otp);
         } else {
-            $success = SmsHelper::sendPasswordResetSMS($user['phone'], $token);
+            // $success = SmsHelper::sendPasswordResetSMS($user['phone'], $otp);
         }
 
         if ($success) {
             return json_encode([
                 'status' => 'success',
-                'message' => 'Password reset instructions have been sent'
+                'message' => 'Password reset OTP has been sent'
             ], 200);
         } else {
             return json_encode([
                 'status' => 'error',
-                'message' => 'Failed to send password reset instructions'
+                'message' => 'Failed to send OTP'
             ], 500);
         }
     }
 
     /**
-     * Resets a user's password using a valid reset token
+     * Resets a user's password using a valid OTP
      * 
-     * @param string $token The reset token
+     * @param string $otp The OTP code
      * @param string $newPassword The new password to set
-     * @return bool True if password reset successfully, false otherwise
+     * @return string JSON response
      */
-    public function resetPassword(string $token, string $newPassword): bool
+    public function resetPassword(string $otp, string $newPassword): string
     {
-        $user = $this->userModel->findByResetToken($token);
-        if (!$user) return false;
+        $user = $this->userModel->findByOtpCode($otp);
+        if (!$user) {
+            return json_encode([
+                'status' => 'error',
+                'message' => 'Invalid or expired OTP'
+            ], 400);
+        }
 
-        return $this->userModel->updatePassword($user['id'], $newPassword);
+        $updated = $this->userModel->updatePassword($user['id'], $newPassword);
+        if ($updated) {
+            return json_encode([
+                'status' => 'success',
+                'message' => 'Password has been reset successfully'
+            ]);
+        } else {
+            return json_encode([
+                'status' => 'error',
+                'message' => 'Failed to reset password'
+            ], 500);
+        }
     }
 }

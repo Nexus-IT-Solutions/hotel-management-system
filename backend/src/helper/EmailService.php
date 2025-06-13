@@ -37,13 +37,14 @@ class EmailService
      * @param string $otpCode The 6-digit OTP to send.
      * @return bool True on success, false on failure.
      */
-    public function sendOtpEmail(string $toEmail, string $otpCode): bool
+    public static function sendOtpEmail(string $toEmail, string $otpCode): bool
     {
         try {
-            $this->mail->addAddress($toEmail);     // Add a recipient
+            $mail = new PHPMailer(true);
+            $mail->addAddress($toEmail);     // Add a recipient
 
-            $this->mail->Subject = 'Your One-Time Password (OTP) for Password Reset';
-            $this->mail->Body    = "
+            $mail->Subject = 'Your One-Time Password (OTP) for Password Reset';
+            $mail->Body    = "
                 <p>Dear User,</p>
                 <p>Your One-Time Password (OTP) for password reset is: <strong>{$otpCode}</strong></p>
                 <p>This OTP is valid for a limited time. Do not share this code with anyone.</p>
@@ -51,12 +52,12 @@ class EmailService
                 <p>Thank you,</p>
                 <p>The Hotel Management System Team</p>
             ";
-            $this->mail->AltBody = "Your One-Time Password (OTP) for password reset is: {$otpCode}. This OTP is valid for a limited time. Do not share this code with anyone. If you did not request a password reset, please ignore this email.";
+            $mail->AltBody = "Your One-Time Password (OTP) for password reset is: {$otpCode}. This OTP is valid for a limited time. Do not share this code with anyone. If you did not request a password reset, please ignore this email.";
 
-            $this->mail->send();
+            $mail->send();
             return true;
         } catch (Exception $e) {
-            error_log("Failed to send OTP email to {$toEmail}: {$this->mail->ErrorInfo}");
+            error_log("Failed to send OTP email to {$toEmail}: {$mail->ErrorInfo}");
             return false;
         }
     }

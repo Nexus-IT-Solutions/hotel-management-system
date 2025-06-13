@@ -108,7 +108,6 @@ class Users
         }
     }
 
-
     /**
      * Find a user by their ID
      * * @param string $id The user's UUID

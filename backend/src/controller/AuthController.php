@@ -94,8 +94,10 @@ class AuthController
                 'message' => 'Login successful',
                 'user' => $user,
                 'token' => $jwt,
+                'issued_at' => date('Y-m-d H:i:s'),
                 'expires_in' => $expiry
             ]);
+            
         } catch (Exception $e) {
             error_log("JWT generation error: " . $e->getMessage());
             return json_encode([
@@ -109,16 +111,20 @@ class AuthController
     /**
      * Initiates the password reset process for a user using OTP
      * 
-     * @param string $emailOrPhone The user's email or phone number
+     * @param string $email The user's email or phone number
      * @return string JSON response
      */
-    public function forgotPassword(string $emailOrPhone): ?string
+    public function forgotPassword(string $email): ?string
     {
-        // Find user by email or phone
-        $user = filter_var($emailOrPhone, FILTER_VALIDATE_EMAIL)
-            ? $this->userModel->getUserByEmail($emailOrPhone)
-            : $this->userModel->getUserByPhone($emailOrPhone);
-
+        // Find user by email
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return json_encode([
+                'status' => 'error',
+                'message' => 'Invalid email format'
+            ], 400);
+        }
+        // Check if user exists
+        $user = $this->userModel->getUserByEmail($email);
         if (!$user) {
             return json_encode([
                 'status' => 'error',
@@ -142,7 +148,7 @@ class AuthController
 
         // Send OTP via email or SMS
         $success = false;
-        if (filter_var($emailOrPhone, FILTER_VALIDATE_EMAIL)) {
+        if (filter_var($user['email'], FILTER_VALIDATE_EMAIL)) {
             // $success = MailHelper::sendPasswordResetEmail($user['email'], $user['name'], $otp);
         } else {
             // $success = SmsHelper::sendPasswordResetSMS($user['phone'], $otp);
@@ -159,6 +165,26 @@ class AuthController
                 'message' => 'Failed to send OTP'
             ], 500);
         }
+    }
+
+    /**
+     * Validates the OTP 
+     */
+    public function validateOtp(string $otp): string
+    {
+        $user = $this->userModel->findByOtpCode($otp);
+        if (!$user) {
+            return json_encode([
+                'status' => 'error',
+                'message' => 'Invalid or expired OTP'
+            ], 400);
+        }
+
+        return json_encode([
+            'status' => 'success',
+            'message' => 'OTP is valid',
+            'user_id' => $user['id']
+        ]);
     }
 
     /**

@@ -97,7 +97,7 @@ $app->get('/hello', function ($request, $response, $args) {
 (require_once __DIR__ . '/../src/routes/api.php')($app);
 
 // Add Not Found Handler - this must be added after all other routes are defined
-$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function ($request, $response) {
+$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], '/{routes:.+}', function ($request, $response) {
     $data = [
         'error' => 'Not Found',
         'message' => 'The requested route does not exist.',

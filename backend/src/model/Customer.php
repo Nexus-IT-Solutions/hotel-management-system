@@ -57,6 +57,51 @@ class Customer
         }
     }
 
+    public function getCustomersSummary(): array
+    {
+        try {
+            // SQL query to join customer, emergency contact, and booking data
+            // It groups by customer to count bookings and concatenate emergency contacts
+            $query = "
+                SELECT
+                    c.id AS id,
+                    c.full_name AS name,
+                    c.email AS email,
+                    c.phone AS phone,
+                    c.address AS address,
+                    -- Use GROUP_CONCAT to get emergency contact phone(s).
+                    -- DISTINCT ensures unique numbers if a customer has multiple emergency contacts.
+                    -- ORDER BY ensures consistent ordering if there are multiple.
+                    -- COALESCE handles cases where a customer has no emergency contact.
+                    COALESCE(GROUP_CONCAT(DISTINCT ec.phone ORDER BY ec.created_at DESC), 'N/A') AS emergencyContact,
+                    COUNT(b.id) AS totalBookings
+                FROM
+                    " . $this->table_name . " c
+                LEFT JOIN
+                    emergency_contacts ec ON c.id = ec.customer_id
+                LEFT JOIN
+                    bookings b ON c.id = b.customer_id
+                GROUP BY
+                    c.id, c.full_name, c.email, c.phone, c.address
+                ORDER BY
+                    c.full_name ASC; -- Order alphabetically by customer name
+            ";
+
+            $stmt = $this->db->prepare($query);
+
+            if (!$this->executeQuery($stmt)) {
+                // executeQuery already logs the error and sets $this->lastError
+                return [];
+            }
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to retrieve customer summary: " . $e->getMessage();
+            error_log($this->lastError); // Log the detailed error
+            return [];
+        }
+    }
+
     public function getById(string $id): ?array
     {
         try {

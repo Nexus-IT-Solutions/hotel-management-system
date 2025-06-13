@@ -112,6 +112,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS bookings (
     id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
+    booking_code VARCHAR(255) UNIQUE,
     customer_id CHAR(36),
     room_id CHAR(36),
     room_type_id CHAR(36),

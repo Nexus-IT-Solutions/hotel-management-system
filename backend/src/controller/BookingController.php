@@ -17,9 +17,9 @@ class BookingController
     /**
      * Get all bookings
      */
-    public function getAllBookings(): string
+    public function getAllBookingSummary(): string
     {
-        $bookings = $this->bookingModel->getAll();
+        $bookings = $this->bookingModel->getAllBookingSummary();
         return json_encode([
             'status' => !empty($bookings) ? 'success' : 'error',
             'bookings' => $bookings,

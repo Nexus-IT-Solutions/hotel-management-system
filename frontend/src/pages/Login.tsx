@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Mail, User, Lock, X, Loader2 } from "lucide-react";
 import Image1 from '../assets/images/image3.jpg';
-import { Link } from "react-router-dom";
+
 import axios from "axios";
 
 export default function Login() {
@@ -15,7 +15,7 @@ export default function Login() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // Hitting the endpoint using axios
-    axios.post("https://hotel-management-system-hqbw.onrender.com/v1/auth/login", {
+    axios.post("https://hotel-management-system-5gk8.onrender.com/v1/auth/login", {
       "username": username,
       "password": password
     })
@@ -24,11 +24,12 @@ export default function Login() {
       console.log(res)
       if (res.status === 200) {
         localStorage.setItem("token", res.data.token);
+        localStorage.setItem("username", res?.data?.user?.name || "");
         setIsLoading(false);
         window.location.href = "/admin";
       }
     })
-    .catch((error) => {
+    .catch(() => {
       alert("OOPs!!!. An error occurred");
       setIsLoading(false)
     });

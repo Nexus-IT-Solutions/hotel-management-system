@@ -1,11 +1,15 @@
 import { Bell, Menu, Search } from "lucide-react";
 
+
 interface HeaderProps {
   showLabels: boolean;
   setShowLabels: (value: boolean) => void;
 }
 
 const Header = (probs: HeaderProps) => {
+
+const getName = localStorage.getItem("username");
+  
   return (
     <header className="bg-white shadow-sm border-b px-6 py-5">
       <div className="flex items-center justify-between">
@@ -16,7 +20,7 @@ const Header = (probs: HeaderProps) => {
           />
 
           <div>
-            <h1>Welcome, Anthony Afriyie</h1>
+            <h1>Welcome, {getName}</h1>
           </div>
         </div>
 

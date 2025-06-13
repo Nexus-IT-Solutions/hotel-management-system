@@ -23,7 +23,10 @@ class EmailService
             $this->mail->isHTML(true);                                        // Set email format to HTML
         } catch (Exception $e) {
             error_log("PHPMailer initialization error: {$e->getMessage()}");
-            // You might want to throw an exception or handle this more gracefully
+            throw new Exception("Failed to initialize email service: " . $e->getMessage());
+            echo "Mailer Error: {$this->mail->ErrorInfo}";
+            return false;
+
         }
     }
 

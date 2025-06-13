@@ -12,15 +12,14 @@ class EmailService
         try {
             // Server settings
             $this->mail->isSMTP();                                            // Send using SMTP
-            $this->mail->Host       = $_ENV['SMTP_HOST'];                     // Set the SMTP server to send through
+            $this->mail->Host       = $_ENV['MAIL_HOST'];                     // Set the SMTP server to send through
             $this->mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-            $this->mail->Username   = $_ENV['SMTP_USERNAME'];               // SMTP username
-            $this->mail->Password   = $_ENV['SMTP_PASSWORD'];                  // SMTP password
-            $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` also accepted
-            $this->mail->Port       = $_ENV['SMTP_PORT'];                                    // TCP port to connect to
-
+            $this->mail->Username   = $_ENV['MAIL_USERNAME'];               // SMTP username
+            $this->mail->Password   = $_ENV['MAIL_PASSWORD'];                  // SMTP password
+            $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
+            $this->mail->Port       = $_ENV['MAIL_PORT'];
             // Recipients
-            $this->mail->setFrom('no-reply@yourdomain.com', 'Hotel Management System');
+            $this->mail->setFrom($_SERVER['HTTP_HOST'], 'Hotel Management System');
             $this->mail->isHTML(true);                                        // Set email format to HTML
         } catch (Exception $e) {
             error_log("PHPMailer initialization error: {$e->getMessage()}");

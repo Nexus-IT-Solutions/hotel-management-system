@@ -11,19 +11,22 @@ class EmailService
         $this->mail = new PHPMailer(true); // Enable exceptions
         try {
             // Server settings
-            $this->mail->isSMTP();                                            // Send using SMTP
-            $this->mail->Host       = $_ENV['MAIL_HOST'];                     // Set the SMTP server to send through
-            $this->mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-            $this->mail->Username   = $_ENV['MAIL_USERNAME'];               // SMTP username
-            $this->mail->Password   = $_ENV['MAIL_PASSWORD'];                  // SMTP password
-            $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
+            $this->mail->isSMTP();
+            $this->mail->Host       = $_ENV['MAIL_HOST'];   
+            $this->mail->SMTPAuth   = true;
+            $this->mail->Username   = $_ENV['MAIL_USERNAME'];   
+            $this->mail->Password   = $_ENV['MAIL_PASSWORD'];                  
+            $this->mail->SMTPSecure = $_ENV['MAIL_ENCRYPTION'];
             $this->mail->Port       = $_ENV['MAIL_PORT'];
             // Recipients
-            $this->mail->setFrom($_SERVER['HTTP_HOST'], 'Hotel Management System');
-            $this->mail->isHTML(true);                                        // Set email format to HTML
+            $this->mail->setFrom('no-reply@yourdomain.com', 'Hotel Management System');
+            $this->mail->isHTML(true);
         } catch (Exception $e) {
             error_log("PHPMailer initialization error: {$e->getMessage()}");
-            // You might want to throw an exception or handle this more gracefully
+            throw new Exception("Failed to initialize email service: " . $e->getMessage());
+            echo "Mailer Error: {$this->mail->ErrorInfo}";
+            return false;
+
         }
     }
 
@@ -54,6 +57,7 @@ class EmailService
             return true;
         } catch (Exception $e) {
             error_log("Failed to send OTP email to {$toEmail}: {$this->mail->ErrorInfo}");
+            echo "Mailer Error: {$this->mail->ErrorInfo}";
             return false;
         }
     }

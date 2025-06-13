@@ -149,7 +149,8 @@ class AuthController
         // Send OTP via email or SMS
         $success = false;
         if (filter_var($user['email'], FILTER_VALIDATE_EMAIL)) {
-            // $success = MailHelper::sendPasswordResetEmail($user['email'], $user['name'], $otp);
+            $mail = new EmailService();
+            $success = $mail->sendOtpEmail($user['email'], $otp);
         } else {
             // $success = SmsHelper::sendPasswordResetSMS($user['phone'], $otp);
         }

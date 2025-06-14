@@ -11,6 +11,14 @@ return function ($app): void{
         return $response->withHeader('Content-Type', 'application/json');
     });
 
+    // Get all branch users
+    $app->get('/v1/users/branch/{branchId}', function ($request, $response, $args) use ($userController) {
+        $branchId = $args['branchId'] ?? '';
+        $result = $userController->getBranchUsers($branchId);
+        $response->getBody()->write($result);
+        return $response->withHeader('Content-Type', 'application/json');
+    });
+
     // Get user by ID
     $app->get('/v1/users/{id}', function ($request, $response) use ($userController) {
         $id = $args['id'] ?? '';

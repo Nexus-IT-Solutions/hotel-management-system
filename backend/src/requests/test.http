@@ -11,11 +11,20 @@ Content-Type: application/json
 GET http://api.hotel.com/v1/auth
 
 ###
-http://api.hotel.com/v1/dashboard/stbats
+// SEND OTP
+POST http://api.hotel.com/v1/auth/forgot-password
+Content-Type: application/json
 
+{
+    "email": "kwamegilbert1114@gmail.com"
+}
+
+// Get room availability
+GET http://api.hotel.com/v1/rooms/availability/branch/
 
 
         
+
         
     
     

@@ -35,7 +35,7 @@ class RoomController
     {
         $availability = $this->roomModel->getRoomAvailability($branchId);
         return json_encode([
-            'status' => !empty($availability) ? 'success' : 'error',
+            'status' => $availability ? 'success' : 'error',
             'roomAvailability' => $availability,
             'message' => !empty($availability) ? null : 'No room availability found for this branch'
         ], JSON_PRETTY_PRINT);

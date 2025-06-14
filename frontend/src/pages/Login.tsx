@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Mail, User, Lock, X, ArrowLeft, CheckCircle, Eye, EyeOff } from "lucide-react";
+import { Mail, User, Lock, X, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import Image1 from "../assets/images/image3.jpg";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -50,19 +50,19 @@ export default function Login() {
     setIsLoading(true);
 
     axios
-      .post("https://hotel-management-system-5gk8.onrender.com/v1/auth/login", {
+      .post("http://api.hotel.com/v1/auth/login", {
         usernameOrEmail: username,
         password: password,
       })
       .then((res) => {
-        if (res.status === 200) {
+        if (res.data.code === 200 && res.data.status === 'success') {
           localStorage.setItem(
             "userData",
             JSON.stringify({
               user: res.data.user,
               token: res.data.token,
             })
-          );
+          ); 
           setIsLoading(false);
           if (res.data.user.role === "manager") {
             Swal.fire({
@@ -86,24 +86,44 @@ export default function Login() {
             });
             window.location.href = "/ceo";
           }
-        }
-      })
-      .catch((error) => {
-        if (error.status === 401) {
+        } else if (res.data.code === 404 && res.data.status === 'error') {
           Swal.fire({
-            title: "Error",
-            text: "Incorrect username or password. Please try again.",
+            title: "Not Found",
+            text: res.data.message || "User not found, please check your email or username",
+            icon: "error"
+          });
+          setIsLoading(false);
+        } else if (res.data.code === 401 && res.data.status === 'error') {
+          Swal.fire({
+            title: "Unauthorized",
+            text: res.data.message || "Incorrect password, please try again",
+            icon: "error",
+          });
+          setIsLoading(false);
+        } else if (res.data.code === 403 && res.data.status === 'error') {
+          Swal.fire({
+            title: "Deactivated",
+            text: res.data.message || "Account deactivated",
             icon: "error",
           });
           setIsLoading(false);
         } else {
           Swal.fire({
             title: "Error",
-            text: "An error occurred while logging in. Please check your network connection and other settings and try again.",
+            text: "Something went wrong, please try again later or contact system admin",
             icon: "error",
           });
           setIsLoading(false);
         }
+      })
+      .catch((error) => {  
+        console.log(error);
+          Swal.fire({
+            title: "Error",
+            text: "An error occurred while logging in. Please check your network connection and other settings and try again.",
+            icon: "error",
+          });
+          setIsLoading(false);
       });
   };
 
@@ -171,11 +191,9 @@ export default function Login() {
       // Open OTP modal and push to stack
       setShowForgotModal(false);
       setShowOtpModal(true);
-      setModalStack((prev) => [...prev, "forgot"]);
-
+      setModalStack((prev) => [...prev, "forgot"]);      
       
-      
-    } catch (error) {
+    } catch {
       Swal.fire({
         title: "Error",
         text: "An error occurred while sending the OTP. Please check your network connection and try again.",
@@ -243,7 +261,7 @@ export default function Login() {
     setShowResetModal(true);
     setModalStack((prev) => [...prev, "otp"]);
     }
-    catch (error) {
+    catch {
       Swal.fire({
         title: "Error",
         text: "An error occurred while verifying the OTP. Please check your OTP digits or network connection and try again.",
@@ -319,7 +337,7 @@ export default function Login() {
       icon: "success",
     });
     }
-    catch (error) {
+    catch {
       Swal.fire({
         title: "Error",
         text: "An error occurred while resetting your password. Please check your network connection and try again.",
@@ -396,7 +414,7 @@ export default function Login() {
       setOtp(["", "", "", "", "", ""]); // Clear previous OTP
       Swal.fire("OTP resent!", "Check your email for a new code.", "info");
       setResendCountdown(60); // Restart countdown
-    } catch (error) {
+    } catch {
       Swal.fire("Error", "Failed to resend OTP.", "error");
     } finally {
       setIsResendingOtp(false);

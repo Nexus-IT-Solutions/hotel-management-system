@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Mail, User, Lock, X, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import Image1 from "../assets/images/image3.jpg";
 import axios from "axios";
@@ -37,6 +37,13 @@ export default function Login() {
 
   // Track modal stack for back navigation
   const [modalStack, setModalStack] = useState<string[]>([]);
+
+  // Add this state for countdown
+  const [resendCountdown, setResendCountdown] = useState(60);
+
+  // Add these states in your component:
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [isResendingOtp, setIsResendingOtp] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -133,8 +140,30 @@ export default function Login() {
 
     try {
       // TODO: Call API to send OTP to email
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-      setForgotPasswordState((prev) => ({
+      const response = await axios.post("https://hotel-management-system-5gk8.onrender.com/v1/auth/forgot-password", JSON.stringify(
+        { email: forgotPasswordState.email }
+      ));
+
+      if (response.status !== 200) {
+        throw new Error("Failed to send OTP");
+      }
+
+        const now = Math.floor(Date.now() / 1000);
+        console.log(response.data.expires_in);
+        const otpExpiry = now + Number(response.data.expires_in);
+        // Storing response data in localstorage
+        localStorage.setItem("forgotPasswordData", JSON.stringify({
+          user: response.data.user,
+          token: response.data.token,
+          expires_in: otpExpiry,
+        }));
+        Swal.fire({
+          title: "OTP Sent",
+          text: "An OTP has been sent to your email. Please check your inbox.",
+          icon: "success",
+        });
+
+        setForgotPasswordState((prev) => ({
         ...prev,
         isLoading: false,
         isSubmitted: true,
@@ -143,11 +172,19 @@ export default function Login() {
       setShowForgotModal(false);
       setShowOtpModal(true);
       setModalStack((prev) => [...prev, "forgot"]);
-    } catch (error) {
+
+      
+      
+    } catch {
+      Swal.fire({
+        title: "Error",
+        text: "An error occurred while sending the OTP. Please check your network connection and try again.",
+        icon: "error",
+      });
       setForgotPasswordState((prev) => ({
         ...prev,
         isLoading: false,
-        error: "Network error. Please try again.",
+        error: "Error. Please try again.",
       }));
     }
   };
@@ -184,11 +221,38 @@ export default function Login() {
       setOtpError("Please enter the 6-digit OTP.");
       return;
     }
-    // TODO: Call API to verify OTP
-    await new Promise((resolve) => setTimeout(resolve, 1200));
+
+    // Expiry check code here...
+
+    setIsVerifyingOtp(true);
+    try {
+      // API call to verify OTP
+      const response = await axios.post("https://hotel-management-system-5gk8.onrender.com/v1/auth/validate-otp", {
+        otp: otp.join(""),
+      });
+    if (response.status !== 200 ) {
+      setOtpError(response.data.message || "Invalid OTP. Please try again.");
+      return;
+    }
+    Swal.fire({
+      title: "OTP Verified",
+      text: "Your OTP has been successfully verified.",
+      icon: "success",
+    });
     setShowOtpModal(false);
     setShowResetModal(true);
     setModalStack((prev) => [...prev, "otp"]);
+    }
+    catch {
+      Swal.fire({
+        title: "Error",
+        text: "An error occurred while verifying the OTP. Please check your OTP digits or network connection and try again.",
+        icon: "error",
+      });
+      setOtpError("Error. Please try again.");
+    } finally {
+      setIsVerifyingOtp(false);
+    }
   };
 
   // Reset Password Modal Handlers
@@ -220,8 +284,25 @@ export default function Login() {
       isLoading: true,
       error: "",
     }));
+
+
     // TODO: Call API to reset password
-    await new Promise((resolve) => setTimeout(resolve, 1200));
+    try{
+      const response = await axios.post("https://hotel-management-system-5gk8.onrender.com/v1/auth/reset-password", JSON.stringify(
+      {
+      otp: otp.join(""),
+      newPassword: resetState.password,
+    }
+    ));
+
+    if (response.status !== 200 ) {
+      setResetState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: response.data.message || "Failed to reset password. Please try again.",
+      }));
+      return;
+    }
     setResetState({
       password: "",
       confirmPassword: "",
@@ -237,6 +318,19 @@ export default function Login() {
       text: "You can now log in with your new password.",
       icon: "success",
     });
+    }
+    catch {
+      Swal.fire({
+        title: "Error",
+        text: "An error occurred while resetting your password. Please check your network connection and try again.",
+        icon: "error",
+      });
+      setResetState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: "Error. Please try again.",
+      }));
+    }
   };
 
   // Modal Navigation
@@ -274,6 +368,39 @@ export default function Login() {
       showPassword: false,
       showConfirmPassword: false,
     });
+  };
+
+  // Start countdown when OTP modal opens
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (showOtpModal && resendCountdown > 0) {
+      timer = setInterval(() => {
+        setResendCountdown((prev) => prev - 1);
+      }, 1000);
+    }
+    if (!showOtpModal) {
+      setResendCountdown(60); // Reset when modal closes
+    }
+    return () => clearInterval(timer);
+  }, [showOtpModal, resendCountdown]);
+
+  // Resend OTP handler
+  const handleResendOtp = async () => {
+    setIsResendingOtp(true);
+    try {
+      // TODO: Call API to resend OTP here
+      // await axios.post("/api/resend-otp", { email: forgotPasswordState.email });
+      await axios.post("https://hotel-management-system-5gk8.onrender.com/v1/auth/forgot-password", {
+        email: forgotPasswordState.email,
+      });
+      setOtp(["", "", "", "", "", ""]); // Clear previous OTP
+      Swal.fire("OTP resent!", "Check your email for a new code.", "info");
+      setResendCountdown(60); // Restart countdown
+    } catch {
+      Swal.fire("Error", "Failed to resend OTP.", "error");
+    } finally {
+      setIsResendingOtp(false);
+    }
   };
 
   return (
@@ -502,20 +629,23 @@ export default function Login() {
                 )}
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition mb-2"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition mb-2 disabled:opacity-50"
+                  disabled={isVerifyingOtp}
                 >
-                  Verify OTP
+                  {isVerifyingOtp ? "Verifying..." : "Verify OTP"}
                 </button>
               </form>
               <button
                 type="button"
-                className="text-blue-500 hover:underline text-sm mt-2"
-                onClick={() => {
-                  // TODO: Resend OTP API
-                  Swal.fire("OTP resent!", "Check your email for a new code.", "info");
-                }}
+                className={`text-blue-500 hover:underline text-sm mt-2 disabled:opacity-50`}
+                onClick={handleResendOtp}
+                disabled={resendCountdown > 0 || isResendingOtp}
               >
-                Resend OTP
+                {isResendingOtp
+                  ? "Resending..."
+                  : resendCountdown > 0
+                  ? `Resend OTP in 0:${resendCountdown.toString().padStart(2, "0")}`
+                  : "Resend OTP"}
               </button>
             </div>
           </div>

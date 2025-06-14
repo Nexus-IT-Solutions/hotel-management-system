@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Mail, User, Lock, X, ArrowLeft, CheckCircle, Eye, EyeOff } from "lucide-react";
 import Image1 from "../assets/images/image3.jpg";
 import axios from "axios";
@@ -37,6 +37,13 @@ export default function Login() {
 
   // Track modal stack for back navigation
   const [modalStack, setModalStack] = useState<string[]>([]);
+
+  // Add this state for countdown
+  const [resendCountdown, setResendCountdown] = useState(60);
+
+  // Add these states in your component:
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [isResendingOtp, setIsResendingOtp] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,15 +148,8 @@ export default function Login() {
         throw new Error("Failed to send OTP");
       }
 
-      if (!response.data.success) {
-        setForgotPasswordState((prev) => ({
-          ...prev,
-          isLoading: false,
-          error: response.data.message || "Failed to send OTP. Please try again.",
-        }));
-        return;
-      }else{
         const now = Math.floor(Date.now() / 1000);
+        console.log(response.data.expires_in);
         const otpExpiry = now + Number(response.data.expires_in);
         // Storing response data in localstorage
         localStorage.setItem("forgotPasswordData", JSON.stringify({
@@ -173,7 +173,7 @@ export default function Login() {
       setShowOtpModal(true);
       setModalStack((prev) => [...prev, "forgot"]);
 
-      }
+      
       
     } catch (error) {
       Swal.fire({
@@ -222,30 +222,15 @@ export default function Login() {
       return;
     }
 
-    // Get expiry from localStorage
-    const forgotData = localStorage.getItem("forgotPasswordData");
-    if (forgotData) {
-      const { expires_in } = JSON.parse(forgotData);
-      const nowSeconds = Math.floor(Date.now() / 1000);
-      if (nowSeconds > expires_in) {
-        Swal.fire({
-          title: "OTP Expired",
-          text: "The OTP has expired. Please request a new one.",
-          icon: "error",
-        });
-        closeAllModals();
-        return;
-      }
-    }
+    // Expiry check code here...
 
-    // TODO: Call API to verify OTP
-    try{
-      const response = await axios.post("https://hotel-management-system-5gk8.onrender.com/v1/auth/validate-otp", JSON.stringify({
-
-      otp: otp.join(""),
-
-      }));
-    if (response.status !== 200 || !response.data.success) {
+    setIsVerifyingOtp(true);
+    try {
+      // API call to verify OTP
+      const response = await axios.post("https://hotel-management-system-5gk8.onrender.com/v1/auth/validate-otp", {
+        otp: otp.join(""),
+      });
+    if (response.status !== 200 ) {
       setOtpError(response.data.message || "Invalid OTP. Please try again.");
       return;
     }
@@ -265,6 +250,8 @@ export default function Login() {
         icon: "error",
       });
       setOtpError("Error. Please try again.");
+    } finally {
+      setIsVerifyingOtp(false);
     }
   };
 
@@ -308,7 +295,7 @@ export default function Login() {
     }
     ));
 
-    if (response.status !== 200 || !response.data.success) {
+    if (response.status !== 200 ) {
       setResetState((prev) => ({
         ...prev,
         isLoading: false,
@@ -381,6 +368,39 @@ export default function Login() {
       showPassword: false,
       showConfirmPassword: false,
     });
+  };
+
+  // Start countdown when OTP modal opens
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (showOtpModal && resendCountdown > 0) {
+      timer = setInterval(() => {
+        setResendCountdown((prev) => prev - 1);
+      }, 1000);
+    }
+    if (!showOtpModal) {
+      setResendCountdown(60); // Reset when modal closes
+    }
+    return () => clearInterval(timer);
+  }, [showOtpModal, resendCountdown]);
+
+  // Resend OTP handler
+  const handleResendOtp = async () => {
+    setIsResendingOtp(true);
+    try {
+      // TODO: Call API to resend OTP here
+      // await axios.post("/api/resend-otp", { email: forgotPasswordState.email });
+      await axios.post("https://hotel-management-system-5gk8.onrender.com/v1/auth/forgot-password", {
+        email: forgotPasswordState.email,
+      });
+      setOtp(["", "", "", "", "", ""]); // Clear previous OTP
+      Swal.fire("OTP resent!", "Check your email for a new code.", "info");
+      setResendCountdown(60); // Restart countdown
+    } catch (error) {
+      Swal.fire("Error", "Failed to resend OTP.", "error");
+    } finally {
+      setIsResendingOtp(false);
+    }
   };
 
   return (
@@ -609,20 +629,23 @@ export default function Login() {
                 )}
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition mb-2"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition mb-2 disabled:opacity-50"
+                  disabled={isVerifyingOtp}
                 >
-                  Verify OTP
+                  {isVerifyingOtp ? "Verifying..." : "Verify OTP"}
                 </button>
               </form>
               <button
                 type="button"
-                className="text-blue-500 hover:underline text-sm mt-2"
-                onClick={() => {
-                  // TODO: Resend OTP API
-                  Swal.fire("OTP resent!", "Check your email for a new code.", "info");
-                }}
+                className={`text-blue-500 hover:underline text-sm mt-2 disabled:opacity-50`}
+                onClick={handleResendOtp}
+                disabled={resendCountdown > 0 || isResendingOtp}
               >
-                Resend OTP
+                {isResendingOtp
+                  ? "Resending..."
+                  : resendCountdown > 0
+                  ? `Resend OTP in 0:${resendCountdown.toString().padStart(2, "0")}`
+                  : "Resend OTP"}
               </button>
             </div>
           </div>

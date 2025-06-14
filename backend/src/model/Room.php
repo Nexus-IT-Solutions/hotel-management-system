@@ -230,6 +230,72 @@ class Room
         }
     }
 
+    /**
+     * Check if a hotel ID exists
+     * 
+     * @param string $hotel_id The hotel ID to check
+     * @return bool True if exists, false otherwise
+     */
+    protected function hotelExists(string $hotel_id): bool
+    {
+        try {
+            $sql = "SELECT COUNT(*) FROM hotels WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            if (!$this->executeQuery($stmt, [':id' => $hotel_id])) {
+                return false;
+            }
+            return (int)$stmt->fetchColumn() > 0;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to verify hotel: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
+    }
+
+    /**
+     * Check if a branch ID exists
+     * 
+     * @param string $branch_id The branch ID to check
+     * @return bool True if exists, false otherwise
+     */
+    protected function branchExists(string $branch_id): bool
+    {
+        try {
+            $sql = "SELECT COUNT(*) FROM branches WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            if (!$this->executeQuery($stmt, [':id' => $branch_id])) {
+                return false;
+            }
+            return (int)$stmt->fetchColumn() > 0;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to verify branch: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
+    }
+
+    /**
+     * Check if a room type ID exists
+     * 
+     * @param string $room_type_id The room type ID to check
+     * @return bool True if exists, false otherwise
+     */
+    protected function roomTypeExists(string $room_type_id): bool
+    {
+        try {
+            $sql = "SELECT COUNT(*) FROM room_types WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            if (!$this->executeQuery($stmt, [':id' => $room_type_id])) {
+                return false;
+            }
+            return (int)$stmt->fetchColumn() > 0;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to verify room type: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
+    }
+
     public function create(array $data): bool
     {
         $requiredFields = ['hotel_id', 'branch_id', 'room_type_id', 'room_number', 'floor', 'status'];
@@ -243,6 +309,24 @@ class Room
         // Check if room number already exists in this branch
         if ($this->roomNumberExists($data['branch_id'], $data['room_number'])) {
             $this->lastError = "Room number {$data['room_number']} already exists in this branch";
+            return false;
+        }
+        
+        // Validate that the hotel_id exists
+        if (!$this->hotelExists($data['hotel_id'])) {
+            $this->lastError = "Hotel ID {$data['hotel_id']} does not exist. Foreign key constraint violation for 'hotel_id'";
+            return false;
+        }
+        
+        // Validate branch_id
+        if (!$this->branchExists($data['branch_id'])) {
+            $this->lastError = "Branch ID {$data['branch_id']} does not exist. Foreign key constraint violation for 'branch_id'";
+            return false;
+        }
+        
+        // Validate room_type_id
+        if (!$this->roomTypeExists($data['room_type_id'])) {
+            $this->lastError = "Room Type ID {$data['room_type_id']} does not exist. Foreign key constraint violation for 'room_type_id'";
             return false;
         }
 

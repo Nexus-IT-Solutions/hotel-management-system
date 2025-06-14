@@ -1,9 +1,7 @@
 import { Globe, LockIcon, User2Icon, Upload, Printer } from "lucide-react";
 import React, { useState } from "react";
-import Swal from "sweetalert2"
+import Swal from "sweetalert2";
 
-
- 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("general");
   const [profile, setProfile] = useState({
@@ -20,36 +18,38 @@ export default function Settings() {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
 
-
-
-  const handlePreferencesChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
+  const handlePreferencesChange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLSelectElement>
+  ) => {
     const { name, value, type } = e.target;
     setPreferences({
       ...preferences,
-      [name]: type === "checkbox" && "checked" in e.target
-        ? (e.target as HTMLInputElement).checked
-        : value,
+      [name]:
+        type === "checkbox" && "checked" in e.target
+          ? (e.target as HTMLInputElement).checked
+          : value,
     });
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
- 
-     Swal.fire({
-  title: "Do you want to save the changes?",
-  showDenyButton: true,
-  showCancelButton: true,
-  confirmButtonText: "Save",
-  denyButtonText: `Don't save`
-}).then((result) => {
-  /* Read more about isConfirmed, isDenied below */
-  if (result.isConfirmed) {
-    Swal.fire("Saved!", "", "success");
-  } else if (result.isDenied) {
-    Swal.fire("Changes are not saved", "", "info");
-  }
-});
-    
+
+    Swal.fire({
+      title: "Do you want to save the changes?",
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: "Save",
+      denyButtonText: `Don't save`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        Swal.fire("Saved!", "", "success");
+      } else if (result.isDenied) {
+        Swal.fire("Changes are not saved", "", "info");
+      }
+    });
   };
 
   return (
@@ -285,7 +285,84 @@ export default function Settings() {
                 </div>
 
                 <div className="flex items-center justify-end py-4">
-                  <input type="submit" className="bg-blue-600 px-4 py-2 text-white text-xl font-medium rounded-sm"/>
+                  <input
+                    type="submit"
+                    className="bg-blue-600 px-4 py-2 text-white text-sm font-medium rounded-sm"
+                  />
+                </div>
+              </form>
+            </div>
+          )}
+
+          {activeTab === "password" && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800">
+                Change Password
+              </h3>
+
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Current Password
+                    </label>
+                    <input
+                      type="password"
+                      name="currentPassword"
+                      placeholder="Enter your current password"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      New Password
+                    </label>
+                    <input
+                      type="password"
+                      name="newPassword"
+                      placeholder="Enter your new password"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Confirm New Password
+                    </label>
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      placeholder="Confirm your new password"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-6">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                    <h4 className="text-sm font-medium text-yellow-800 mb-2">
+                      Password Requirements:
+                    </h4>
+                    <ul className="text-sm text-yellow-700 space-y-1">
+                      <li>• At least 8 characters long</li>
+                      <li>• Contains at least one uppercase letter</li>
+                      <li>• Contains at least one lowercase letter</li>
+                      <li>• Contains at least one number</li>
+                      <li>• Contains at least one special character</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end py-4">
+                  <input
+                    type="submit"
+                    value="Update Password"
+                    className="bg-blue-600 px-4 py-2 text-white text-sm font-medium rounded-sm cursor-pointer hover:bg-blue-700 transition-colors"
+                  />
                 </div>
               </form>
             </div>
@@ -294,11 +371,10 @@ export default function Settings() {
       </main>
     </div>
   );
-};
-
+}
 
 const tabs = [
   { id: "general", label: "General", icon: Globe },
   { id: "profile", label: "Profile", icon: User2Icon },
-  { id: "password", label: "Change Password", icon: LockIcon }
+  { id: "password", label: "Change Password", icon: LockIcon },
 ];

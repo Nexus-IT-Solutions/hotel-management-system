@@ -32,9 +32,9 @@ createRoot(document.getElementById('root')!).render(
       <Route
         path='/admin'
         element={
-          <ProtectedRoute>
+          // <ProtectedRoute>
             <MainLayout />
-          </ProtectedRoute>
+          // </ProtectedRoute>
         }
       >
         <Route index element={<Dashboard />} />

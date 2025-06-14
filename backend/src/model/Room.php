@@ -314,13 +314,13 @@ class Room
         
         // Validate that the hotel_id exists
         if (!$this->hotelExists($data['hotel_id'])) {
-            $this->lastError = "Hotel ID {$data['hotel_id']} does not exist. Foreign key constraint violation for 'hotel_id'";
+            $this->lastError = "Hotel ID {$data['hotel_id']} does not exist.";
             return false;
         }
         
         // Validate branch_id
         if (!$this->branchExists($data['branch_id'])) {
-            $this->lastError = "Branch ID {$data['branch_id']} does not exist. Foreign key constraint violation for 'branch_id'";
+            $this->lastError = "Branch ID {$data['branch_id']} does not exist. ";
             return false;
         }
         

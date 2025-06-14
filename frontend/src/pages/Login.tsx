@@ -50,12 +50,14 @@ export default function Login() {
     setIsLoading(true);
 
     axios
-      .post("https://hotel-management-system-5gk8.onrender.com/v1/auth/login", {
+      .post("http://api.hotel.com/v1/auth/login", {
         usernameOrEmail: username,
         password: password,
       })
       .then((res) => {
-        if (res.status === 200 && res.data.status === "success") {
+        console.log(res.data.code);
+        console.log(res.data.status);
+        if (res.data.code === 200 && res.data.status === 'success') {
           localStorage.setItem(
             "userData",
             JSON.stringify({
@@ -86,35 +88,37 @@ export default function Login() {
             });
             window.location.href = "/ceo";
           }
-        }else if(res.status === 404 && res.data.status === "error"){
+        } else if (res.data.code === 404 && res.data.status === 'error') {
           Swal.fire({
             title: "Not Found",
             text: res.data.message || "User not found, please check your email or username",
             icon: "error"
           });
           setIsLoading(false);
-        }else if(res.status === 401 && res.data.status === "error"){
-            Swal.fire({
-              title: "Unauthorized",
-              text: res.data.message || "Incorrect password, please try again",
-              icon: "error",
-            });
-            setIsLoading(false);
-        }else if(res.status === 403 && res.data.status === "error"){
-            Swal.fire({
-              title: "Deactivated",
-              text: res.data.message || "Account deactivated",
-              icon: "error",
-            });
-            setIsLoading(false);
-        }else{
-          Swal.fire({ 
-            title: "Error",
-            text: "Something went wrong, please try again later or contact system admin",
+        } else if (res.data.code === 401 && res.data.status === 'error') {
+          Swal.fire({
+            title: "Unauthorized",
+            text: res.data.message || "Incorrect password, please try again",
+            icon: "error",
+          });
+          setIsLoading(false);
+        } else if (res.data.code === 403 && res.data.status === 'error') {
+          Swal.fire({
+            title: "Deactivated",
+            text: res.data.message || "Account deactivated",
             icon: "error",
           });
           setIsLoading(false);
         }
+        setIsLoading(false);
+        // else{
+        //   Swal.fire({ 
+        //     title: "Error",
+        //     text: "Something went wrong, please try again later or contact system admin",
+        //     icon: "error",
+        //   });
+        //   setIsLoading(false);
+        // }
       })
       .catch((error) => {  
         console.log(error);

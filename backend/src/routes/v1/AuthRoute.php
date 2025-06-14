@@ -9,8 +9,8 @@ return function ($app): void{
         $usernameOrEmail = $data['usernameOrEmail'] ?? '';
         $password = $data['password'] ?? '';
         $result = $authController->login($usernameOrEmail, $password);
-        $response->getBody()->write(json_encode($result));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus($result['code']);
+        $response->getBody()->write($result);
+        return $response->withHeader('Content-Type', 'application/json');
     });
 
     // Forgot Password Route
@@ -18,7 +18,7 @@ return function ($app): void{
         $data = json_decode($request->getBody()->getContents(), true);
         $email = $data['email'] ?? '';
         $result = $authController->forgotPassword($email);
-        $response->getBody()->write(json_encode($result));
+        $response->getBody()->write($result);
         return $response->withHeader('Content-Type', 'application/json');
     });
 
@@ -27,7 +27,7 @@ return function ($app): void{
         $data = json_decode($request->getBody()->getContents(), true);
         $otp = $data['otp'] ?? '';
         $result = $authController->validateOtp($otp);
-        $response->getBody()->write(json_encode($result));
+        $response->getBody()->write($result);
         return $response->withHeader('Content-Type', 'application/json');
     });
 
@@ -37,7 +37,7 @@ return function ($app): void{
         $otp = $data['otp'] ?? '';
         $newPassword = $data['newPassword'] ?? '';
         $result = $authController->resetPassword($otp, $newPassword);
-        $response->getBody()->write(json_encode($result));
+        $response->getBody()->write($result);
         return $response->withHeader('Content-Type', 'application/json');
     });
 };

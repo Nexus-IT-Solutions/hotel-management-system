@@ -21,7 +21,7 @@ export default function StaffTable() {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        'https://hotel-management-system-5gk8.onrender.com/v1/users',
+        'https://hotel-management-system-5gk8.onrender.com/v1/users/branch/2092ff29-4786-11f0-a9cd-862ccfb04b4e',
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -29,7 +29,7 @@ export default function StaffTable() {
         }
       );
 
-      setUsers(response.data.users || []);
+      setUsers(response.data.branchUsers || []);
     } catch (error) {
       console.error('Failed to fetch users:', error);
     } finally {

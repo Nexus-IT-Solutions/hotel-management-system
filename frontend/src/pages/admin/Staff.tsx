@@ -1,119 +1,39 @@
-import  { useState } from 'react';
-import { Plus , Shield, User, Settings } from 'lucide-react';
-import StaffTable from '../../components/admin-components/StaffTable';
+import { useState } from "react";
+import { Plus, Shield, User, Settings } from "lucide-react";
+import StaffTable from "../../components/admin-components/StaffTable";
+import AddUser from "../../components/admin-components/AddUser";
 
-export default function Staff(){
-
-  // const handleDelete = () => {
-  //     Swal.fire({
-  //   title: "Are you sure?",
-  //   text: "You won't be able to revert this!",
-  //   icon: "warning",
-  //   showCancelButton: true,
-  //   confirmButtonColor: "#d33",
-  //   cancelButtonColor: "#D3D3D3",
-  //   confirmButtonText: "Yes, delete it!"
-  // }).then((result) => {
-  //   if (result.isConfirmed) {
-  //     Swal.fire({
-  //       title: "Deleted!",
-  //       text: "Your record has been deleted.",
-  //       icon: "success"
-  //     });
-  //   }
-  // });
-  //   }
-
-
+export default function Staff() {
   const [showAddUser, setShowAddUser] = useState(false);
-  const [newUser, setNewUser] = useState({
-    name: '',
-    email: '',
-    role: 'receptionist',
-    phone: '',
-    password: ''
-  });
-
-  // const users = [
-  //   {
-  //     id: 1,
-  //     name: 'John Doe',
-  //     email: 'john.doe@hotelflow.com',
-  //     phone: '+1 (555) 123-4567',
-  //     role: 'manager',
-  //     status: 'active',
-  //     lastLogin: '2024-01-20 09:30:00',
-  //     createdAt: '2023-06-15'
-  //   },
-  //   {
-  //     id: 2,
-  //     name: 'Sarah Johnson',
-  //     email: 'sarah.j@hotelflow.com',
-  //     phone: '+1 (555) 234-5678',
-  //     role: 'receptionist',
-  //     status: 'active',
-  //     lastLogin: '2024-01-20 14:22:00',
-  //     createdAt: '2023-08-22'
-  //   },
-  //   {
-  //     id: 3,
-  //     name: 'Mike Brown',
-  //     email: 'mike.brown@hotelflow.com',
-  //     phone: '+1 (555) 345-6789',
-  //     role: 'receptionist',
-  //     status: 'inactive',
-  //     lastLogin: '2024-01-18 16:45:00',
-  //     createdAt: '2023-09-10'
-  //   },
-  //   {
-  //     id: 4,
-  //     name: 'Emily Davis',
-  //     email: 'emily.d@hotelflow.com',
-  //     phone: '+1 (555) 456-7890',
-  //     role: 'manager',
-  //     status: 'active',
-  //     lastLogin: '2024-01-20 11:15:00',
-  //     createdAt: '2023-05-30'
-  //   }
-  // ];
-
-  
-
-  const handleAddUser = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Handle user creation
-    console.log('Creating user:', newUser);
-    setShowAddUser(false);
-    setNewUser({ name: '', email: '', role: 'receptionist', phone: '', password: '' });
-  };
 
   const permissions = {
     manager: [
-      'View all bookings',
-      'Create/edit bookings',
-      'Manage customers',
-      'View reports',
-      'Manage users',
-      'Hotel settings',
-      'Financial data'
+      "View all bookings",
+      "Create/edit bookings",
+      "Manage customers",
+      "View reports",
+      "Manage users",
+      "Hotel settings",
+      "Financial data",
     ],
     receptionist: [
-      'View bookings',
-      'Create/edit bookings',
-      'Room availability',
-      'Customer check-in/out',
-      'Basic customer info'
-    ]
+      "View bookings",
+      "Create/edit bookings",
+      "Room availability",
+      "Customer check-in/out",
+      "Basic customer info",
+    ],
   };
 
-
-  return(
+  return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">User Management</h2>
-          <p className="text-gray-600">Manage system users and their permissions</p>
+          <p className="text-gray-600">
+            Manage system users and their permissions
+          </p>
         </div>
         <button
           onClick={() => setShowAddUser(true)}
@@ -137,7 +57,7 @@ export default function Staff(){
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-lg shadow border-b-4 border-purple-600">
           <div className="flex items-center justify-between">
             <div>
@@ -149,7 +69,7 @@ export default function Staff(){
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-lg shadow border-t-4 border-orange-600">
           <div className="flex items-center justify-between">
             <div>
@@ -161,7 +81,7 @@ export default function Staff(){
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white p-6 rounded-lg shadow border-b-4 border-green-600">
           <div className="flex items-center justify-between">
             <div>
@@ -175,13 +95,15 @@ export default function Staff(){
         </div>
       </div>
 
-     {/* user's table */}
-     <StaffTable/>
+      {/* user's table */}
+      <StaffTable />
 
       {/* Role Permissions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Manager Permissions</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Manager Permissions
+          </h3>
           <div className="space-y-2">
             {permissions.manager.map((permission, index) => (
               <div key={index} className="flex items-center space-x-2">
@@ -193,7 +115,9 @@ export default function Staff(){
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Receptionist Permissions</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Receptionist Permissions
+          </h3>
           <div className="space-y-2">
             {permissions.receptionist.map((permission, index) => (
               <div key={index} className="flex items-center space-x-2">
@@ -208,7 +132,7 @@ export default function Staff(){
       {/* Add User Modal */}
       {showAddUser && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          {/* <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Add New User</h3>
             
             <form onSubmit={handleAddUser} className="space-y-4">
@@ -284,9 +208,10 @@ export default function Staff(){
                 </button>
               </div>
             </form>
-          </div>
+          </div> */}
+          <AddUser onClose={() => setShowAddUser(false)}/>
         </div>
       )}
     </div>
-  )
+  );
 }

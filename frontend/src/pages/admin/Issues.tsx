@@ -8,7 +8,7 @@ const Issues = () => {
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-lg flex justify-between">
         <div>
           <h1 className="text-2xl font-bold">Issue Management</h1>
-          <p className="text-blue-100">Manage and track constituency issues</p>
+          <p className="text-blue-100">Manage and track issues</p>
         </div>
 
         <div>

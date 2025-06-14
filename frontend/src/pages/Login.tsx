@@ -62,7 +62,7 @@ export default function Login() {
               user: res.data.user,
               token: res.data.token,
             })
-          );
+          ); 
           setIsLoading(false);
           if (res.data.user.role === "manager") {
             Swal.fire({
@@ -195,7 +195,7 @@ export default function Login() {
 
       
       
-    } catch (error) {
+    } catch {
       Swal.fire({
         title: "Error",
         text: "An error occurred while sending the OTP. Please check your network connection and try again.",
@@ -263,7 +263,7 @@ export default function Login() {
     setShowResetModal(true);
     setModalStack((prev) => [...prev, "otp"]);
     }
-    catch (error) {
+    catch {
       Swal.fire({
         title: "Error",
         text: "An error occurred while verifying the OTP. Please check your OTP digits or network connection and try again.",
@@ -339,7 +339,7 @@ export default function Login() {
       icon: "success",
     });
     }
-    catch (error) {
+    catch {
       Swal.fire({
         title: "Error",
         text: "An error occurred while resetting your password. Please check your network connection and try again.",
@@ -416,7 +416,7 @@ export default function Login() {
       setOtp(["", "", "", "", "", ""]); // Clear previous OTP
       Swal.fire("OTP resent!", "Check your email for a new code.", "info");
       setResendCountdown(60); // Restart countdown
-    } catch (error) {
+    } catch {
       Swal.fire("Error", "Failed to resend OTP.", "error");
     } finally {
       setIsResendingOtp(false);

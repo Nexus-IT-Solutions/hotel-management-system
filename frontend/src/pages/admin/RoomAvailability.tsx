@@ -34,64 +34,6 @@ const RoomAvailability = () => {
       guest: "John Doe",
       price: 120,
     },
-    {
-      number: "103",
-      type: "Standard",
-      capacity: 2,
-      status: "maintenance",
-      price: 120,
-    },
-    {
-      number: "201",
-      type: "Deluxe",
-      capacity: 3,
-      status: "available",
-      price: 180,
-    },
-    {
-      number: "202",
-      type: "Deluxe",
-      capacity: 3,
-      status: "reserved",
-      guest: "Alice Johnson",
-      price: 180,
-    },
-    {
-      number: "203",
-      type: "Deluxe",
-      capacity: 3,
-      status: "available",
-      price: 180,
-    },
-    {
-      number: "301",
-      type: "Suite",
-      capacity: 4,
-      status: "occupied",
-      guest: "Bob Smith",
-      price: 300,
-    },
-    {
-      number: "302",
-      type: "Suite",
-      capacity: 4,
-      status: "available",
-      price: 300,
-    },
-    {
-      number: "401",
-      type: "Executive",
-      capacity: 6,
-      status: "available",
-      price: 450,
-    },
-    {
-      number: "402",
-      type: "Executive",
-      capacity: 6,
-      status: "cleaning",
-      price: 450,
-    },
   ];
 
   const getStatusColor = (
@@ -133,42 +75,6 @@ const RoomAvailability = () => {
     ).length,
   };
 
-  // Modal component
-  // const RoomModal = ({ room, onClose }: { room: any; onClose: () => void }) => (
-  //   <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#cfcfcf9c] bg-opacity-40">
-  //     <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
-  //       <button
-  //         className="absolute top-3 right-3 text-gray-400 hover:text-gray-700"
-  //         onClick={onClose}
-  //       >
-  //         <X className="w-6 h-6" />
-  //       </button>
-  //       <h2 className="text-xl font-bold mb-2">Room {room.number}</h2>
-  //       <div className="mb-2 text-gray-700">{room.type}</div>
-  //       <div className="mb-2 flex items-center">
-  //         <Users className="w-4 h-4 mr-1" /> Capacity: {room.capacity}
-  //       </div>
-  //       <div className="mb-2">
-  //         <span
-  //           className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(
-  //             room.status
-  //           )}`}
-  //         >
-  //           {room.status}
-  //         </span>
-  //       </div>
-  //       {room.guest && (
-  //         <div className="mb-2">
-  //           <span className="font-medium">Guest:</span> {room.guest}
-  //         </div>
-  //       )}
-  //       <div className="mb-2">
-  //         <span className="font-medium">Price:</span> ${room.price}/night
-  //       </div>
-  //       {/* Add more details or actions here if needed */}
-  //     </div>
-  //   </div>
-  // );
 
 type RoomStatus = "available" | "occupied" | "reserved" | "maintenance" | "cleaning";
 type Room = {

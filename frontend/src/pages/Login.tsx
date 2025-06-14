@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { Mail, User, Lock, X, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import Image1 from "../assets/images/image3.jpg";
@@ -196,7 +195,7 @@ export default function Login() {
 
       
       
-    } catch (error) {
+    } catch {
       Swal.fire({
         title: "Error",
         text: "An error occurred while sending the OTP. Please check your network connection and try again.",
@@ -264,7 +263,7 @@ export default function Login() {
     setShowResetModal(true);
     setModalStack((prev) => [...prev, "otp"]);
     }
-    catch (error) {
+    catch {
       Swal.fire({
         title: "Error",
         text: "An error occurred while verifying the OTP. Please check your OTP digits or network connection and try again.",
@@ -340,7 +339,7 @@ export default function Login() {
       icon: "success",
     });
     }
-    catch (error) {
+    catch {
       Swal.fire({
         title: "Error",
         text: "An error occurred while resetting your password. Please check your network connection and try again.",
@@ -417,7 +416,7 @@ export default function Login() {
       setOtp(["", "", "", "", "", ""]); // Clear previous OTP
       Swal.fire("OTP resent!", "Check your email for a new code.", "info");
       setResendCountdown(60); // Restart countdown
-    } catch (error) {
+    } catch {
       Swal.fire("Error", "Failed to resend OTP.", "error");
     } finally {
       setIsResendingOtp(false);

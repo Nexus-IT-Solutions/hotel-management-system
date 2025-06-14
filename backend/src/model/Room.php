@@ -173,6 +173,32 @@ class Room
         }
     }
 
+    /**
+     * Get all available rooms of a roomtype
+     * @param string $room_type_id The room type ID to filter by
+     */
+    public function getAvailableRoomsByRoomType(string $room_type_id): array
+    {
+        try {
+            $sql = "SELECT 
+                        r.*, 
+                        rt.id AS room_type_id, rt.name AS room_type_name, rt.description AS room_type_description, 
+                        rt.price_per_night, rt.max_occupancy, rt.amenities
+                    FROM {$this->table_name} r
+                    LEFT JOIN room_types rt ON r.room_type_id = rt.id
+                    WHERE r.room_type_id = :room_type_id AND r.status = 'available'";
+            $stmt = $this->db->prepare($sql);
+            if (!$this->executeQuery($stmt, [':room_type_id' => $room_type_id])) {
+                return [];
+            }
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to get available rooms by type: " . $e->getMessage();
+            error_log($this->lastError);
+            return [];
+        }
+    }
+
     public function getById(string $id): ?array
     {
         try {

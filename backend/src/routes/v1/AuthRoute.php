@@ -8,7 +8,6 @@ return function ($app): void{
         $data = json_decode($request->getBody()->getContents(), true);
         $usernameOrEmail = $data['usernameOrEmail'] ?? '';
         $password = $data['password'] ?? '';
-
         $result = $authController->login($usernameOrEmail, $password);
         $response->getBody()->write($result);
         return $response->withHeader('Content-Type', 'application/json');

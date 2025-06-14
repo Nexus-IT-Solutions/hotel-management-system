@@ -45,7 +45,6 @@ class AuthController
                 'code' => 400
             ]);
         }
-        
         // Attempt login
         $user = $this->userModel->login($usernameOrEmail, $password);
         
@@ -67,7 +66,6 @@ class AuthController
                 'code' => $code
             ]);
         }
-        
         // Check if account is active
         if (!$user['is_active']) {
             return json_encode([
@@ -91,6 +89,7 @@ class AuthController
             // Return success response
             return json_encode([
                 'status' => 'success',
+                'code' => 200,
                 'message' => 'Login successful',
                 'user' => $user,
                 'token' => $jwt,

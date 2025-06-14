@@ -10,7 +10,7 @@ return function ($app): void{
         $password = $data['password'] ?? '';
         $result = $authController->login($usernameOrEmail, $password);
         $response->getBody()->write($result);
-        return $response->withHeader('Content-Type', 'application/json')->withStatus($result['code'] ?? 200);
+        return $response->withHeader('Content-Type', 'application/json')->withStatus($result['code']);
     });
 
     // Forgot Password Route

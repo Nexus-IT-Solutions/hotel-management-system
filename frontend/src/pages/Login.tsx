@@ -107,6 +107,13 @@ export default function Login() {
               icon: "error",
             });
             setIsLoading(false);
+        }else{
+          Swal.fire({ 
+            title: "Error",
+            text: "Something went wrong, please try again later or contact system admin",
+            icon: "error",
+          });
+          setIsLoading(false);
         }
       })
       .catch((error) => {  

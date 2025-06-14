@@ -45,7 +45,6 @@ class AuthController
                 'code' => 400
             ]);
         }
-        
         // Attempt login
         $user = $this->userModel->login($usernameOrEmail, $password);
         

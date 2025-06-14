@@ -539,7 +539,7 @@ class Users
     {
         try {
             // Validate password requirements
-            if (strlen($newPassword) < 8) {
+            if (strlen($newPassword) < 1) {
                 $this->lastError = "Password must be at least 8 characters";
                 return false;
             }
@@ -577,11 +577,7 @@ class Users
                 $this->lastError = "User not found with this email.";
                 return false;
             }
-            $stmt = $this->db->prepare("UPDATE {$this->table_name} SET 
-                                        otp_code = :otp_code, 
-                                        otp_expiry = :expiry 
-                                        WHERE email = :email");
-
+            $stmt = $this->db->prepare("UPDATE {$this->table_name} SET otp_code = :otp_code, otp_expiry = :expiry WHERE email = :email");
             return $this->executeQuery($stmt, [
                 'otp_code' => $otpCode,
                 'expiry' => $expiry,

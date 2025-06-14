@@ -21,8 +21,9 @@ Content-Type: application/json
 
 // Get room availability
 GET http://api.hotel.com/v1/rooms/availability/branch/
-
-
+###
+//GET BRACNH ROOM TYPES
+GET http://api.hotel.com/v1/room
         
 
         

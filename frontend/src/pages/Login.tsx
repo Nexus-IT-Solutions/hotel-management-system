@@ -133,8 +133,37 @@ export default function Login() {
 
     try {
       // TODO: Call API to send OTP to email
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-      setForgotPasswordState((prev) => ({
+      const response = await axios.post("https://hotel-management-system-5gk8.onrender.com/v1/auth/forgot-password", JSON.stringify(
+        { email: forgotPasswordState.email }
+      ));
+
+      if (response.status !== 200) {
+        throw new Error("Failed to send OTP");
+      }
+
+      if (!response.data.success) {
+        setForgotPasswordState((prev) => ({
+          ...prev,
+          isLoading: false,
+          error: response.data.message || "Failed to send OTP. Please try again.",
+        }));
+        return;
+      }else{
+        const now = Math.floor(Date.now() / 1000);
+        const otpExpiry = now + Number(response.data.expires_in);
+        // Storing response data in localstorage
+        localStorage.setItem("forgotPasswordData", JSON.stringify({
+          user: response.data.user,
+          token: response.data.token,
+          expires_in: otpExpiry,
+        }));
+        Swal.fire({
+          title: "OTP Sent",
+          text: "An OTP has been sent to your email. Please check your inbox.",
+          icon: "success",
+        });
+
+        setForgotPasswordState((prev) => ({
         ...prev,
         isLoading: false,
         isSubmitted: true,
@@ -143,11 +172,19 @@ export default function Login() {
       setShowForgotModal(false);
       setShowOtpModal(true);
       setModalStack((prev) => [...prev, "forgot"]);
+
+      }
+      
     } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: "An error occurred while sending the OTP. Please check your network connection and try again.",
+        icon: "error",
+      });
       setForgotPasswordState((prev) => ({
         ...prev,
         isLoading: false,
-        error: "Network error. Please try again.",
+        error: "Error. Please try again.",
       }));
     }
   };
@@ -184,11 +221,51 @@ export default function Login() {
       setOtpError("Please enter the 6-digit OTP.");
       return;
     }
+
+    // Get expiry from localStorage
+    const forgotData = localStorage.getItem("forgotPasswordData");
+    if (forgotData) {
+      const { expires_in } = JSON.parse(forgotData);
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      if (nowSeconds > expires_in) {
+        Swal.fire({
+          title: "OTP Expired",
+          text: "The OTP has expired. Please request a new one.",
+          icon: "error",
+        });
+        closeAllModals();
+        return;
+      }
+    }
+
     // TODO: Call API to verify OTP
-    await new Promise((resolve) => setTimeout(resolve, 1200));
+    try{
+      const response = await axios.post("https://hotel-management-system-5gk8.onrender.com/v1/auth/validate-otp", JSON.stringify({
+
+      otp: otp.join(""),
+
+      }));
+    if (response.status !== 200 || !response.data.success) {
+      setOtpError(response.data.message || "Invalid OTP. Please try again.");
+      return;
+    }
+    Swal.fire({
+      title: "OTP Verified",
+      text: "Your OTP has been successfully verified.",
+      icon: "success",
+    });
     setShowOtpModal(false);
     setShowResetModal(true);
     setModalStack((prev) => [...prev, "otp"]);
+    }
+    catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: "An error occurred while verifying the OTP. Please check your OTP digits or network connection and try again.",
+        icon: "error",
+      });
+      setOtpError("Error. Please try again.");
+    }
   };
 
   // Reset Password Modal Handlers
@@ -220,8 +297,25 @@ export default function Login() {
       isLoading: true,
       error: "",
     }));
+
+
     // TODO: Call API to reset password
-    await new Promise((resolve) => setTimeout(resolve, 1200));
+    try{
+      const response = await axios.post("https://hotel-management-system-5gk8.onrender.com/v1/auth/reset-password", JSON.stringify(
+      {
+      otp: otp.join(""),
+      newPassword: resetState.password,
+    }
+    ));
+
+    if (response.status !== 200 || !response.data.success) {
+      setResetState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: response.data.message || "Failed to reset password. Please try again.",
+      }));
+      return;
+    }
     setResetState({
       password: "",
       confirmPassword: "",
@@ -237,6 +331,19 @@ export default function Login() {
       text: "You can now log in with your new password.",
       icon: "success",
     });
+    }
+    catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: "An error occurred while resetting your password. Please check your network connection and try again.",
+        icon: "error",
+      });
+      setResetState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: "Error. Please try again.",
+      }));
+    }
   };
 
   // Modal Navigation

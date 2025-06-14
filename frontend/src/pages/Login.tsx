@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Mail, User, Lock, X, ArrowLeft, CheckCircle, Eye, EyeOff } from "lucide-react";
+import { Mail, User, Lock, X, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import Image1 from "../assets/images/image3.jpg";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -109,7 +109,8 @@ export default function Login() {
             setIsLoading(false);
         }
       })
-      .catch((error) => {     
+      .catch((error) => {  
+        console.log(error);
           Swal.fire({
             title: "Error",
             text: "An error occurred while logging in. Please check your network connection and other settings and try again.",

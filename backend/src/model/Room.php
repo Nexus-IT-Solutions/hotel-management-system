@@ -207,6 +207,28 @@ class Room
             return null;
         }
     }
+    /**
+     * Check if a room number already exists in a branch
+     * 
+     * @param string $branch_id The branch ID to check
+     * @param string $room_number The room number to check
+     * @return bool True if room number already exists, false otherwise
+     */
+    public function roomNumberExists(string $branch_id, string $room_number): bool
+    {
+        try {
+            $sql = "SELECT COUNT(*) FROM {$this->table_name} WHERE branch_id = :branch_id AND room_number = :room_number";
+            $stmt = $this->db->prepare($sql);
+            if (!$this->executeQuery($stmt, [':branch_id' => $branch_id, ':room_number' => $room_number])) {
+                return false;
+            }
+            return (int)$stmt->fetchColumn() > 0;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to check room number existence: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
+    }
 
     public function create(array $data): bool
     {
@@ -216,6 +238,12 @@ class Room
                 $this->lastError = "Missing required field: $field";
                 return false;
             }
+        }
+
+        // Check if room number already exists in this branch
+        if ($this->roomNumberExists($data['branch_id'], $data['room_number'])) {
+            $this->lastError = "Room number {$data['room_number']} already exists in this branch";
+            return false;
         }
 
         $id = Uuid::uuid4()->toString();
@@ -235,6 +263,10 @@ class Room
         ];
 
         return $this->executeQuery($stmt, $params);
+    }
+
+    public function getLastInsertId(){
+        return $this->db->lastInsertId();
     }
 
     public function update(string $id, array $data): bool

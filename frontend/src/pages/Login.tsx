@@ -55,8 +55,6 @@ export default function Login() {
         password: password,
       })
       .then((res) => {
-        console.log(res.data.code);
-        console.log(res.data.status);
         if (res.data.code === 200 && res.data.status === 'success') {
           localStorage.setItem(
             "userData",
@@ -109,16 +107,14 @@ export default function Login() {
             icon: "error",
           });
           setIsLoading(false);
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: "Something went wrong, please try again later or contact system admin",
+            icon: "error",
+          });
+          setIsLoading(false);
         }
-        setIsLoading(false);
-        // else{
-        //   Swal.fire({ 
-        //     title: "Error",
-        //     text: "Something went wrong, please try again later or contact system admin",
-        //     icon: "error",
-        //   });
-        //   setIsLoading(false);
-        // }
       })
       .catch((error) => {  
         console.log(error);

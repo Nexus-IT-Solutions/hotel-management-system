@@ -19,6 +19,7 @@ import Issues from './pages/admin/Issues.tsx'
 import MakeReport from './pages/admin/MakeReport.tsx'
 //import ProtectedRoute from './pages/ProtectedRoute.tsx'
 import OTP from './pages/OTP.tsx'
+import RoomType from './pages/admin/RoomType.tsx'
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
@@ -26,7 +27,6 @@ createRoot(document.getElementById("root")!).render(
       <Route path='/' element={<Login/>}/>
       <Route path='/otp' element={<OTP />} />
 
-     
       {/* Protected Admin Routes */}
       <Route path="/admin" element={<MainLayout />}>
         <Route index element={<Dashboard />} />
@@ -40,6 +40,7 @@ createRoot(document.getElementById("root")!).render(
         <Route path="settings" element={<Settings />} />
         <Route path="issues" element={<Issues />} />
         <Route path="make-reports-admin" element={<MakeReport />} />
+        <Route path="add-room-type" element={<RoomType />} />
       </Route>
 
       {/* Protected Receptionist Routes */}

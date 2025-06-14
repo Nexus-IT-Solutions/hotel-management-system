@@ -249,6 +249,7 @@ function generateOtpEmailTemplate(string $otp): string
 </html>
 HTML;
 }
+
 }
 
 

@@ -360,18 +360,56 @@ class Room
             return false;
         }
 
-        $fields = [];
-        $params = [':id' => $id];
+        // Verify room exists
+        $existing = $this->getById($id);
+        if (!$existing) {
+            $this->lastError = "Room not found.";
+            return false;
+        }
 
-        foreach ($data as $key => $value) {
-            if (in_array($key, ['hotel_id', 'branch_id', 'room_type_id', 'room_number', 'floor', 'status'])) {
-                $fields[] = "$key = :$key";
-                $params[":$key"] = $value;
+        // Validate foreign keys and unique constraints if they are provided
+        if (isset($data['hotel_id']) && !$this->hotelExists($data['hotel_id'])) {
+            $this->lastError = "Hotel ID {$data['hotel_id']} does not exist.";
+            return false;
+        }
+
+        if (isset($data['branch_id']) && !$this->branchExists($data['branch_id'])) {
+            $this->lastError = "Branch ID {$data['branch_id']} does not exist.";
+            return false;
+        }
+
+        if (isset($data['room_type_id']) && !$this->roomTypeExists($data['room_type_id'])) {
+            $this->lastError = "Room Type ID {$data['room_type_id']} does not exist.";
+            return false;
+        }
+
+        // Check if room number is being updated and if it already exists
+        if (isset($data['room_number']) && 
+            $data['room_number'] !== $existing['room_number']) {
+            $branchId = isset($data['branch_id']) ? $data['branch_id'] : $existing['branch_id'];
+            if ($this->roomNumberExists($branchId, $data['room_number'])) {
+                $this->lastError = "Room number {$data['room_number']} already exists in this branch.";
+                return false;
             }
         }
 
-        $fields[] = "updated_at = CURRENT_TIMESTAMP";
+        // Build update fields
+        $fields = [];
+        $params = [':id' => $id];
 
+        foreach (['hotel_id', 'branch_id', 'room_type_id', 'room_number', 'floor', 'status'] as $field) {
+            if (isset($data[$field])) {
+                $fields[] = "$field = :$field";
+                $params[":$field"] = $data[$field];
+            }
+        }
+
+        if (empty($fields)) {
+            $this->lastError = "No valid fields to update.";
+            return false;
+        }
+
+        $fields[] = "updated_at = CURRENT_TIMESTAMP";
         $sql = "UPDATE {$this->table_name} SET " . implode(', ', $fields) . " WHERE id = :id";
 
         try {

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { Mail, User, Lock, X, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import Image1 from "../assets/images/image3.jpg";
@@ -62,7 +63,7 @@ export default function Login() {
               user: res.data.user,
               token: res.data.token,
             })
-          );
+          ); 
           setIsLoading(false);
           if (res.data.user.role === "manager") {
             Swal.fire({

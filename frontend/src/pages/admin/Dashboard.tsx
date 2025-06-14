@@ -18,7 +18,7 @@ export default function Dashboard(){
   }, []);
 
   return(
-    <section className='space-y-6'>
+    <section className='space-y-4'>
        {/* Header with Current Time */}
        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-lg">
         <div className="flex justify-between items-center">
@@ -35,6 +35,7 @@ export default function Dashboard(){
       
       {/* overview stat */}
       <DashboardStat/>
+
 
       {/* today's check in and room status */}
       <div className='flex flex-col lg:flex-row items-center gap-5'>

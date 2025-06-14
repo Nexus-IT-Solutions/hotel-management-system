@@ -55,7 +55,7 @@ export default function Login() {
         password: password,
       })
       .then((res) => {
-        if (res.status === 200) {
+        if (res.status === 200 && res.data.status === "success") {
           localStorage.setItem(
             "userData",
             JSON.stringify({
@@ -86,24 +86,36 @@ export default function Login() {
             });
             window.location.href = "/ceo";
           }
-        }
-      })
-      .catch((error) => {
-        if (error.status === 401) {
+        }else if(res.status === 404 && res.data.status === "error"){
           Swal.fire({
-            title: "Error",
-            text: "Incorrect username or password. Please try again.",
-            icon: "error",
+            title: "Not Found",
+            text: res.data.message || "User not found, please check your email or username",
+            icon: "error"
           });
           setIsLoading(false);
-        } else {
+        }else if(res.status === 401 && res.data.status === "error"){
+            Swal.fire({
+              title: "Unauthorized",
+              text: res.data.message || "Incorrect password, please try again",
+              icon: "error",
+            });
+            setIsLoading(false);
+        }else if(res.status === 403 && res.data.status === "error"){
+            Swal.fire({
+              title: "Deactivated",
+              text: res.data.message || "Account deactivated",
+              icon: "error",
+            });
+            setIsLoading(false);
+        }
+      })
+      .catch((error) => {     
           Swal.fire({
             title: "Error",
             text: "An error occurred while logging in. Please check your network connection and other settings and try again.",
             icon: "error",
           });
           setIsLoading(false);
-        }
       });
   };
 

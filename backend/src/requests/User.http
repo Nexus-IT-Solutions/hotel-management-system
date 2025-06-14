@@ -1,4 +1,4 @@
-PUT http://api.hotel.com/v1/users
+GET http://api.hotel.com/v1/users
 
 ###
 GET http://api.hotel.com/v1/users/8931e790-54e7-4e5c-8018-5df41a892fb2

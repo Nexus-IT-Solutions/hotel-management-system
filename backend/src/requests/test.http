@@ -8,6 +8,31 @@ Content-Type: application/json
 }
 ###
 
-GET https://api.hotel.com/v1/auth
+GET http://api.hotel.com/v1/auth
 
 ###
+// SEND OTP
+POST http://api.hotel.com/v1/auth/forgot-password
+Content-Type: application/json
+
+{
+    "email": "kwamegilbert1114@gmail.com"
+}
+
+// Get room availability
+GET http://api.hotel.com/v1/rooms/availability/branch/
+
+
+        
+
+        
+    
+    
+    
+    
+        
+        
+        
+    
+
+

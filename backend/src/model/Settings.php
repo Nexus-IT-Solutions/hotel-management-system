@@ -4,15 +4,14 @@ require_once __DIR__ . '/../config/Database.php';
 use Ramsey\Uuid\Uuid;
 
 /**
- * PaymentMethod Model Class
- * 
- * Handles all database operations related to the payment_methods table.
+ * Setting Model Class
+ * Handles all database operations related to the `settings` table.
  */
-class PaymentMethod
+class Settings
 {
     protected $db;
-    private string $table_name = 'payment_methods';
-    private string $lastError = '';
+    private $table_name = 'settings';
+    private $lastError = '';
 
     public function __construct()
     {
@@ -31,7 +30,7 @@ class PaymentMethod
         return $this->lastError;
     }
 
-    protected function executeQuery(PDOStatement $stmt, array $params = []): bool
+    protected function executeQuery(\PDOStatement $stmt, array $params = []): bool
     {
         try {
             return $stmt->execute($params);
@@ -42,30 +41,17 @@ class PaymentMethod
         }
     }
 
-    public function getAllByHotel(string $hotel_id): array
+    public function getAll(): array
     {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE hotel_id = ?");
-            if (!$this->executeQuery($stmt, [$hotel_id])) {
+            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name}");
+            if (!$this->executeQuery($stmt)) {
                 return [];
             }
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            $this->lastError = "Failed to fetch payment methods: " . $e->getMessage();
-            return [];
-        }
-    }
-
-    public function getAllByBranch(string $branch_id): array
-    {
-        try {
-            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE branch_id = ?");
-            if (!$this->executeQuery($stmt, [$branch_id])) {
-                return [];
-            }
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            $this->lastError = "Failed to fetch payment methods by branch: " . $e->getMessage();
+            $this->lastError = "Failed to get settings: " . $e->getMessage();
+            error_log($this->lastError);
             return [];
         }
     }
@@ -79,16 +65,17 @@ class PaymentMethod
             }
             return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
         } catch (PDOException $e) {
-            $this->lastError = "Failed to fetch payment method: " . $e->getMessage();
+            $this->lastError = "Failed to get setting: " . $e->getMessage();
+            error_log($this->lastError);
             return null;
         }
     }
 
     public function create(array $data): bool
     {
-        $requiredFields = ['hotel_id', 'name'];
+        $requiredFields = ['key', 'value'];
         foreach ($requiredFields as $field) {
-            if (empty($data[$field])) {
+            if (!isset($data[$field])) { // Use isset for potentially empty but existing values
                 $this->lastError = "Missing required field: $field";
                 return false;
             }
@@ -96,17 +83,21 @@ class PaymentMethod
 
         $id = Uuid::uuid4()->toString();
 
-        $stmt = $this->db->prepare("INSERT INTO {$this->table_name} 
-            (id, hotel_id, branch_id, name, details, is_active) 
-            VALUES (:id, :hotel_id, :branch_id, :name, :details, :is_active)");
+        // Assuming created_at and updated_at are handled by default in the DB or added later if needed.
+        // For consistency, if your other tables have them, you might consider adding them to the settings table too.
+        // For now, sticking strictly to the provided schema.
+
+        $stmt = $this->db->prepare("INSERT INTO {$this->table_name}
+            (id, hotel_id, branch_id, `key`, `value`, description)
+            VALUES (:id, :hotel_id, :branch_id, :key, :value, :description)");
 
         $params = [
             ':id' => $id,
-            ':hotel_id' => $data['hotel_id'],
+            ':hotel_id' => $data['hotel_id'] ?? null,
             ':branch_id' => $data['branch_id'] ?? null,
-            ':name' => $data['name'],
-            ':details' => json_encode($data['details'] ?? []),
-            ':is_active' => isset($data['is_active']) ? (bool)$data['is_active'] : true,
+            ':key' => $data['key'],
+            ':value' => $data['value'],
+            ':description' => $data['description'] ?? null,
         ];
 
         return $this->executeQuery($stmt, $params);
@@ -123,13 +114,16 @@ class PaymentMethod
         $params = [':id' => $id];
 
         foreach ($data as $key => $value) {
-            if (in_array($key, ['hotel_id', 'branch_id', 'name', 'details', 'is_active'])) {
-                $fields[] = "$key = :$key";
-                $params[":$key"] = $key === 'details' ? json_encode($value) : $value;
+            if (in_array($key, ['hotel_id', 'branch_id', 'key', 'value', 'description'])) {
+                $fields[] = "`$key` = :$key"; // Backticks for 'key' are important
+                $params[":$key"] = $value;
             }
         }
 
-        $fields[] = "updated_at = CURRENT_TIMESTAMP";
+        if (empty($fields)) {
+            $this->lastError = "No valid fields provided for update.";
+            return false;
+        }
 
         $sql = "UPDATE {$this->table_name} SET " . implode(', ', $fields) . " WHERE id = :id";
 
@@ -137,7 +131,8 @@ class PaymentMethod
             $stmt = $this->db->prepare($sql);
             return $this->executeQuery($stmt, $params);
         } catch (PDOException $e) {
-            $this->lastError = "Failed to update payment method: " . $e->getMessage();
+            $this->lastError = "Failed to update setting: " . $e->getMessage();
+            error_log($this->lastError);
             return false;
         }
     }

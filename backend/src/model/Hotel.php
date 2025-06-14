@@ -146,30 +146,42 @@ class Hotel
      */
     public function update(string $id, array $data): bool
     {
-        $stmt = $this->db->prepare("UPDATE {$this->table_name} SET 
-            name = :name,
-            address = :address,
-            city = :city,
-            country = :country,
-            email = :email,
-            phone = :phone,
-            description = :description,
-            updated_at = CURRENT_TIMESTAMP
-            WHERE id = :id");
+        if (empty($data)) {
+            $this->lastError = "No data provided for update.";
+            return false;
+        }
 
-        $params = [
-            ':id' => $id,
-            ':name' => $data['name'] ?? null,
-            ':address' => $data['address'] ?? null,
-            ':city' => $data['city'] ?? null,
-            ':country' => $data['country'] ?? null,
-            ':email' => $data['email'] ?? null,
-            ':phone' => $data['phone'] ?? null,
-            ':description' => $data['description'] ?? null,
-        ];
+        $fields = [];
+        $params = [':id' => $id];
 
-        return $this->executeQuery($stmt, $params);
+        foreach ($data as $key => $value) {
+            // Only allow known columns to be updated
+            if (in_array($key, ['name', 'address', 'city', 'country', 'email', 'phone', 'description'])) {
+                $fields[] = "$key = :$key";
+                $params[":$key"] = $value;
+            }
+        }
+
+        if (empty($fields)) {
+            $this->lastError = "No valid fields provided for update.";
+            return false;
+        }
+
+        // Always update the timestamp
+        $fields[] = "updated_at = CURRENT_TIMESTAMP";
+
+        $sql = "UPDATE {$this->table_name} SET " . implode(', ', $fields) . " WHERE id = :id";
+
+        try {
+            $stmt = $this->db->prepare($sql);
+            return $this->executeQuery($stmt, $params);
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to update hotel: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
     }
+
 
     /**
      * Delete a hotel by ID

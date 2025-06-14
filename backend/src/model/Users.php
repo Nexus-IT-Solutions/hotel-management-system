@@ -79,7 +79,7 @@ class Users
     public function getAll(): array
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name}");
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login, created_at FROM {$this->table_name}");
             if (!$this->executeQuery($stmt)) {
                 return [];
             }
@@ -100,7 +100,7 @@ class Users
     public function getUserById(string $id): ?array
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE id = :id");
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login, created_at FROM {$this->table_name} WHERE id = :id");
             if (!$this->executeQuery($stmt, ['id' => $id])) {
                 return null;
             }
@@ -122,7 +122,7 @@ class Users
     public function getUserByEmail(string $email): ?array
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE email = :email");
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login, created_at FROM {$this->table_name} WHERE email = :email");
             if (!$this->executeQuery($stmt, ['email' => $email])) {
                 return null;
             }
@@ -144,7 +144,7 @@ class Users
     public function getUserByPhone(string $phone): ?array
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE phone = :phone");
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login, created_at FROM {$this->table_name} WHERE phone = :phone");
             if (!$this->executeQuery($stmt, ['phone' => $phone])) {
                 return null;
             }
@@ -166,7 +166,7 @@ class Users
     public function getUserByUsername(string $username): ?array
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE username = :username");
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login, created_at FROM {$this->table_name} WHERE username = :username");
             if (!$this->executeQuery($stmt, ['username' => $username])) {
                 return null;
             }
@@ -188,7 +188,7 @@ class Users
     public function getUserByIdentifier(string $identifier): ?array
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login 
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login , created_at
                                     FROM {$this->table_name} 
                                     WHERE username = :identifier 
                                        OR email = :identifier 
@@ -216,7 +216,7 @@ class Users
     public function findByResetToken(string $token): ?array
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login FROM {$this->table_name} WHERE reset_token = :token AND reset_token_expiry > NOW()");
+            $stmt = $this->db->prepare("SELECT id, hotel_id, branch_id, username, name, email, phone, role, is_active, first_login, last_login, created_at FROM {$this->table_name} WHERE reset_token = :token AND reset_token_expiry > NOW()");
             if (!$this->executeQuery($stmt, ['token' => $token])) {
                 return null;
             }
@@ -247,8 +247,8 @@ class Users
             }
             
             // Find user by username OR email
-            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE username = :identifier OR email = :identifier");
-            if (!$this->executeQuery($stmt, ['identifier' => $usernameOrEmail])) {
+            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE username = :username OR email = :email");
+            if (!$this->executeQuery($stmt, ['username' => $usernameOrEmail, 'email' => $usernameOrEmail])) {
                 $this->lastError = "Database error during login";
                 return null;
             }
@@ -415,30 +415,37 @@ class Users
                 $this->lastError = "User not found";
                 return false;
             }
-            
-            $stmt = $this->db->prepare("UPDATE {$this->table_name} SET 
-                                     hotel_id = :hotel_id, 
-                                     branch_id = :branch_id, 
-                                     username = :username, 
-                                     name = :name, 
-                                     email = :email, 
-                                     phone = :phone, 
-                                     role = :role, 
-                                     is_active = :is_active 
-                                     WHERE id = :id");
-            
-            $params = [
-                'hotel_id'  => $data['hotel_id'] ?? null,
-                'branch_id' => $data['branch_id'] ?? null,
-                'username'  => $data['username'] ?? '',
-                'name'      => $data['name'] ?? '',
-                'email'     => $data['email'] ?? '',
-                'phone'     => $data['phone'] ?? '',
-                'role'      => $data['role'] ?? '',
-                'is_active' => $data['is_active'] ?? true,
-                'id'        => $id,
+
+            // Allowed fields to be updated
+            $allowedFields = [
+                'hotel_id',
+                'branch_id',
+                'username',
+                'name',
+                'email',
+                'phone',
+                'role',
+                'is_active'
             ];
-            
+
+            $fields = [];
+            $params = [':id' => $id];
+
+            foreach ($data as $key => $value) {
+                if (in_array($key, $allowedFields)) {
+                    $fields[] = "$key = :$key";
+                    $params[":$key"] = $value;
+                }
+            }
+
+            if (empty($fields)) {
+                $this->lastError = "No valid fields provided for update.";
+                return false;
+            }
+
+            $sql = "UPDATE {$this->table_name} SET " . implode(', ', $fields) . " WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+
             return $this->executeQuery($stmt, $params);
         } catch (PDOException $e) {
             $this->lastError = "Failed to update user: " . $e->getMessage();
@@ -446,6 +453,7 @@ class Users
             return false;
         }
     }
+
 
     /**
      * Update a user's last login timestamp and mark as not first login

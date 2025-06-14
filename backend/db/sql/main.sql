@@ -106,29 +106,37 @@ CREATE TABLE IF NOT EXISTS users (
     first_login BOOLEAN DEFAULT TRUE,
     last_login TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (hotel_id) REFERENCES hotels(id) ON DELETE CASCADE
+    FOREIGN KEY (hotel_id) REFERENCES hotels(id) ON DELETE CASCADE,
+    FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS bookings (
     id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
+    booking_code VARCHAR(255) UNIQUE,
     customer_id CHAR(36),
     room_id CHAR(36),
     room_type_id CHAR(36),
+    hotel_id CHAR(36),
     branch_id CHAR(36),
     check_in_date DATE,
     check_out_date DATE,
-    status ENUM('booked', 'checked_in', 'checked_out', 'cancelled') DEFAULT 'booked',
+    status ENUM('pending','booked', 'checked_in', 'checked_out', 'cancelled') DEFAULT 'pending',
     special_requests TEXT,
     number_of_guests INT,
     total_amount DECIMAL(10, 2),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL,
+    FOREIGN KEY (hotel_id) REFERENCES hotels(id) ON DELETE CASCADE,
+    FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE SET NULL,
     FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL,
-    FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE SET NULL
+    FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE SET NULL,
+    FOREIGN KEY (room_type_id) REFERENCES room_types(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS check_ins (
     id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
+    hotel_id CHAR(36),
+    branch_id CHAR(36),
     booking_id CHAR(36),
     checked_in_by CHAR(36),
     checked_in_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -138,6 +146,8 @@ CREATE TABLE IF NOT EXISTS check_ins (
 
 CREATE TABLE IF NOT EXISTS check_outs (
     id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
+    hotel_id CHAR(36),
+    branch_id CHAR(36),
     booking_id CHAR(36),
     checked_out_by CHAR(36),
     checked_out_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -149,18 +159,32 @@ CREATE TABLE IF NOT EXISTS check_outs (
 
 CREATE TABLE IF NOT EXISTS payment_methods (
     id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
+    hotel_id CHAR(36),
+    branch_id CHAR(36),
     name VARCHAR(255),
     details JSON,
-    is_active BOOLEAN DEFAULT TRUE
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (hotel_id) REFERENCES hotels(id) ON DELETE CASCADE,
+    FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS payments (
     id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
+    hotel_id CHAR(36),
+    branch_id CHAR(36),
     booking_id CHAR(36),
     payment_method_id CHAR(36),
     amount DECIMAL(10, 2),
     paid_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     reference VARCHAR(255),
+    status ENUM('pending', 'completed', 'failed', 'refunded') DEFAULT 'pending',
+    notes TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (hotel_id) REFERENCES hotels(id) ON DELETE CASCADE,
+    FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE SET NULL,
     FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE,
     FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id)
 );
@@ -188,16 +212,11 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 CREATE TABLE IF NOT EXISTS settings (
     id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
     hotel_id CHAR(36),
+    branch_id CHAR(36),
     `key` VARCHAR(255),
     `value` TEXT,
     description VARCHAR(255),
-    FOREIGN KEY (hotel_id) REFERENCES hotels(id) ON DELETE CASCADE
+    FOREIGN KEY (hotel_id) REFERENCES hotels(id) ON DELETE CASCADE,
+    FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE SET NULL
 );
 
-CREATE TABLE IF NOT EXISTS phinxlog (
-    version BIGINT NOT NULL PRIMARY KEY,
-    migration_name VARCHAR(100),
-    start_time TIMESTAMP,
-    end_time TIMESTAMP,
-    breakpoint BOOLEAN DEFAULT FALSE
-);

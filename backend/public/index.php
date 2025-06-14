@@ -67,7 +67,12 @@ $app->add(function ($request, $handler) {
 
 // Handle preflight OPTIONS requests
 $app->options('/{routes:.+}', function ($request, $response) {
-    return $response;
+    return $response->withHeader('Access-Control-Allow-Origin', '*')
+        ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
+        ->withHeader('Access-Control-Allow-Credentials', 'true')
+        ->withHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        ->withHeader('Access-Control-Max-Age', '86400');
 });
 
 // Add content length middleware
@@ -91,5 +96,18 @@ $app->get('/hello', function ($request, $response, $args) {
 // Include routes
 (require_once __DIR__ . '/../src/routes/api.php')($app);
 
+// Add Not Found Handler - this must be added after all other routes are defined
+$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function ($request, $response) {
+    $data = [
+        'error' => 'Not Found',
+        'message' => 'The requested route does not exist.',
+        'status' => 404
+    ];
+    $payload = json_encode($data);
+    $response->getBody()->write($payload);
+    return $response
+        ->withHeader('Content-Type', 'application/json')
+        ->withStatus(404);
+});
 // Run the application
 $app->run();

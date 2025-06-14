@@ -6,9 +6,9 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const token = localStorage.getItem("token");
+  const data =JSON.parse(localStorage.getItem("userData") || "null");
 
-  if (!token) {
+  if (!data || !data.token) {
     console.warn("No token found, redirecting...");
     return <Navigate to="/" replace />;
   }

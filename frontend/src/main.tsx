@@ -18,12 +18,15 @@ import ReportIssueForm from './pages/receptionist/ReportIssueForm.tsx'
 import Issues from './pages/admin/Issues.tsx'
 import MakeReport from './pages/admin/MakeReport.tsx'
 import ProtectedRoute from './pages/ProtectedRoute.tsx'
+import OTP from './pages/OTP.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
     <Routes>
       <Route path='/' element={<Login/>}/>
+      <Route path='/otp' element={<OTP />} />
+
      
       {/* Protected Admin Routes */}
       <Route

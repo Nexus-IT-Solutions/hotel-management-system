@@ -1,7 +1,28 @@
 import  { useState } from 'react';
-import { Plus, Edit, Trash2, Shield, User, Settings } from 'lucide-react';
+import { Plus , Shield, User, Settings } from 'lucide-react';
+import StaffTable from '../../components/admin-components/StaffTable';
 
 export default function Staff(){
+
+  // const handleDelete = () => {
+  //     Swal.fire({
+  //   title: "Are you sure?",
+  //   text: "You won't be able to revert this!",
+  //   icon: "warning",
+  //   showCancelButton: true,
+  //   confirmButtonColor: "#d33",
+  //   cancelButtonColor: "#D3D3D3",
+  //   confirmButtonText: "Yes, delete it!"
+  // }).then((result) => {
+  //   if (result.isConfirmed) {
+  //     Swal.fire({
+  //       title: "Deleted!",
+  //       text: "Your record has been deleted.",
+  //       icon: "success"
+  //     });
+  //   }
+  // });
+  //   }
 
 
   const [showAddUser, setShowAddUser] = useState(false);
@@ -13,76 +34,50 @@ export default function Staff(){
     password: ''
   });
 
-  const users = [
-    {
-      id: 1,
-      name: 'John Doe',
-      email: 'john.doe@hotelflow.com',
-      phone: '+1 (555) 123-4567',
-      role: 'manager',
-      status: 'active',
-      lastLogin: '2024-01-20 09:30:00',
-      createdAt: '2023-06-15'
-    },
-    {
-      id: 2,
-      name: 'Sarah Johnson',
-      email: 'sarah.j@hotelflow.com',
-      phone: '+1 (555) 234-5678',
-      role: 'receptionist',
-      status: 'active',
-      lastLogin: '2024-01-20 14:22:00',
-      createdAt: '2023-08-22'
-    },
-    {
-      id: 3,
-      name: 'Mike Brown',
-      email: 'mike.brown@hotelflow.com',
-      phone: '+1 (555) 345-6789',
-      role: 'receptionist',
-      status: 'inactive',
-      lastLogin: '2024-01-18 16:45:00',
-      createdAt: '2023-09-10'
-    },
-    {
-      id: 4,
-      name: 'Emily Davis',
-      email: 'emily.d@hotelflow.com',
-      phone: '+1 (555) 456-7890',
-      role: 'manager',
-      status: 'active',
-      lastLogin: '2024-01-20 11:15:00',
-      createdAt: '2023-05-30'
-    }
-  ];
+  // const users = [
+  //   {
+  //     id: 1,
+  //     name: 'John Doe',
+  //     email: 'john.doe@hotelflow.com',
+  //     phone: '+1 (555) 123-4567',
+  //     role: 'manager',
+  //     status: 'active',
+  //     lastLogin: '2024-01-20 09:30:00',
+  //     createdAt: '2023-06-15'
+  //   },
+  //   {
+  //     id: 2,
+  //     name: 'Sarah Johnson',
+  //     email: 'sarah.j@hotelflow.com',
+  //     phone: '+1 (555) 234-5678',
+  //     role: 'receptionist',
+  //     status: 'active',
+  //     lastLogin: '2024-01-20 14:22:00',
+  //     createdAt: '2023-08-22'
+  //   },
+  //   {
+  //     id: 3,
+  //     name: 'Mike Brown',
+  //     email: 'mike.brown@hotelflow.com',
+  //     phone: '+1 (555) 345-6789',
+  //     role: 'receptionist',
+  //     status: 'inactive',
+  //     lastLogin: '2024-01-18 16:45:00',
+  //     createdAt: '2023-09-10'
+  //   },
+  //   {
+  //     id: 4,
+  //     name: 'Emily Davis',
+  //     email: 'emily.d@hotelflow.com',
+  //     phone: '+1 (555) 456-7890',
+  //     role: 'manager',
+  //     status: 'active',
+  //     lastLogin: '2024-01-20 11:15:00',
+  //     createdAt: '2023-05-30'
+  //   }
+  // ];
 
-  const getRoleBadge = (role: 'manager' | 'receptionist' | 'admin') => {
-    const styles: { [key: string]: string } = {
-      'manager': 'bg-purple-100 text-purple-800',
-      'receptionist': 'bg-blue-100 text-blue-800',
-      'admin': 'bg-red-100 text-red-800'
-    };
-    
-    return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${styles[role]}`}>
-        {role}
-      </span>
-    );
-  };
-
-  const getStatusBadge = (status: 'active' | 'inactive' | 'suspended') => {
-    const styles: { [key: string]: string } = {
-      'active': 'bg-green-100 text-green-800',
-      'inactive': 'bg-gray-100 text-gray-800',
-      'suspended': 'bg-red-100 text-red-800'
-    };
-    
-    return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${styles[status]}`}>
-        {status}
-      </span>
-    );
-  };
+  
 
   const handleAddUser = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -180,75 +175,8 @@ export default function Staff(){
         </div>
       </div>
 
-      {/* Users Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  User
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Role
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Login
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                        <User className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                        <div className="text-sm text-gray-500">{user.email}</div>
-                        <div className="text-sm text-gray-500">{user.phone}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {getRoleBadge(user.role as "manager" | "receptionist" | "admin")}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {getStatusBadge(user.status as "active" | "inactive" | "suspended")}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.lastLogin}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.createdAt}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-3">
-                      <button className="text-blue-600 hover:text-blue-900">
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button className="text-red-600 hover:text-red-900">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+     {/* user's table */}
+     <StaffTable/>
 
       {/* Role Permissions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

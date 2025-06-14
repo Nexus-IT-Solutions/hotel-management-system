@@ -1,4 +1,6 @@
 import { Bell, Menu, Search } from "lucide-react";
+import { useEffect, useState } from "react";
+
 
 interface HeaderProps {
   showLabels: boolean;
@@ -6,6 +8,21 @@ interface HeaderProps {
 }
 
 const Header = (probs: HeaderProps) => {
+
+   const [username, setUsername] = useState<any>(null);
+
+  useEffect(() => {
+    const data = JSON.parse(localStorage.getItem("userData") || "null");
+
+    if (data && data.user) {
+      setUsername(data.user.username);
+    } else {
+      console.warn("No user data found in localStorage");
+    }
+  }, []);
+
+// const getName = localStorage.getItem("username");
+  
   return (
     <header className="bg-white shadow-sm border-b px-6 py-5">
       <div className="flex items-center justify-between">
@@ -16,7 +33,7 @@ const Header = (probs: HeaderProps) => {
           />
 
           <div>
-            <h1>Welcome, Anthony Afriyie</h1>
+            <h1>Welcome, {username}</h1>
           </div>
         </div>
 

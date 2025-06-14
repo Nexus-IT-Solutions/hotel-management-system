@@ -1,6 +1,10 @@
-import { Search, Eye, Edit, Trash2, Mail, Phone } from "lucide-react";
+import { Search } from "lucide-react";
+import CustomersTable from "../../components/admin-components/CustomersTable";
 
 export default function Customer() {
+
+ 
+
   return (
     <div>
       {/* header section */}
@@ -55,122 +59,9 @@ export default function Customer() {
         </div>
       </div>
 
-      {/* customer table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden hidden md:block">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Customer Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Contact
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Address
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Emergence Contact
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Bookings
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {customers.map((customer) => (
-                <tr key={customer.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {customer.name}
-                      </div>
-                      <div className="text-sm text-gray-500">{customer.id}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="space-y-1">
-                      <div className="flex items-center text-sm text-gray-900 font-medium">
-                        <Mail className="w-3 h-3 mr-1" />
-                        {customer.phone}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Phone className="w-3 h-3 mr-1" />
-                        {customer.email}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {customer.address}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {customer.emergencyContact}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {customer.totalBookings}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-3">
-                      <button className="text-blue-600 hover:text-blue-900">
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button className="text-yellow-600 hover:text-yellow-900">
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button className="text-red-600 hover:text-yellow-900">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <CustomersTable/>
 
-      <div className="block sm:hidden space-y-1">
-        {customers.map((customer) => (
-          <div
-            key={customer.id}
-            className="border border-gray-200 rounded-lg p-4">
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-gray-900 truncate">
-                  {customer.name}{" "}
-                  {/* Assuming 'name' is the correct property */}
-                </h4>
-                <p className="text-sm text-gray-600">
-                  {customer.phone} • {customer.address}{" "}
-                  {/* Ensure 'roomType' is a valid property */}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-600">
-                Grade: {customer.totalBookings} • {customer.address}{" "}
-                {/* Ensure 'room' and 'guests' are valid properties */}
-              </div>
-              <div className="flex items-center space-x-2">
-                <button className="text-blue-600 hover:text-blue-900">
-                  <Eye className="w-4 h-4" />
-                </button>
-                <button className="text-yellow-600 hover:text-yellow-900">
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button className="text-red-600 hover:text-red-900">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
+     
       {/* Customer Details Modal would go here */}
       <div className="bg-white rounded-lg shadow p-6 mt-5">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">
@@ -239,42 +130,3 @@ export default function Customer() {
     </div>
   );
 }
-
-const customers = [
-  {
-    id: "CUST001",
-    name: "Alice Johnson",
-    email: "alice.johnson@email.com",
-    phone: "+1 (555) 123-4567",
-    address: "123 Main St, Anytown, USA",
-    emergencyContact: "0201434567",
-    totalBookings: 8,
-  },
-  {
-    id: "CUST002",
-    name: "Bob Smith",
-    email: "bob.smith@email.com",
-    phone: "+1 (555) 234-5678",
-    address: "456 Elm St, Anytown, USA",
-    emergencyContact: "0201434568",
-    totalBookings: 12,
-  },
-  {
-    id: "CUST003",
-    name: "Carol Davis",
-    email: "carol.davis@email.com",
-    phone: "+1 (555) 345-6789",
-    address: "789 Oak St, Anytown, USA",
-    emergencyContact: "0201434569",
-    totalBookings: 8,
-  },
-  {
-    id: "CUST004",
-    name: "David Wilson",
-    email: "david.wilson@email.com",
-    phone: "+1 (555) 456-7890",
-    address: "321 Pine St, Anytown, USA",
-    emergencyContact: "0201434570",
-    totalBookings: 15,
-  },
-];

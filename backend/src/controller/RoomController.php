@@ -59,9 +59,11 @@ class RoomController
      */
     public function createRoom(array $data): string
     {
-        $success = $this->roomModel->create($data);
+        $result = $this->roomModel->create($data);
+        $success = is_array($result) ? true : $result;
         return json_encode([
             'status' => $success ? 'success' : 'error',
+            'room' => $success ? $this->roomModel->getById($this->roomModel->getLastInsertId()) : null,
             'message' => $success ? 'Room created successfully' : $this->roomModel->getLastError()
         ], JSON_PRETTY_PRINT);
     }

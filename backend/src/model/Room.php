@@ -207,6 +207,94 @@ class Room
             return null;
         }
     }
+    /**
+     * Check if a room number already exists in a branch
+     * 
+     * @param string $branch_id The branch ID to check
+     * @param string $room_number The room number to check
+     * @return bool True if room number already exists, false otherwise
+     */
+    public function roomNumberExists(string $branch_id, string $room_number): bool
+    {
+        try {
+            $sql = "SELECT COUNT(*) FROM {$this->table_name} WHERE branch_id = :branch_id AND room_number = :room_number";
+            $stmt = $this->db->prepare($sql);
+            if (!$this->executeQuery($stmt, [':branch_id' => $branch_id, ':room_number' => $room_number])) {
+                return false;
+            }
+            return (int)$stmt->fetchColumn() > 0;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to check room number existence: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
+    }
+
+    /**
+     * Check if a hotel ID exists
+     * 
+     * @param string $hotel_id The hotel ID to check
+     * @return bool True if exists, false otherwise
+     */
+    protected function hotelExists(string $hotel_id): bool
+    {
+        try {
+            $sql = "SELECT COUNT(*) FROM hotels WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            if (!$this->executeQuery($stmt, [':id' => $hotel_id])) {
+                return false;
+            }
+            return (int)$stmt->fetchColumn() > 0;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to verify hotel: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
+    }
+
+    /**
+     * Check if a branch ID exists
+     * 
+     * @param string $branch_id The branch ID to check
+     * @return bool True if exists, false otherwise
+     */
+    protected function branchExists(string $branch_id): bool
+    {
+        try {
+            $sql = "SELECT COUNT(*) FROM branches WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            if (!$this->executeQuery($stmt, [':id' => $branch_id])) {
+                return false;
+            }
+            return (int)$stmt->fetchColumn() > 0;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to verify branch: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
+    }
+
+    /**
+     * Check if a room type ID exists
+     * 
+     * @param string $room_type_id The room type ID to check
+     * @return bool True if exists, false otherwise
+     */
+    protected function roomTypeExists(string $room_type_id): bool
+    {
+        try {
+            $sql = "SELECT COUNT(*) FROM room_types WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            if (!$this->executeQuery($stmt, [':id' => $room_type_id])) {
+                return false;
+            }
+            return (int)$stmt->fetchColumn() > 0;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to verify room type: " . $e->getMessage();
+            error_log($this->lastError);
+            return false;
+        }
+    }
 
     public function create(array $data): bool
     {
@@ -216,6 +304,30 @@ class Room
                 $this->lastError = "Missing required field: $field";
                 return false;
             }
+        }
+
+        // Check if room number already exists in this branch
+        if ($this->roomNumberExists($data['branch_id'], $data['room_number'])) {
+            $this->lastError = "Room number {$data['room_number']} already exists in this branch";
+            return false;
+        }
+        
+        // Validate that the hotel_id exists
+        if (!$this->hotelExists($data['hotel_id'])) {
+            $this->lastError = "Hotel ID {$data['hotel_id']} does not exist.";
+            return false;
+        }
+        
+        // Validate branch_id
+        if (!$this->branchExists($data['branch_id'])) {
+            $this->lastError = "Branch ID {$data['branch_id']} does not exist. ";
+            return false;
+        }
+        
+        // Validate room_type_id
+        if (!$this->roomTypeExists($data['room_type_id'])) {
+            $this->lastError = "Room Type ID {$data['room_type_id']} does not exist. Foreign key constraint violation for 'room_type_id'";
+            return false;
         }
 
         $id = Uuid::uuid4()->toString();
@@ -237,6 +349,10 @@ class Room
         return $this->executeQuery($stmt, $params);
     }
 
+    public function getLastInsertId(){
+        return $this->db->lastInsertId();
+    }
+
     public function update(string $id, array $data): bool
     {
         if (empty($data)) {
@@ -244,18 +360,56 @@ class Room
             return false;
         }
 
-        $fields = [];
-        $params = [':id' => $id];
+        // Verify room exists
+        $existing = $this->getById($id);
+        if (!$existing) {
+            $this->lastError = "Room not found.";
+            return false;
+        }
 
-        foreach ($data as $key => $value) {
-            if (in_array($key, ['hotel_id', 'branch_id', 'room_type_id', 'room_number', 'floor', 'status'])) {
-                $fields[] = "$key = :$key";
-                $params[":$key"] = $value;
+        // Validate foreign keys and unique constraints if they are provided
+        if (isset($data['hotel_id']) && !$this->hotelExists($data['hotel_id'])) {
+            $this->lastError = "Hotel ID {$data['hotel_id']} does not exist.";
+            return false;
+        }
+
+        if (isset($data['branch_id']) && !$this->branchExists($data['branch_id'])) {
+            $this->lastError = "Branch ID {$data['branch_id']} does not exist.";
+            return false;
+        }
+
+        if (isset($data['room_type_id']) && !$this->roomTypeExists($data['room_type_id'])) {
+            $this->lastError = "Room Type ID {$data['room_type_id']} does not exist.";
+            return false;
+        }
+
+        // Check if room number is being updated and if it already exists
+        if (isset($data['room_number']) && 
+            $data['room_number'] !== $existing['room_number']) {
+            $branchId = isset($data['branch_id']) ? $data['branch_id'] : $existing['branch_id'];
+            if ($this->roomNumberExists($branchId, $data['room_number'])) {
+                $this->lastError = "Room number {$data['room_number']} already exists in this branch.";
+                return false;
             }
         }
 
-        $fields[] = "updated_at = CURRENT_TIMESTAMP";
+        // Build update fields
+        $fields = [];
+        $params = [':id' => $id];
 
+        foreach (['hotel_id', 'branch_id', 'room_type_id', 'room_number', 'floor', 'status'] as $field) {
+            if (isset($data[$field])) {
+                $fields[] = "$field = :$field";
+                $params[":$field"] = $data[$field];
+            }
+        }
+
+        if (empty($fields)) {
+            $this->lastError = "No valid fields to update.";
+            return false;
+        }
+
+        $fields[] = "updated_at = CURRENT_TIMESTAMP";
         $sql = "UPDATE {$this->table_name} SET " . implode(', ', $fields) . " WHERE id = :id";
 
         try {

@@ -20,7 +20,7 @@ return function ($app): void {
     });
 
     // Create a new booking
-    $app->post('/v1/bookings', function ($request, $response) use ($bookingController) {
+    $app->post('/v1/bookings/new', function ($request, $response) use ($bookingController) {
         $data = json_decode($request->getBody()->getContents(), true);
         $result = $bookingController->createBooking($data);
         $response->getBody()->write($result);

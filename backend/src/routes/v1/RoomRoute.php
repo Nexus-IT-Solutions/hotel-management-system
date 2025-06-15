@@ -20,6 +20,14 @@ return function ($app): void {
         return $response->withHeader('Content-Type', 'application/json');
     });
 
+    // Get available rooms by room type ID
+    $app->get('/v1/rooms/available/room-type/{room_type_id}', function ($request, $response, $args) use ($roomController) {
+        $roomTypeId = $args['room_type_id'] ?? '';
+        $result = $roomController->getAvailableRoomsByType($roomTypeId);
+        $response->getBody()->write($result);
+        return $response->withHeader('Content-Type', 'application/json');
+    });
+
     // Get room by ID
     $app->get('/v1/rooms/{id}', function ($request, $response, $args) use ($roomController) {
         $id = $args['id'] ?? '';

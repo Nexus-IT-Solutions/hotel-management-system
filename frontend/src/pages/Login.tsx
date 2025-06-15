@@ -50,7 +50,7 @@ export default function Login() {
     setIsLoading(true);
 
     axios
-      .post("http://api.hotel.com/v1/auth/login", {
+      .post("https://hotel-management-system-5gk8.onrender.com/v1/auth/login", {
         usernameOrEmail: username,
         password: password,
       })

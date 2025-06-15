@@ -45,10 +45,11 @@ class BookingController
      */
     public function createBooking(array $data): string
     {
-        $success = $this->bookingModel->create($data);
+        $booking = $this->bookingModel->create($data);
         return json_encode([
-            'status' => $success ? 'success' : 'error',
-            'message' => $success ? 'Booking created successfully' : $this->bookingModel->getLastError()
+            'status' => $booking ? 'success' : 'error',
+            'booking' => $booking,
+            'message' => $booking ? 'Booking created successfully' : $this->bookingModel->getLastError()
         ], JSON_PRETTY_PRINT);
     }
 

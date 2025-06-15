@@ -128,7 +128,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     
     // Prepare booking data with all fields
     const bookingData = {
-      customer_name: customerName,
+      customerName: customerName,
       phone_number: phoneNumber,
       email_address: emailAddress,
       address,
@@ -154,7 +154,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
     // Make API call to create booking
     const response = await axios.post(
-      'http://hotel-management-system-5gk8.onrender.com/v1/bookings/new', 
+      'http://hotel-management-system-5gk8.onrender.com/v1/bookings', 
       bookingData
     );
     

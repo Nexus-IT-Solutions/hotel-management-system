@@ -4,34 +4,34 @@ import Swal from "sweetalert2";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("general");
-  const [profile, setProfile] = useState({
-    name: "Admin User",
-    email: "admin@example.com",
-    password: "",
-  });
-  const [preferences, setPreferences] = useState({
-    theme: "light",
-    notifications: true,
-  });
+  // const [profile, setProfile] = useState({
+  //   name: "Admin User",
+  //   email: "admin@example.com",
+  //   password: "",
+  // });
+  // const [preferences, setPreferences] = useState({
+  //   theme: "light",
+  //   notifications: true,
+  // });
 
-  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProfile({ ...profile, [e.target.name]: e.target.value });
-  };
+  // const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setProfile({ ...profile, [e.target.name]: e.target.value });
+  // };
 
-  const handlePreferencesChange = (
-    e:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const { name, value, type } = e.target;
-    setPreferences({
-      ...preferences,
-      [name]:
-        type === "checkbox" && "checked" in e.target
-          ? (e.target as HTMLInputElement).checked
-          : value,
-    });
-  };
+  // const handlePreferencesChange = (
+  //   e:
+  //     | React.ChangeEvent<HTMLInputElement>
+  //     | React.ChangeEvent<HTMLSelectElement>
+  // ) => {
+  //   const { name, value, type } = e.target;
+  //   setPreferences({
+  //     ...preferences,
+  //     [name]:
+  //       type === "checkbox" && "checked" in e.target
+  //         ? (e.target as HTMLInputElement).checked
+  //         : value,
+  //   });
+  // };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

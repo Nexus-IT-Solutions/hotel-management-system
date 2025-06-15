@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 export default function AddRoomForms() {
-  const [roomTypes, setRoomTypes] = useState([]);
+  const [roomTypes, setRoomTypes] = useState<Array<{ id: number; name: string }>>([]);
   const [formData, setFormData] = useState({
     roomNumber: 0,
     roomType: "",
@@ -17,10 +17,10 @@ export default function AddRoomForms() {
 
   const amenitiesMap: Record<string, string> = {
     "Air Condition": "ac",
-    "Television": "tv",
-    "Refrigerator": "fridge",
-    "Jacuzzi": "jacuzzi",
-    "Fan": "fan",
+    Television: "tv",
+    Refrigerator: "fridge",
+    Jacuzzi: "jacuzzi",
+    Fan: "fan",
   };
 
   useEffect(() => {
@@ -37,13 +37,19 @@ export default function AddRoomForms() {
     }
 
     axios
-      .get("https://hotel-management-system-5gk8.onrender.com/v1/room-types/branch/${branchId}")
+      .get(
+        `https://hotel-management-system-5gk8.onrender.com/v1/room-types/branch/${formData.branchId}`
+      )
       .then((res) => setRoomTypes(res.data.roomTypes || []))
       .catch((err) => console.error("Failed to fetch room types", err));
-  }, []);
+  }, [formData.branchId]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target;
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const target = e.target;
+    const { name, value, type } = target;
+    const checked = target instanceof HTMLInputElement ? target.checked : false;
 
     if (name === "amenities") {
       setFormData((prev) => {
@@ -55,13 +61,11 @@ export default function AddRoomForms() {
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: type === "number" || name.includes("room")
-          ? Number(value)
-          : value,
+        [name]:
+          type === "number" || name.includes("room") ? Number(value) : value,
       }));
     }
   };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -112,7 +116,9 @@ export default function AddRoomForms() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start gap-8">
           <div className="space-y-8">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Room Number *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Room Number *
+              </label>
               <input
                 type="number"
                 name="roomNumber"
@@ -124,7 +130,9 @@ export default function AddRoomForms() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Room Type *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Room Type *
+              </label>
               <select
                 name="roomType"
                 value={formData.roomType}
@@ -133,13 +141,17 @@ export default function AddRoomForms() {
                 required
               >
                 <option value="">Select Room Type</option>
-                {roomTypes.map((type: any) => (
-                  <option key={type.id} value={type.id}>{type.name}</option>
+                {roomTypes.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Room Floor *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Room Floor *
+              </label>
               <select
                 name="roomFloor"
                 value={formData.roomFloor}
@@ -155,7 +167,9 @@ export default function AddRoomForms() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Room Price *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Room Price *
+              </label>
               <input
                 type="number"
                 name="roomPrice"
@@ -170,7 +184,9 @@ export default function AddRoomForms() {
 
           <div className="space-y-8">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Room Capacity *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Room Capacity *
+              </label>
               <input
                 type="number"
                 name="roomCapacity"
@@ -216,30 +232,41 @@ export default function AddRoomForms() {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Room Number:</span>
-                  <span className="font-medium">{formData.roomNumber || 'Not Selected'}</span>
+                  <span className="font-medium">
+                    {formData.roomNumber || "Not Selected"}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Room Type:</span>
                   <span className="font-medium">
-                    {roomTypes.find((t: any) => t.id == formData.roomType)?.name || 'Not Selected'}
-                  </span>
+                    {roomTypes.find((t) => t.id === parseInt(formData.roomType))?.name ??
+                      "Not Selected"}
+                  </span>{" "}
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Room Floor:</span>
-                  <span className="font-medium">{formData.roomFloor || 'Not Selected'}</span>
+                  <span className="font-medium">
+                    {formData.roomFloor || "Not Selected"}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Room Price:</span>
-                  <span className="font-medium">{formData.roomPrice || 'Not Selected'}</span>
+                  <span className="font-medium">
+                    {formData.roomPrice || "Not Selected"}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Room Capacity:</span>
-                  <span className="font-medium">{formData.roomCapacity || 'Not Selected'}</span>
+                  <span className="font-medium">
+                    {formData.roomCapacity || "Not Selected"}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Room Amenities:</span>
                   <span className="font-medium">
-                    {formData.amenities.length > 0 ? formData.amenities.join(", ") : 'Not Selected'}
+                    {formData.amenities.length > 0
+                      ? formData.amenities.join(", ")
+                      : "Not Selected"}
                   </span>
                 </div>
               </div>

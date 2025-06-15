@@ -117,8 +117,61 @@ export default function BookingForm() {
   const totalNights = calculateNights();
   const totalAmount = calculateTotalAmount();
 
+
+// Handle form submission
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  
+  try {
+    // Get user data from localStorage
+    const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+    
+    // Prepare booking data with all fields
+    const bookingData = {
+      customer_name: customerName,
+      phone_number: phoneNumber,
+      email_address: emailAddress,
+      address,
+      nationality,
+      purpose_of_visit: purposeOfVisit,
+      id_type: idType,
+      id_number: idNumber,
+      emergency_contact_name: emergencyContactName,
+      emergency_contact_relationship: emergencyContactRelationship,
+      emergency_contact_phone: emergencyContactPhone,
+      check_in_date: checkInDate,
+      check_out_date: checkOutDate,
+      room_type_id: selectedRoomTypeId,
+      room_id: selectedRoomId,
+      number_of_guests: numberOfGuests,
+      special_requests: specialRequests,
+      payment_method: paymentMethod,
+      nights: totalNights,
+      total_amount: totalAmount,
+      hotel_id: userData.user.hotel_id,
+      branch_id: userData.user.branch_id,
+    };
+
+    // Make API call to create booking
+    const response = await axios.post(
+      'http://hotel-management-system-5gk8.onrender.com/v1/bookings/new', 
+      bookingData
+    );
+    
+    console.log('Booking successful:', response.data);
+    alert('Booking created successfully!');
+    
+    // Reset form or redirect to bookings list
+    // You could add navigation here or clear the form
+    
+  } catch (error) {
+    console.error('Booking failed:', error);
+    alert('Failed to create booking. Please try again.');
+  }
+};
+
   return (
-    <form action="">
+    <form onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Hotel and Branch Id (Hidden Inputs) */}
         <input

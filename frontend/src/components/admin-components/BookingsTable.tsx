@@ -300,7 +300,7 @@ export default function BookingsTable() {
                     <div className="flex items-center space-x-3">
                       <button 
                         onClick={() => handleViewBooking(booking)}
-                        className="text-blue-600 hover:text-blue-900 transition-colors"
+                        className="text-blue-600 hover:text-blue-900 transition-colors cursor-pointer"
                         title="View booking details"
                       >
                         <Eye className="w-4 h-4" />
@@ -311,14 +311,14 @@ export default function BookingsTable() {
                           e.stopPropagation();
                           handleEditBooking(booking);
                         }}
-                        className="text-yellow-600 hover:text-yellow-900 transition-colors"
+                        className="text-yellow-600 hover:text-yellow-900 transition-colors cursor-pointer"
                         title="Edit booking"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={() => handleDeleteBooking(booking)}
-                        className="text-red-600 hover:text-red-900"
+                        className="text-red-600 hover:text-red-900 cursor-pointer"
                         title="Delete booking"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -368,21 +368,21 @@ export default function BookingsTable() {
               <div className="flex items-center space-x-2">
                 <button 
                   onClick={() => handleViewBooking(booking)}
-                  className="text-blue-600 hover:text-blue-900 transition-colors"
+                  className="text-blue-600 hover:text-blue-900 transition-colors cursor-pointer"
                   title="View booking details"
                 >
                   <Eye className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={() => handleEditBooking(booking)}
-                  className="text-yellow-600 hover:text-yellow-900"
+                  className="text-yellow-600 hover:text-yellow-900 cursor-pointer"
                   title="Edit booking"
                 >
                   <Edit className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={() => handleDeleteBooking(booking)}
-                  className="text-red-600 hover:text-red-900"
+                  className="text-red-600 hover:text-red-900 cursor-pointer"
                   title="Delete booking"
                 >
                   <Trash2 className="w-4 h-4" />

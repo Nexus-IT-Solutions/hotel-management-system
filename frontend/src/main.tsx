@@ -17,7 +17,7 @@ import RecepDashboard from './pages/receptionist/Dashboard.tsx'
 import ReportIssueForm from './pages/receptionist/ReportIssueForm.tsx'
 import Issues from './pages/admin/Issues.tsx'
 import MakeReport from './pages/admin/MakeReport.tsx'
-//import ProtectedRoute from './pages/ProtectedRoute.tsx'
+import ProtectedRoute from './pages/ProtectedRoute.tsx'
 import OTP from './pages/OTP.tsx'
 import RoomType from './pages/admin/RoomType.tsx'
 
@@ -28,7 +28,7 @@ createRoot(document.getElementById("root")!).render(
       <Route path='/otp' element={<OTP />} />
 
       {/* Protected Admin Routes */}
-      <Route path="/admin" element={<MainLayout />}>
+      <Route path="/admin" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
         <Route index element={<Dashboard />} />
         <Route path="new-booking" element={<NewBooking />} />
         <Route path="bookings" element={<Bookings />} />
@@ -44,7 +44,7 @@ createRoot(document.getElementById("root")!).render(
       </Route>
 
       {/* Protected Receptionist Routes */}
-      <Route path="/receptionist" element={<RecepMainLayout />}>
+      <Route path="/receptionist" element={<ProtectedRoute><RecepMainLayout /></ProtectedRoute>}>
         <Route index element={<RecepDashboard />} />
         <Route path="new-booking" element={<NewBooking />} />
         <Route path="bookings" element={<Bookings />} />

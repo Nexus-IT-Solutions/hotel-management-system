@@ -1,4 +1,4 @@
-//import { Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
 
 interface ProtectedRouteProps {
@@ -10,7 +10,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   if (!data || !data.token) {
     console.warn("No token found, redirecting...");
-    // return <Navigate to="/" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;

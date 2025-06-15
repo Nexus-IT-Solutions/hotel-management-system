@@ -66,7 +66,7 @@ class Customer
 
         // If not found by email, try by phone
         $stmt = $this->db->prepare("SELECT id FROM {$this->table_name} WHERE phone = :phone LIMIT 1");
-        $this->executeQuery($stmt, [':phone' => $data['phone']]);
+        $this->executeQuery($stmt, [':phone' => $data['phone_number']]);
         $customer = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($customer) {

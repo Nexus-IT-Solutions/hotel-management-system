@@ -56,7 +56,7 @@ class Customer
     {
         // Try to find an existing customer by email
         $stmt = $this->db->prepare("SELECT id FROM {$this->table_name} WHERE email = :email LIMIT 1");
-        $this->executeQuery($stmt, [':email' => $data['email']]);
+        $this->executeQuery($stmt, [':email' => $data['email_address']]);
         $customer = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($customer) {
@@ -77,17 +77,16 @@ class Customer
         // If no existing customer found, create a new one
         $id = Uuid::uuid4()->toString();
         $stmt = $this->db->prepare("INSERT INTO {$this->table_name}
-            (id, full_name, email, phone, address, nationality, purpose_of_visit, id_type, id_number)
-            VALUES (:id, :full_name, :email, :phone, :address, :nationality, :purpose_of_visit, :id_type, :id_number)");
+            (id, full_name, email, phone, address, nationality, id_type, id_number)
+            VALUES (:id, :full_name, :email, :phone, :address, :nationality, :id_type, :id_number)");
 
         $params = [
             ':id' => $id,
             ':full_name' => $data['customer_name'],
-            ':email' => $data['email'],
+            ':email' => $data['email_address'], 
             ':phone' => $data['phone'],
             ':address' => $data['address'] ?? null,
             ':nationality' => $data['nationality'] ?? null,
-            ':purpose_of_visit' => $data['purpose_of_visit'] ?? null,
             ':id_type' => $data['id_type'] ?? null,
             ':id_number' => $data['id_number'] ?? null,
         ];

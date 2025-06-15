@@ -485,6 +485,22 @@ export default function BookingForm() {
             <button
               type="button"
               className="w-full px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center"
+              onClick={() => {
+              // Reset all form fields
+              setCustomerName('');
+              setPhoneNumber('');
+              setEmailAddress('');
+              setEmergencyContactName('');
+              setEmergencyContactRelationship('');
+              setEmergencyContactPhone('');
+              setCheckInDate(new Date().toISOString().split("T")[0]);
+              setCheckOutDate(new Date().toISOString().split("T")[0]);
+              setNumberOfGuests(1);
+              setSpecialRequests('');
+              setPaymentMethod('');
+              setSelectedRoomTypeId('');
+              setSelectedRoomId('');
+              }}
             >
               <X className="w-4 h-4 mr-2" />
               Cancel

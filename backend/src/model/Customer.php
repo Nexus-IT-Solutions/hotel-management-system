@@ -82,7 +82,7 @@ class Customer
 
         $params = [
             ':id' => $id,
-            ':full_name' => $data['full_name'],
+            ':full_name' => $data['customer_name'],
             ':email' => $data['email'],
             ':phone' => $data['phone'],
             ':address' => $data['address'] ?? null,

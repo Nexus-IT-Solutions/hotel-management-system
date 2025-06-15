@@ -128,8 +128,8 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     
     // Prepare booking data with all fields
     const bookingData = {
-      customerName: customerName,
-      phone_number: phoneNumber,
+      customer_name: customerName,
+      phone: phoneNumber,
       email_address: emailAddress,
       address,
       nationality,
@@ -143,7 +143,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       check_out_date: checkOutDate,
       room_type_id: selectedRoomTypeId,
       room_id: selectedRoomId,
-      number_of_guests: numberOfGuests,
+      guests: numberOfGuests,
       special_requests: specialRequests,
       payment_method: paymentMethod,
       nights: totalNights,

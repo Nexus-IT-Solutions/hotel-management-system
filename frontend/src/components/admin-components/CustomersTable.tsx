@@ -254,21 +254,21 @@ const handleConfirmDelete = async () => {
                     <div className="flex items-center space-x-3">
                       <button 
                         onClick={() => handleViewCustomer(customer)}
-                        className="text-blue-600 hover:text-blue-900 transition-colors"
+                        className="text-blue-600 hover:text-blue-900 transition-colors cursor-pointer"
                         title="View customer details"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={() => handleEditCustomer(customer)}
-                        className="text-yellow-600 hover:text-yellow-900"
+                        className="text-yellow-600 hover:text-yellow-900 cursor-pointer"
                         title="Edit customer"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={() => handleDeleteCustomer(customer)}
-                        className="text-red-600 hover:text-red-900"
+                        className="text-red-600 hover:text-red-900 cursor-pointer"
                         title="Delete customer"
                       >
                         <Trash2 className="w-4 h-4" />

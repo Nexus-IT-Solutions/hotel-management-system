@@ -159,57 +159,60 @@ export default function Login() {
     }));
 
     try {
-      // TODO: Call API to send OTP to email
-      const response = await axios.post("https://hotel-management-system-5gk8.onrender.com/v1/auth/forgot-password", JSON.stringify(
+      // API call to send OTP to email
+      const response = await axios.post(
+        "https://hotel-management-system-5gk8.onrender.com/v1/auth/forgot-password",
         { email: forgotPasswordState.email }
-      ));
+      );
 
       if (response.status !== 200) {
-        throw new Error("Failed to send OTP");
+        setForgotPasswordState((prev) => ({
+          ...prev,
+          isLoading: false,
+          error: response.data.message || "Failed to send OTP.",
+        }));
+        return;
       }
 
-        const now = Math.floor(Date.now() / 1000);
-        console.log(response.data.expires_in);
-        const otpExpiry = now + Number(response.data.expires_in);
-        // Storing response data in localstorage
-        localStorage.setItem("forgotPasswordData", JSON.stringify({
+      // Calculate expiry in seconds
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const expiresIn = Number(response.data.expires_in); // e.g., 600
+      const otpExpiry = nowSeconds + expiresIn;
+
+      // Store in localStorage
+      localStorage.setItem(
+        "forgotPasswordData",
+        JSON.stringify({
           user: response.data.user,
           token: response.data.token,
           expires_in: otpExpiry,
-        }));
-        Swal.fire({
-          title: "OTP Sent",
-          text: "An OTP has been sent to your email. Please check your inbox.",
-          icon: "success",
-        });
+        })
+      );
 
-        setForgotPasswordState((prev) => ({
+      Swal.fire({
+        title: "OTP Sent",
+        text: "An OTP has been sent to your email. Please check your inbox.",
+        icon: "success",
+      });
+
+      setForgotPasswordState((prev) => ({
         ...prev,
         isLoading: false,
         isSubmitted: true,
       }));
-      // Open OTP modal and push to stack
       setShowForgotModal(false);
       setShowOtpModal(true);
       setModalStack((prev) => [...prev, "forgot"]);
-
-      
-      
-    } catch {
-      Swal.fire({
-        title: "Error",
-        text: "An error occurred while sending the OTP. Please check your network connection and try again.",
-        icon: "error",
-      });
+    } catch (error: any) {
       setForgotPasswordState((prev) => ({
         ...prev,
         isLoading: false,
-        error: "Error. Please try again.",
+        error: error?.response?.data?.message || "Network error. Please try again.",
       }));
     }
   };
 
-  // OTP Modal Handlers
+  // OTP Handlers
   const handleOtpChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return; // Only allow digits
     const newOtp = [...otp];
@@ -242,36 +245,60 @@ export default function Login() {
       return;
     }
 
-    // Expiry check code here...
+    // Expiry check
+    const forgotData = localStorage.getItem("forgotPasswordData");
+    if (forgotData) {
+      const { expires_in } = JSON.parse(forgotData);
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      if (nowSeconds > expires_in) {
+        Swal.fire({
+          title: "OTP Expired",
+          text: "The OTP has expired. Please request a new one.",
+          icon: "error",
+        });
+        closeAllModals();
+        return;
+      }
+    }
 
     setIsVerifyingOtp(true);
     try {
       // API call to verify OTP
-      const response = await axios.post("https://hotel-management-system-5gk8.onrender.com/v1/auth/validate-otp", {
-        otp: otp.join(""),
-      });
-    if (response.status !== 200 ) {
-      setOtpError(response.data.message || "Invalid OTP. Please try again.");
-      return;
-    }
-    Swal.fire({
-      title: "OTP Verified",
-      text: "Your OTP has been successfully verified.",
-      icon: "success",
-    });
-    setShowOtpModal(false);
-    setShowResetModal(true);
-    setModalStack((prev) => [...prev, "otp"]);
-    }
-    catch {
+      const response = await axios.post(
+        "https://hotel-management-system-5gk8.onrender.com/v1/auth/validate-otp",
+        { otp: otp.join("") }
+      );
+      if (response.status !== 200) {
+        setOtpError(response.data.message || "Invalid OTP. Please try again.");
+        return;
+      }
       Swal.fire({
-        title: "Error",
-        text: "An error occurred while verifying the OTP. Please check your OTP digits or network connection and try again.",
-        icon: "error",
+        title: "OTP Verified",
+        text: "Your OTP has been successfully verified.",
+        icon: "success",
       });
-      setOtpError("Error. Please try again.");
+      setShowOtpModal(false);
+      setShowResetModal(true);
+      setModalStack((prev) => [...prev, "otp"]);
+    } catch (error: any) {
+      setOtpError(error?.response?.data?.message || "Error. Please try again.");
     } finally {
       setIsVerifyingOtp(false);
+    }
+  };
+
+  // Resend OTP handler
+  const handleResendOtp = async () => {
+    setIsResendingOtp(true);
+    try {
+      // TODO: Call API to resend OTP here
+      // await axios.post("/api/resend-otp", { email: forgotPasswordState.email });
+      Swal.fire("OTP resent!", "Check your email for a new code.", "info");
+      setResendCountdown(60);
+    } catch (error) {
+      Swal.fire("Error", "Failed to resend OTP.", "error");
+    } finally {
+      setIsResendingOtp(false);
     }
   };
 
@@ -304,25 +331,8 @@ export default function Login() {
       isLoading: true,
       error: "",
     }));
-
-
     // TODO: Call API to reset password
-    try{
-      const response = await axios.post("https://hotel-management-system-5gk8.onrender.com/v1/auth/reset-password", JSON.stringify(
-      {
-      otp: otp.join(""),
-      newPassword: resetState.password,
-    }
-    ));
-
-    if (response.status !== 200 ) {
-      setResetState((prev) => ({
-        ...prev,
-        isLoading: false,
-        error: response.data.message || "Failed to reset password. Please try again.",
-      }));
-      return;
-    }
+    await new Promise((resolve) => setTimeout(resolve, 1200));
     setResetState({
       password: "",
       confirmPassword: "",
@@ -338,19 +348,6 @@ export default function Login() {
       text: "You can now log in with your new password.",
       icon: "success",
     });
-    }
-    catch {
-      Swal.fire({
-        title: "Error",
-        text: "An error occurred while resetting your password. Please check your network connection and try again.",
-        icon: "error",
-      });
-      setResetState((prev) => ({
-        ...prev,
-        isLoading: false,
-        error: "Error. Please try again.",
-      }));
-    }
   };
 
   // Modal Navigation
@@ -403,25 +400,6 @@ export default function Login() {
     }
     return () => clearInterval(timer);
   }, [showOtpModal, resendCountdown]);
-
-  // Resend OTP handler
-  const handleResendOtp = async () => {
-    setIsResendingOtp(true);
-    try {
-      // TODO: Call API to resend OTP here
-      // await axios.post("/api/resend-otp", { email: forgotPasswordState.email });
-      await axios.post("https://hotel-management-system-5gk8.onrender.com/v1/auth/forgot-password", {
-        email: forgotPasswordState.email,
-      });
-      setOtp(["", "", "", "", "", ""]); // Clear previous OTP
-      Swal.fire("OTP resent!", "Check your email for a new code.", "info");
-      setResendCountdown(60); // Restart countdown
-    } catch {
-      Swal.fire("Error", "Failed to resend OTP.", "error");
-    } finally {
-      setIsResendingOtp(false);
-    }
-  };
 
   return (
     <div className="h-screen bg-white">

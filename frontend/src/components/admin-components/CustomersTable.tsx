@@ -156,7 +156,7 @@ const handleConfirmDelete = async () => {
     setEditLoading(true);
     try {
       // TODO: Replace with your API endpoint
-      const response = await axios.put(
+      await axios.put(
         `https://hotel-management-system-5gk8.onrender.com/v1/customers/${editModal.customer.id}`,
         editForm
       );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Trash2, Pencil } from "lucide-react";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -45,7 +45,7 @@ export default function RoomType() {
   }, []);
 
   const handleChange = (e: any) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, checked } = e.target;
     if (name in form.amenities) {
       setForm({
         ...form,

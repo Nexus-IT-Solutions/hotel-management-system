@@ -30,6 +30,11 @@ export default function BookingForm() {
   const [customerName, setCustomerName] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [emailAddress, setEmailAddress] = useState<string>('');
+  const [address, setAddress] = useState<string>(''); // New: Address
+  const [nationality, setNationality] = useState<string>(''); // New: Nationality
+  const [purposeOfVisit, setPurposeOfVisit] = useState<string>(''); // New: Purpose of Visit
+  const [idType, setIdType] = useState<string>(''); // New: ID Type
+  const [idNumber, setIdNumber] = useState<string>(''); // New: ID Number
   const [emergencyContactName, setEmergencyContactName] = useState<string>('');
   const [emergencyContactRelationship, setEmergencyContactRelationship] = useState<string>('');
   const [emergencyContactPhone, setEmergencyContactPhone] = useState<string>('');
@@ -114,299 +119,400 @@ export default function BookingForm() {
 
   return (
     <form action="">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* customer information */}
-        <div className="space-y-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <User className="w-5 h-5 mr-2 text-blue-600" />
-            Customer Information
-          </h3>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Hotel and Branch Id (Hidden Inputs) */}
+        <input
+          type="hidden"
+          name="hotelId"
+          value={JSON.parse(localStorage.getItem("userData") || "{}").user.hotel_id}
+        />
+        <input
+          type="hidden"
+          name="branchId"
+          value={JSON.parse(localStorage.getItem("userData") || "{}").user.branch_id}
+        />
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name *
-              </label>
-              <input
-                type="text"
-                name="customerName"
-                className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                placeholder="Enter customer's full name"
-                required
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phone Number *
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                placeholder="+1 (555) 123-4567"
-                required
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <input
-                type="email"
-                name="email"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                placeholder="customer@example.com"
-                value={emailAddress}
-                onChange={(e) => setEmailAddress(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Emergency Contact */}
-          <div className="space-y-4 mt-6">
+        {/* This div will contain Customer Info and Booking Details, spanning 2 columns on large screens */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:col-span-2 gap-6"> {/* Nested grid */}
+          {/* Customer Information */}
+          <div className="space-y-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-              <User className="w-5 h-5 mr-2 text-red-600" />
-              Emergency Contact
-            </h3>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Emergency Contact Name *
-              </label>
-              <input
-                type="text"
-                name="emergency_contact_name"
-                className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                placeholder="Enter full name"
-                required
-                value={emergencyContactName}
-                onChange={(e) => setEmergencyContactName(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Relationship *
-              </label>
-              <select
-                name="emergency_contact_relationship"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                required
-                value={emergencyContactRelationship}
-                onChange={(e) => setEmergencyContactRelationship(e.target.value)}
-              >
-                <option value="">Select relationship</option>
-                <option value="spouse">Spouse</option>
-                <option value="parent">Parent</option>
-                <option value="sibling">Sibling</option>
-                <option value="child">Child</option>
-                <option value="friend">Friend</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Emergency Contact Phone *
-              </label>
-              <input
-                type="tel"
-                name="emergency_contact_phone"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                placeholder="Enter phone number"
-                required
-                value={emergencyContactPhone}
-                onChange={(e) => setEmergencyContactPhone(e.target.value)}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* booking details */}
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-              <Calendar className="w-5 h-5 mr-2 text-purple-600" />
-              Booking Details
+              <User className="w-5 h-5 mr-2 text-blue-600" />
+              Customer Information
             </h3>
 
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Check-in Date *
-                  </label>
-                  <input
-                    type="date"
-                    name="checkIn"
-                    defaultValue={checkInDate}
-                    min={new Date().toISOString().split("T")[0]}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                    required
-                    onChange={(e) => setCheckInDate(e.target.value)}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Check-out Date *
-                  </label>
-                  <input
-                    type="date"
-                    name="checkOut"
-                    min={new Date().toISOString().split("T")[0]}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                    required
-                    onChange={(e) => setCheckOutDate(e.target.value)}
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  name="customerName"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="Enter customer's full name"
+                  required
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Room Type *
+                  Phone Number *
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="+1 (555) 123-4567"
+                  required
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="customer@example.com"
+                  value={emailAddress}
+                  onChange={(e) => setEmailAddress(e.target.value)}
+                />
+              </div>
+
+              {/* New: Address */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  name="address"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="Enter customer's address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                />
+              </div>
+
+              {/* New: Nationality */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nationality
+                </label>
+                <input
+                  type="text"
+                  name="nationality"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="Enter customer's nationality"
+                  value={nationality}
+                  onChange={(e) => setNationality(e.target.value)}
+                />
+              </div>
+
+              {/* New: Purpose of Visit */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Purpose of Visit
+                </label>
+                <input
+                  type="text"
+                  name="purpose_of_visit"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="e.g., Business, Leisure, Family Visit"
+                  value={purposeOfVisit}
+                  onChange={(e) => setPurposeOfVisit(e.target.value)}
+                />
+              </div>
+
+              {/* New: ID Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  ID Type
                 </label>
                 <select
-                  name="roomType"
+                  name="id_type"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  required
-                  value={selectedRoomTypeId}
-                  onChange={handleRoomTypeChange}
+                  value={idType}
+                  onChange={(e) => setIdType(e.target.value)}
                 >
-                  <option value="">Select Room Type</option>
-                  {roomTypes.map((roomType) => (
-                    <option key={roomType.id} value={roomType.id}>
-                      {roomType.name} - ${roomType.price_per_night}
-                    </option>
-                  ))}
+                  <option value="">Select ID Type</option>
+                  <option value="Passport">Passport</option>
+                  <option value="Driver's License">Driver's License</option>
+                  <option value="National ID">National ID</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
 
-              {selectedRoomTypeId && (
+              {/* New: ID Number */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  ID Number
+                </label>
+                <input
+                  type="text"
+                  name="id_number"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="Enter ID number"
+                  value={idNumber}
+                  onChange={(e) => setIdNumber(e.target.value)}
+                />
+              </div>
+            </div>
+
+         
+          </div>
+
+          {/* Booking Details and Payment Method */}
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <Calendar className="w-5 h-5 mr-2 text-purple-600" />
+                Booking Details
+              </h3>
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Check-in Date *
+                    </label>
+                    <input
+                      type="date"
+                      name="checkIn"
+                      defaultValue={checkInDate}
+                      min={new Date().toISOString().split("T")[0]}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      required
+                      onChange={(e) => setCheckInDate(e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Check-out Date *
+                    </label>
+                    <input
+                      type="date"
+                      name="checkOut"
+                      min={new Date().toISOString().split("T")[0]}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      required
+                      onChange={(e) => setCheckOutDate(e.target.value)}
+                    />
+                  </div>
+
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Available Room *
+                    Room Type *
                   </label>
                   <select
-                    name="availableRoom"
+                    name="roomType"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                     required
-                    value={selectedRoomId}
-                    onChange={handleAvailableRoomChange}
-                    disabled={availableRooms.length === 0}
+                    value={selectedRoomTypeId}
+                    onChange={handleRoomTypeChange}
                   >
-                    <option value="">
-                      {availableRooms.length > 0 ? "Select a Room" : "No Available Rooms for this type"}
-                    </option>
-                    {availableRooms.map((room) => (
-                      <option key={room.id} value={room.id}>
-                        Room Number: {room.room_number}
+                    <option value="">Select Room Type</option>
+                    {roomTypes.map((roomType) => (
+                      <option key={roomType.id} value={roomType.id}>
+                        {roomType.name} - ${roomType.price_per_night}
                       </option>
                     ))}
                   </select>
                 </div>
-              )}
+
+                {selectedRoomTypeId && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Available Room *
+                    </label>
+                    <select
+                      name="availableRoom"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      required
+                      value={selectedRoomId}
+                      onChange={handleAvailableRoomChange}
+                      disabled={availableRooms.length === 0}
+                    >
+                      <option value="">
+                        {availableRooms.length > 0 ? "Select a Room" : "No Available Rooms for this type"}
+                      </option>
+                      {availableRooms.map((room) => (
+                        <option key={room.id} value={room.id}>
+                          Room Number: {room.room_number}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Number of Guests
+                  </label>
+                  <select
+                    name="guests"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    value={numberOfGuests}
+                    onChange={(e) => setNumberOfGuests(parseInt(e.target.value))}
+                  >
+                    {[1, 2, 3, 4, 5, 6].map((num) => (
+                      <option key={num} value={num}>
+                        {num} Guest{num > 1 ? "s" : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Special Requests
+                  </label>
+                  <textarea
+                    name="specialRequests"
+                    rows={3}
+                    className="w-full px-4 py-1 h-[80px] border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    placeholder="Any special requirements or notes..."
+                    value={specialRequests}
+                    onChange={(e) => setSpecialRequests(e.target.value)}
+                  />
+                </div>
+
+                   {/* Emergency Contact */}
+            <div className="space-y-4 mt-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <User className="w-5 h-5 mr-2 text-red-600" />
+                Emergency Contact
+              </h3>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Number of Guests
+                  Emergency Contact Name *
+                </label>
+                <input
+                  type="text"
+                  name="emergency_contact_name"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="Enter full name"
+                  required
+                  value={emergencyContactName}
+                  onChange={(e) => setEmergencyContactName(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Relationship *
                 </label>
                 <select
-                  name="guests"
+                  name="emergency_contact_relationship"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  value={numberOfGuests}
-                  onChange={(e) => setNumberOfGuests(parseInt(e.target.value))}
+                  required
+                  value={emergencyContactRelationship}
+                  onChange={(e) => setEmergencyContactRelationship(e.target.value)}
                 >
-                  {[1, 2, 3, 4, 5, 6].map((num) => (
-                    <option key={num} value={num}>
-                      {num} Guest{num > 1 ? "s" : ""}
-                    </option>
-                  ))}
+                  <option value="">Select relationship</option>
+                  <option value="spouse">Spouse</option>
+                  <option value="parent">Parent</option>
+                  <option value="sibling">Sibling</option>
+                  <option value="child">Child</option>
+                  <option value="friend">Friend</option>
+                  <option value="other">Other</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Special Requests
+                  Emergency Contact Phone *
                 </label>
-                <textarea
-                  name="specialRequests"
-                  rows={3}
-                  className="w-full px-4 py-1 h-[80px] border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  placeholder="Any special requirements or notes..."
-                  value={specialRequests}
-                  onChange={(e) => setSpecialRequests(e.target.value)}
+                <input
+                  type="tel"
+                  name="emergency_contact_phone"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="Enter phone number"
+                  required
+                  value={emergencyContactPhone}
+                  onChange={(e) => setEmergencyContactPhone(e.target.value)}
                 />
               </div>
+                </div>
+                
+              </div>
+
             </div>
-          </div>
 
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-              <CreditCard className="w-5 h-5 mr-2 text-green-600" />
-              Payment Method
-            </h3>
-
-            <div className="grid grid-cols-2 gap-3">
-              <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="Cash"
-                  className="mr-3 text-blue-600 focus:ring-blue-500"
-                  checked={paymentMethod === 'Cash'}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
-                <span className="text-gray-700 text-sm">Cash</span>
-              </label>
-
-              <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="Credit Card"
-                  className="mr-3 text-blue-600 focus:ring-blue-500"
-                  checked={paymentMethod === 'Credit Card'}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
-                <span className="text-gray-700 text-sm">Credit Card</span>
-              </label>
-
-              <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="Mobile Money"
-                  className="mr-3 text-blue-600 focus:ring-blue-500"
-                  checked={paymentMethod === 'Mobile Money'}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
-                <span className="text-gray-700 text-sm">Mobile Money</span>
-              </label>
-
-              <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="Bank Transfer"
-                  className="mr-3 text-blue-600 focus:ring-blue-500"
-                  checked={paymentMethod === 'Bank Transfer'}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
-                <span className="text-gray-700 text-sm">Bank Transfer</span>
-              </label>
-            </div>
+          
           </div>
         </div>
 
-        {/* Booking Summary */}
-        <div className="space-y-6 md:col-span-2 lg:col-span-1">
+        {/* Booking Summary (This will naturally fall into the last column due to the parent grid) */}
+        <div className="space-y-6">
+        <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <CreditCard className="w-5 h-5 mr-2 text-green-600" />
+                Payment Method
+              </h3>
+
+              <div className="grid grid-cols-2 gap-3">
+                <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="Cash"
+                    className="mr-3 text-blue-600 focus:ring-blue-500"
+                    checked={paymentMethod === 'Cash'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                  />
+                  <span className="text-gray-700 text-sm">Cash</span>
+                </label>
+
+                <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="Credit Card"
+                    className="mr-3 text-blue-600 focus:ring-blue-500"
+                    checked={paymentMethod === 'Credit Card'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                  />
+                  <span className="text-gray-700 text-sm">Credit Card</span>
+                </label>
+
+                <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="Mobile Money"
+                    className="mr-3 text-blue-600 focus:ring-blue-500"
+                    checked={paymentMethod === 'Mobile Money'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                  />
+                  <span className="text-gray-700 text-sm">Mobile Money</span>
+                </label>
+
+                <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="Bank Transfer"
+                    className="mr-3 text-blue-600 focus:ring-blue-500"
+                    checked={paymentMethod === 'Bank Transfer'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                  />
+                  <span className="text-gray-700 text-sm">Bank Transfer</span>
+                </label>
+              </div>
+          </div>
+          
           <div className="bg-gray-50 p-6 rounded-lg">
             <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
               <Bed className="w-5 h-5 mr-2 text-orange-600" />
@@ -485,6 +591,27 @@ export default function BookingForm() {
             <button
               type="button"
               className="w-full px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center"
+              onClick={() => {
+                // Reset all form fields
+                setCustomerName('');
+                setPhoneNumber('');
+                setEmailAddress('');
+                setAddress(''); // Reset new fields
+                setNationality(''); // Reset new fields
+                setPurposeOfVisit(''); // Reset new fields
+                setIdType(''); // Reset new fields
+                setIdNumber(''); // Reset new fields
+                setEmergencyContactName('');
+                setEmergencyContactRelationship('');
+                setEmergencyContactPhone('');
+                setCheckInDate(new Date().toISOString().split("T")[0]);
+                setCheckOutDate(new Date().toISOString().split("T")[0]);
+                setNumberOfGuests(1);
+                setSpecialRequests('');
+                setPaymentMethod('');
+                setSelectedRoomTypeId('');
+                setSelectedRoomId('');
+              }}
             >
               <X className="w-4 h-4 mr-2" />
               Cancel

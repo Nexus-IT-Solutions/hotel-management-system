@@ -87,11 +87,75 @@ class Booking
     public function getById(string $id): ?array
     {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM {$this->table_name} WHERE id = ?");
+            $query = "
+                SELECT 
+                    b.*, 
+                    c.id as customer_id, 
+                    c.full_name as customer_name, 
+                    c.phone as customer_phone, 
+                    c.email as customer_email,
+                    c.address as customer_address,
+                    c.nationality as customer_nationality,
+                    c.id_type as customer_id_type,
+                    c.id_number as customer_id_number,
+                    ec.id as emergency_contact_id,
+                    ec.name as emergency_contact_name,
+                    ec.relationship as emergency_contact_relationship,
+                    ec.phone as emergency_contact_phone
+                FROM {$this->table_name} b
+                LEFT JOIN customers c ON b.customer_id = c.id
+                LEFT JOIN emergency_contacts ec ON c.id = ec.customer_id
+                WHERE b.id = ?
+            ";
+            
+            $stmt = $this->db->prepare($query);
             if (!$this->executeQuery($stmt, [$id])) {
                 return null;
             }
-            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+            
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$result) {
+                return null;
+            }
+            
+            // Restructure the result to include booking, customer and emergency contact info
+            $booking = [
+                'id' => $result['id'],
+                'booking_code' => $result['booking_code'],
+                'room_id' => $result['room_id'],
+                'room_type_id' => $result['room_type_id'],
+                'hotel_id' => $result['hotel_id'],
+                'branch_id' => $result['branch_id'],
+                'check_in_date' => $result['check_in_date'],
+                'check_out_date' => $result['check_out_date'],
+                'status' => $result['status'],
+                'special_requests' => $result['special_requests'],
+                'number_of_guests' => $result['number_of_guests'],
+                'total_amount' => $result['total_amount'],
+                'customer' => [
+                    'id' => $result['customer_id'],
+                    'full_name' => $result['customer_name'],
+                    'phone' => $result['customer_phone'],
+                    'email' => $result['customer_email'],
+                    'address' => $result['customer_address'],
+                    'nationality' => $result['customer_nationality'],
+                    'id_type' => $result['customer_id_type'],
+                    'id_number' => $result['customer_id_number']
+                ],
+                'emergency_contact' => null
+            ];
+            
+            // Add emergency contact if available
+            if (!empty($result['emergency_contact_id'])) {
+                $booking['emergency_contact'] = [
+                    'id' => $result['emergency_contact_id'],
+                    'name' => $result['emergency_contact_name'],
+                    'relationship' => $result['emergency_contact_relationship'],
+                    'phone' => $result['emergency_contact_phone']
+                ];
+            }
+            
+            return $booking;
         } catch (PDOException $e) {
             $this->lastError = "Failed to get booking: " . $e->getMessage();
             error_log($this->lastError);
@@ -99,48 +163,123 @@ class Booking
         }
     }
 
-    public function create(array $data): bool
+   /**
+     * Creates a new booking, including customer and emergency contact information.
+     *
+     * @param array $data An associative array containing booking, customer, and emergency contact details.
+     * Expected keys:
+     * - 'customerName', 'phone', 'email' (for customer)
+     * - 'emergency_contact_name', 'emergency_contact_relationship', 'emergency_contact_phone' (optional)
+     * - 'hotelId', 'branchId', 'checkIn', 'checkOut', 'roomType', 'availableRoom', 'guests', 'specialRequests'
+     * - 'total_amount' (this needs to be part of $data, even if calculated elsewhere)
+     * @return bool True if the booking and associated data are successfully created, false otherwise.
+     */
+    public function create(array $data): bool|array
     {
-        $requiredFields = [
-            'customer_id',
-            'room_id',
-            'room_type_id',
-            'hotel_id',
-            'branch_id',
-            'check_in_date',
-            'check_out_date',
-            'number_of_guests',
-            'total_amount'
+        if (empty($data)) {
+            $this->lastError = "No data provided for booking creation.";
+            return false;
+        }
+        // 1. Validate incoming data based on the updated request body
+        $requiredCustomerFields = [
+            'customerName',
+            'phone',
+            'address',
+            'nationality',
+            'id_type',
+            'id_number'
         ];
-        foreach ($requiredFields as $field) {
+
+        $requiredBookingFields = [
+            'hotelId',
+            'branchId',
+            'checkIn',
+            'checkOut',
+            'roomType', // Maps to room_type_id
+            'availableRoom', // Maps to room_id
+            'guests', 
+            'total_amount',
+            'purpose_of_visit',
+        ];
+
+        // Validate customer fields
+        foreach ($requiredCustomerFields as $field) {
             if (empty($data[$field])) {
-                $this->lastError = "Missing required field: $field";
+                $this->lastError = "Missing required customer field: $field";
                 return false;
             }
         }
 
-        $id = Uuid::uuid4()->toString();
+        // Validate booking fields
+        foreach ($requiredBookingFields as $field) {
+            if (empty($data[$field])) {
+                $this->lastError = "Missing required booking field: $field";
+                return false;
+            }
+        }
 
-        $stmt = $this->db->prepare("INSERT INTO {$this->table_name} 
-            (id, customer_id, room_id, room_type_id, hotel_id, branch_id, check_in_date, check_out_date, status, special_requests, number_of_guests, total_amount) 
-            VALUES (:id, :customer_id, :room_id, :room_type_id, :hotel_id, :branch_id, :check_in_date, :check_out_date, :status, :special_requests, :number_of_guests, :total_amount)");
+        require_once __DIR__ . '/Customer.php';
+        // 2. Create or retrieve customer
+        $customerModel = new Customer();
+        $customer_id = $customerModel->findOrCreateCustomer($data );
 
-        $params = [
-            ':id' => $id,
-            ':customer_id' => $data['customer_id'],
-            ':room_id' => $data['room_id'],
-            ':room_type_id' => $data['room_type_id'],
-            ':hotel_id' => $data['hotel_id'],
-            ':branch_id' => $data['branch_id'],
-            ':check_in_date' => $data['check_in_date'],
-            ':check_out_date' => $data['check_out_date'],
-            ':status' => $data['status'] ?? 'pending',
-            ':special_requests' => $data['special_requests'] ?? null,
-            ':number_of_guests' => $data['number_of_guests'],
-            ':total_amount' => $data['total_amount'],
+        if (!$customer_id) {
+            $this->lastError = "Failed to create or retrieve customer: " . $customerModel->getLastError();
+            return false;
+        }
+        // 3. Handle Emergency Contact (if provided)
+        $emergencyData = [
+            'name' => $data['emergency_contact_name'] ?? null,
+            'relationship' => $data['emergency_contact_relationship'] ?? null,
+            'phone' => $data['emergency_contact_phone'] ?? null
         ];
 
-        return $this->executeQuery($stmt, $params);
+        if (!empty($emergencyData)) {
+            require_once __DIR__ . '/EmergencyContact.php';
+            $emergencyContactModel = new EmergencyContact();
+            $emergencyContactData = [
+                'customer_id' => $customer_id,
+                'name' => $emergencyData['name'],
+                'relationship' => $emergencyData['relationship'],
+                'phone' => $emergencyData['phone']
+            ];
+            if (!$emergencyContactModel->create($emergencyContactData)) {
+                $this->lastError = "Failed to create emergency contact: " . $emergencyContactModel->getLastError();
+                return false;
+            }
+        }
+
+        // 4. Generate UUID for the booking
+        $booking_id = Uuid::uuid4()->toString();
+
+        // 5. Generate a simple booking code (consider a more robust, unique generation for production)
+        $booking_code = 'BK-' . strtoupper(substr(Uuid::uuid4()->toString(), 0, 8));
+
+        // 6. Prepare and execute the booking insertion
+        $stmt = $this->db->prepare("INSERT INTO {$this->table_name}
+            (id, booking_code, customer_id, room_id, room_type_id, hotel_id, branch_id, check_in_date, check_out_date, status, special_requests, number_of_guests, total_amount)
+            VALUES (:id, :booking_code, :customer_id, :room_id, :room_type_id, :hotel_id, :branch_id, :check_in_date, :check_out_date, :status, :special_requests, :number_of_guests, :total_amount)");
+
+        $params = [
+            ':id' => $booking_id,
+            ':booking_code' => $booking_code,
+            ':customer_id' => $customer_id,
+            ':room_id' => $data['availableRoom'], // Maps from availableRoom
+            ':room_type_id' => $data['roomType'], // Maps from roomType
+            ':hotel_id' => $data['hotelId'],
+            ':branch_id' => $data['branchId'],
+            ':check_in_date' => $data['checkIn'],
+            ':check_out_date' => $data['checkOut'],
+            ':status' => $data['status'] ?? 'pending', // Default to 'pending' if not provided
+            ':special_requests' => $data['specialRequests'] ?? null,
+            ':number_of_guests' => $data['guests'], // Maps from guests
+            ':total_amount' => $data['total_amount'], // Ensure this is provided in $data
+        ];
+
+        if($this->executeQuery($stmt, $params)){
+            return $this->getById($booking_id);
+        }
+        return false;
     }
 
     public function update(string $id, array $data): bool

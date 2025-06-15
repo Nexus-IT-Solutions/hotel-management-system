@@ -276,7 +276,6 @@ export default function RoomType() {
               className="w-full border px-3 py-2 rounded"
               required
             />
-
             <div className="grid grid-cols-2 gap-4">
               <input
                 type="number"

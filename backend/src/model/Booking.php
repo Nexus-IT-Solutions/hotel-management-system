@@ -257,8 +257,8 @@ class Booking
 
         // 6. Prepare and execute the booking insertion
         $stmt = $this->db->prepare("INSERT INTO {$this->table_name}
-            (id, booking_code, customer_id, room_id, room_type_id, hotel_id, branch_id, check_in_date, check_out_date, status, special_requests, number_of_guests, total_amount)
-            VALUES (:id, :booking_code, :customer_id, :room_id, :room_type_id, :hotel_id, :branch_id, :check_in_date, :check_out_date, :status, :special_requests, :number_of_guests, :total_amount)");
+            (id, booking_code, customer_id, room_id, room_type_id, hotel_id, branch_id, check_in_date, check_out_date, status, special_requests, number_of_guests, total_amount, purpose_of_visit, payment_method)
+            VALUES (:id, :booking_code, :customer_id, :room_id, :room_type_id, :hotel_id, :branch_id, :check_in_date, :check_out_date, :status, :special_requests, :number_of_guests, :total_amount, :purpose_of_visit, :payment_method)");
 
         $params = [
             ':id' => $booking_id,
@@ -272,8 +272,10 @@ class Booking
             ':check_out_date' => $data['check_out_date'],
             ':status' => $data['status'] ?? 'pending', // Default to 'pending' if not provided
             ':special_requests' => $data['special_requests'] ?? null,
-            ':number_of_guests' => $data['guests'], // Maps from guests
+            ':number_of_guests' => $data['number_of_guests'], // Use consistent field name
             ':total_amount' => $data['total_amount'], // Ensure this is provided in $data
+            ':purpose_of_visit' => $data['purpose_of_visit'], // Add purpose of visit parameter
+            ':payment_method' => $data['payment_method'] ?? null // Add payment method with null default
         ];
 
         if($this->executeQuery($stmt, $params)){

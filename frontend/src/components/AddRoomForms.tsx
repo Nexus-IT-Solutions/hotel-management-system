@@ -2,17 +2,51 @@ import { Bed, Check, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+interface RoomType {
+  id: string;
+  name: string;
+  description: string;
+  price_per_night: string;
+  max_occupancy: number;
+  amenities: Record<string, boolean>;
+}
+
+interface Room {
+  id: string;
+  hotel_id: string;
+  branch_id: string;
+  room_type_id: string | null;
+  room_number: string;
+  floor: number;
+  status: string;
+  created_at: string;
+  updated_at: string | null;
+}
+
+interface BranchRoom {
+  room_type: RoomType;
+  rooms: Room[];
+}
+
+interface ApiResponse {
+  status: string;
+  branchRooms: BranchRoom[];
+  message: string | null;
+}
+
 export default function AddRoomForms() {
-  const [roomTypes, setRoomTypes] = useState<Array<{ id: number; name: string }>>([]);
+  const [branchRooms, setBranchRooms] = useState<BranchRoom[]>([]);
+  const [availableRoomNumbers, setAvailableRoomNumbers] = useState<string[]>([]);
+  const [availableFloors, setAvailableFloors] = useState<number[]>([]);
   const [formData, setFormData] = useState({
-    roomNumber: 0,
+    roomNumber: "",
     roomType: "",
-    roomFloor: 0,
+    roomFloor: "",
     roomPrice: 0,
     roomCapacity: 0,
     amenities: [] as string[],
-    hotelId: 0,
-    branchId: 0,
+    hotelId: "",
+    branchId: "",
   });
 
   const amenitiesMap: Record<string, string> = {
@@ -36,13 +70,47 @@ export default function AddRoomForms() {
       }));
     }
 
-    axios
-      .get(
-        `https://hotel-management-system-5gk8.onrender.com/v1/room-types/branch/${formData.branchId}`
-      )
-      .then((res) => setRoomTypes(res.data.roomTypes || []))
-      .catch((err) => console.error("Failed to fetch room types", err));
-  }, [formData.branchId]);
+    // Fetch branch rooms data
+    fetchBranchRooms();
+  }, []);
+
+  const fetchBranchRooms = async () => {
+    try {
+      const response = await axios.get<ApiResponse>(
+        "https://api.placeholder.com/v1/branch-rooms" // Placeholder API endpoint
+      );
+      setBranchRooms(response.data.branchRooms || []);
+    } catch (err) {
+      console.error("Failed to fetch branch rooms", err);
+    }
+  };
+
+  // Update available room numbers and floors when room type changes
+  useEffect(() => {
+    if (formData.roomType) {
+      const selectedRoomType = branchRooms.find(
+        (branchRoom) => branchRoom.room_type?.id === formData.roomType
+      );
+      
+      if (selectedRoomType) {
+        const roomNumbers = selectedRoomType.rooms.map(room => room.room_number);
+        const floors = [...new Set(selectedRoomType.rooms.map(room => room.floor))];
+        
+        setAvailableRoomNumbers(roomNumbers);
+        setAvailableFloors(floors.sort((a, b) => a - b));
+      }
+    } else {
+      setAvailableRoomNumbers([]);
+      setAvailableFloors([]);
+    }
+    
+    // Reset room number and floor when room type changes
+    setFormData(prev => ({
+      ...prev,
+      roomNumber: "",
+      roomFloor: ""
+    }));
+  }, [formData.roomType, branchRooms]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -61,11 +129,11 @@ export default function AddRoomForms() {
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]:
-          type === "number" || name.includes("room") ? Number(value) : value,
+        [name]: type === "number" ? Number(value) : value,
       }));
     }
   };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -77,8 +145,8 @@ export default function AddRoomForms() {
 
     const payload = {
       room_number: formData.roomNumber,
-      room_type_id: parseInt(formData.roomType),
-      floor: formData.roomFloor,
+      room_type_id: formData.roomType,
+      floor: parseInt(formData.roomFloor),
       status: "available",
       hotel_id: formData.hotelId,
       branch_id: formData.branchId,
@@ -88,16 +156,17 @@ export default function AddRoomForms() {
     };
 
     try {
+      // Placeholder API endpoint for creating room
       const res = await axios.post(
-        "http://hotel-management-system-5gk8.onrender.com/v1/rooms",
+        "https://api.placeholder.com/v1/rooms/create",
         payload
       );
       alert(res.data.message || "Room created successfully!");
       setFormData((prev) => ({
         ...prev,
-        roomNumber: 0,
+        roomNumber: "",
         roomType: "",
-        roomFloor: 0,
+        roomFloor: "",
         roomPrice: 0,
         roomCapacity: 0,
         amenities: [],
@@ -108,6 +177,11 @@ export default function AddRoomForms() {
     }
   };
 
+  // Get room types for dropdown (filter out null room types)
+  const roomTypes = branchRooms
+    .filter(branchRoom => branchRoom.room_type?.id && branchRoom.room_type?.name)
+    .map(branchRoom => branchRoom.room_type);
+
   return (
     <div>
       <form onSubmit={handleSubmit}>
@@ -115,20 +189,6 @@ export default function AddRoomForms() {
         <input type="hidden" name="branchId" value={formData.branchId} />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start gap-8">
           <div className="space-y-8">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Room Number *
-              </label>
-              <input
-                type="number"
-                name="roomNumber"
-                value={formData.roomNumber}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded"
-                placeholder="Enter room number"
-                required
-              />
-            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Room Type *
@@ -148,6 +208,28 @@ export default function AddRoomForms() {
                 ))}
               </select>
             </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Room Number *
+              </label>
+              <select
+                name="roomNumber"
+                value={formData.roomNumber}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded"
+                required
+                disabled={!formData.roomType}
+              >
+                <option value="">Select Room Number</option>
+                {availableRoomNumbers.map((roomNumber) => (
+                  <option key={roomNumber} value={roomNumber}>
+                    {roomNumber}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Room Floor *
@@ -158,14 +240,17 @@ export default function AddRoomForms() {
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded"
                 required
+                disabled={!formData.roomType}
               >
-                <option value={0}>Ground Floor</option>
-                <option value={1}>Floor 1</option>
-                <option value={2}>Floor 2</option>
-                <option value={3}>Floor 3</option>
-                <option value={4}>Last Floor</option>
+                <option value="">Select Floor</option>
+                {availableFloors.map((floor) => (
+                  <option key={floor} value={floor}>
+                    Floor {floor}
+                  </option>
+                ))}
               </select>
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Room Price *
@@ -231,22 +316,22 @@ export default function AddRoomForms() {
               </h4>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
+                  <span className="text-gray-600">Room Type:</span>
+                  <span className="font-medium">
+                    {roomTypes.find((t) => t.id === formData.roomType)?.name ??
+                      "Not Selected"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-gray-600">Room Number:</span>
                   <span className="font-medium">
                     {formData.roomNumber || "Not Selected"}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Room Type:</span>
-                  <span className="font-medium">
-                    {roomTypes.find((t) => t.id === parseInt(formData.roomType))?.name ??
-                      "Not Selected"}
-                  </span>{" "}
-                </div>
-                <div className="flex justify-between">
                   <span className="text-gray-600">Room Floor:</span>
                   <span className="font-medium">
-                    {formData.roomFloor || "Not Selected"}
+                    {formData.roomFloor ? `Floor ${formData.roomFloor}` : "Not Selected"}
                   </span>
                 </div>
                 <div className="flex justify-between">

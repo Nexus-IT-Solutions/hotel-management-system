@@ -182,8 +182,8 @@ class Booking
         }
         // 1. Validate incoming data based on the updated request body
         $requiredCustomerFields = [
-            'customerName',
-            'phone',
+            'customer_name',
+            'phone_number',
             'address',
             'nationality',
             'id_type',
@@ -191,13 +191,13 @@ class Booking
         ];
 
         $requiredBookingFields = [
-            'hotelId',
-            'branchId',
-            'checkIn',
-            'checkOut',
-            'roomType', // Maps to room_type_id
-            'availableRoom', // Maps to room_id
-            'guests', 
+            'hotel_id',
+            'branch_id',
+            'check_in_date',
+            'check_out_date',
+            'room_type_id', // Maps to roomType
+            'room_id', // Maps to availableRoom
+            'number_of_guests', // Maps to guests
             'total_amount',
             'purpose_of_visit',
         ];
@@ -264,14 +264,14 @@ class Booking
             ':id' => $booking_id,
             ':booking_code' => $booking_code,
             ':customer_id' => $customer_id,
-            ':room_id' => $data['availableRoom'], // Maps from availableRoom
-            ':room_type_id' => $data['roomType'], // Maps from roomType
-            ':hotel_id' => $data['hotelId'],
-            ':branch_id' => $data['branchId'],
-            ':check_in_date' => $data['checkIn'],
-            ':check_out_date' => $data['checkOut'],
+            ':room_id' => $data['room_id'], // Maps from availableRoom
+            ':room_type_id' => $data['room_type_id'], // Maps from roomType
+            ':hotel_id' => $data['hotel_id'],
+            ':branch_id' => $data['branch_id'],
+            ':check_in_date' => $data['check_in_date'],
+            ':check_out_date' => $data['check_out_date'],
             ':status' => $data['status'] ?? 'pending', // Default to 'pending' if not provided
-            ':special_requests' => $data['specialRequests'] ?? null,
+            ':special_requests' => $data['special_requests'] ?? null,
             ':number_of_guests' => $data['guests'], // Maps from guests
             ':total_amount' => $data['total_amount'], // Ensure this is provided in $data
         ];

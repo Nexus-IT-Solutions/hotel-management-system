@@ -4,8 +4,8 @@ require_once __DIR__ . '/../../controller/RoomTypeController.php';
 return function ($app): void {
     $roomTypeController = new RoomTypeController();
 
-    // Get all room types for a specific hotel
-    $app->get('/v1/hotels/{branch_id}/room-types', function ($request, $response, $args) use ($roomTypeController) {
+    // Get all room types for a specific hotel brnach
+    $app->get('/v1/room-types/branch/{branch_id}', function ($request, $response, $args) use ($roomTypeController) {
         $branch_id = $args['branch_id'] ?? '';
         $result = $roomTypeController->getAllBranchRoomTypes($branch_id);
         $response->getBody()->write($result);

@@ -42,6 +42,20 @@ class RoomController
     }
 
     /**
+     * Get all available roooms of a roomtype
+     * @param $room_type_id The room type ID to filter by
+     */
+    public function getAvailableRoomsByType(string $roomTypeId): string
+    {
+        $rooms = $this->roomModel->getAvailableRoomsByRoomType($roomTypeId);
+        return json_encode([
+            'status' => !empty($rooms) ? 'success' : 'error',
+            'availableRooms' => $rooms,
+            'message' => !empty($rooms) ? null : 'No available rooms found for this room type'
+        ], JSON_PRETTY_PRINT);
+    }
+
+    /**
      * Get a room by ID
      */
     public function getRoomById(string $id): string
@@ -59,9 +73,11 @@ class RoomController
      */
     public function createRoom(array $data): string
     {
-        $success = $this->roomModel->create($data);
+        $result = $this->roomModel->create($data);
+        $success = is_array($result) ? true : $result;
         return json_encode([
             'status' => $success ? 'success' : 'error',
+            'room' => $success ? $this->roomModel->getById($this->roomModel->getLastInsertId()) : null,
             'message' => $success ? 'Room created successfully' : $this->roomModel->getLastError()
         ], JSON_PRETTY_PRINT);
     }

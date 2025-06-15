@@ -9,10 +9,9 @@ interface SidebarProps {
 const Sidebar = (probs: SidebarProps) => {
   return (
     <div
-      className={`bg-white shadow-lg h-screen flex-col transition-all duration-700 hidden md:flex ${
+      className={`bg-white shadow-lg flex-col transition-all duration-700 hidden md:flex h-screen ${
         probs.showLabels && "w-56 duration-1000"
       }`}
-      
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
@@ -30,12 +29,12 @@ const Sidebar = (probs: SidebarProps) => {
         </div>
       </div>
 
-      {/* Navigation */}
-      <div className="flex-1 p-4">
+      {/* Navigation - now with overflow scroll */}
+      <div className="flex-1 p-4 overflow-y-auto">
         {/* Main Section */}
         {navLinks.map((item, index) => (
-          <div className="mb-6">
-            <div key={index}>
+          <div className="mb-6" key={`section-${index}`}>
+            <div>
               {probs.showLabels && (
                 <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
                   {item.title}
@@ -45,7 +44,7 @@ const Sidebar = (probs: SidebarProps) => {
                 {item.menuItems.map((item, index) => (
                   <NavLink to={item.path}
                     key={index}
-                    end={item.path === '/'}
+                    end={true}
                     className={({ isActive }) =>
                       `w-full flex items-center gap-3 text-slate-800 px-3 py-2 rounded-lg text-left transition-colors ${
                         isActive
@@ -64,8 +63,6 @@ const Sidebar = (probs: SidebarProps) => {
           </div>
         ))}
       </div>
-
-      
     </div>
   );
 };

@@ -18,36 +18,50 @@ interface AvailableRoom {
   room_number: string;
   room_type_id: string;
   is_available: boolean;
-  // Add other properties of an available room if they exist in your API response
 }
 
 export default function BookingForm() {
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
   const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<string>('');
   const [availableRooms, setAvailableRooms] = useState<AvailableRoom[]>([]);
-  const [selectedRoomId, setSelectedRoomId] = useState<string>(''); // New state for selected room
+  const [selectedRoomId, setSelectedRoomId] = useState<string>(''); // State for selected room
 
+  // State variables for form inputs
+  const [customerName, setCustomerName] = useState<string>('');
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [emailAddress, setEmailAddress] = useState<string>('');
+  const [emergencyContactName, setEmergencyContactName] = useState<string>('');
+  const [emergencyContactRelationship, setEmergencyContactRelationship] = useState<string>('');
+  const [emergencyContactPhone, setEmergencyContactPhone] = useState<string>('');
+  const [checkInDate, setCheckInDate] = useState<string>(new Date().toISOString().split("T")[0]);
+  const [checkOutDate, setCheckOutDate] = useState<string>(new Date().toISOString().split("T")[0]);
+  const [numberOfGuests, setNumberOfGuests] = useState<number>(1);
+  const [specialRequests, setSpecialRequests] = useState<string>('');
+  const [paymentMethod, setPaymentMethod] = useState<string>('');
+
+  // Effect to fetch room types on component mount
   useEffect(() => {
     const fetchRoomTypes = async () => {
       try {
+        // Retrieve user data from localStorage
         const userData = JSON.parse(localStorage.getItem("userData") || "{}");
         const userBranchId = userData.user.branch_id;
+        // Fetch room types for the specific branch
         const response = await axios.get(`https://hotel-management-system-5gk8.onrender.com/v1/room-types/branch/${userBranchId}`);
-        console.log(response.data);
-        console.log(userBranchId);
         setRoomTypes(response.data.data || []);
       } catch (error) {
         console.error("Error fetching room types:", error);
       }
     };
-
     fetchRoomTypes();
   }, []);
 
+  // Effect to fetch available rooms when selectedRoomTypeId changes
   useEffect(() => {
     const fetchAvailableRooms = async () => {
       if (selectedRoomTypeId) {
         try {
+          // Fetch available rooms for the selected room type
           const response = await axios.get(`https://hotel-management-system-5gk8.onrender.com/v1/rooms/available/room-type/${selectedRoomTypeId}`);
           setAvailableRooms(response.data.availableRooms || []);
         } catch (error) {
@@ -58,23 +72,49 @@ export default function BookingForm() {
         setAvailableRooms([]);
       }
     };
-
     fetchAvailableRooms();
-  }, [selectedRoomTypeId]); // Re-fetch when selectedRoomTypeId changes
+  }, [selectedRoomTypeId]); // Dependency array includes selectedRoomTypeId
 
+  // Handle change for room type selection
   const handleRoomTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const roomTypeId = e.target.value;
     setSelectedRoomTypeId(roomTypeId);
     setSelectedRoomId(''); // Reset selected room when room type changes
   };
 
+  // Handle change for available room selection
   const handleAvailableRoomChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedRoomId(e.target.value);
   };
 
+  // Calculate the number of nights
+  const calculateNights = () => {
+    if (checkInDate && checkOutDate) {
+      const start = new Date(checkInDate);
+      const end = new Date(checkOutDate);
+      const diffTime = Math.abs(end.getTime() - start.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays;
+    }
+    return 0;
+  };
+
+  // Calculate the total amount
+  const calculateTotalAmount = () => {
+    const selectedRoomType = roomTypes.find(rt => rt.id === selectedRoomTypeId);
+    const nights = calculateNights();
+    if (selectedRoomType && nights > 0) {
+      return parseFloat(selectedRoomType.price_per_night) * nights;
+    }
+    return 0;
+  };
+
+  const totalNights = calculateNights();
+  const totalAmount = calculateTotalAmount();
+
   return (
     <form action="">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* customer information */}
         <div className="space-y-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
@@ -93,6 +133,8 @@ export default function BookingForm() {
                 className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                 placeholder="Enter customer's full name"
                 required
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
               />
             </div>
 
@@ -106,6 +148,8 @@ export default function BookingForm() {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                 placeholder="+1 (555) 123-4567"
                 required
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
               />
             </div>
 
@@ -118,52 +162,68 @@ export default function BookingForm() {
                 name="email"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                 placeholder="customer@example.com"
+                value={emailAddress}
+                onChange={(e) => setEmailAddress(e.target.value)}
               />
             </div>
           </div>
 
-          <div>
+          {/* Emergency Contact */}
+          <div className="space-y-4 mt-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-              <CreditCard className="w-5 h-5 mr-2 text-green-600" />
-              Payment Method
+              <User className="w-5 h-5 mr-2 text-red-600" />
+              Emergency Contact
             </h3>
 
-            <div className="grid grid-cols-2 gap-3">
-              <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  className="mr-3 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-gray-700 text-sm">Cash</span>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Emergency Contact Name *
               </label>
+              <input
+                type="text"
+                name="emergency_contact_name"
+                className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                placeholder="Enter full name"
+                required
+                value={emergencyContactName}
+                onChange={(e) => setEmergencyContactName(e.target.value)}
+              />
+            </div>
 
-              <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  className="mr-3 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-gray-700 text-sm">Credit Card</span>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Relationship *
               </label>
+              <select
+                name="emergency_contact_relationship"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                required
+                value={emergencyContactRelationship}
+                onChange={(e) => setEmergencyContactRelationship(e.target.value)}
+              >
+                <option value="">Select relationship</option>
+                <option value="spouse">Spouse</option>
+                <option value="parent">Parent</option>
+                <option value="sibling">Sibling</option>
+                <option value="child">Child</option>
+                <option value="friend">Friend</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
 
-              <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  className="mr-3 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-gray-700 text-sm">Mobile Money</span>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Emergency Contact Phone *
               </label>
-
-              <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  className="mr-3 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-gray-700 text-sm">Bank Transfer</span>
-              </label>
+              <input
+                type="tel"
+                name="emergency_contact_phone"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                placeholder="Enter phone number"
+                required
+                value={emergencyContactPhone}
+                onChange={(e) => setEmergencyContactPhone(e.target.value)}
+              />
             </div>
           </div>
         </div>
@@ -185,10 +245,11 @@ export default function BookingForm() {
                   <input
                     type="date"
                     name="checkIn"
-                    defaultValue={new Date().toISOString().split("T")[0]}
+                    defaultValue={checkInDate}
                     min={new Date().toISOString().split("T")[0]}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                     required
+                    onChange={(e) => setCheckInDate(e.target.value)}
                   />
                 </div>
 
@@ -202,6 +263,7 @@ export default function BookingForm() {
                     min={new Date().toISOString().split("T")[0]}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                     required
+                    onChange={(e) => setCheckOutDate(e.target.value)}
                   />
                 </div>
               </div>
@@ -226,7 +288,7 @@ export default function BookingForm() {
                 </select>
               </div>
 
-              {selectedRoomTypeId && ( // Only show if a room type is selected
+              {selectedRoomTypeId && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Available Room *
@@ -251,7 +313,6 @@ export default function BookingForm() {
                 </div>
               )}
 
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Number of Guests
@@ -259,6 +320,8 @@ export default function BookingForm() {
                 <select
                   name="guests"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  value={numberOfGuests}
+                  onChange={(e) => setNumberOfGuests(parseInt(e.target.value))}
                 >
                   {[1, 2, 3, 4, 5, 6].map((num) => (
                     <option key={num} value={num}>
@@ -277,14 +340,73 @@ export default function BookingForm() {
                   rows={3}
                   className="w-full px-4 py-1 h-[80px] border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                   placeholder="Any special requirements or notes..."
+                  value={specialRequests}
+                  onChange={(e) => setSpecialRequests(e.target.value)}
                 />
               </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <CreditCard className="w-5 h-5 mr-2 text-green-600" />
+              Payment Method
+            </h3>
+
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="Cash"
+                  className="mr-3 text-blue-600 focus:ring-blue-500"
+                  checked={paymentMethod === 'Cash'}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                />
+                <span className="text-gray-700 text-sm">Cash</span>
+              </label>
+
+              <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="Credit Card"
+                  className="mr-3 text-blue-600 focus:ring-blue-500"
+                  checked={paymentMethod === 'Credit Card'}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                />
+                <span className="text-gray-700 text-sm">Credit Card</span>
+              </label>
+
+              <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="Mobile Money"
+                  className="mr-3 text-blue-600 focus:ring-blue-500"
+                  checked={paymentMethod === 'Mobile Money'}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                />
+                <span className="text-gray-700 text-sm">Mobile Money</span>
+              </label>
+
+              <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="Bank Transfer"
+                  className="mr-3 text-blue-600 focus:ring-blue-500"
+                  checked={paymentMethod === 'Bank Transfer'}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                />
+                <span className="text-gray-700 text-sm">Bank Transfer</span>
+              </label>
             </div>
           </div>
         </div>
 
         {/* Booking Summary */}
-        <div className="space-y-6">
+        <div className="space-y-6 md:col-span-2 lg:col-span-1">
           <div className="bg-gray-50 p-6 rounded-lg">
             <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
               <Bed className="w-5 h-5 mr-2 text-orange-600" />
@@ -294,7 +416,9 @@ export default function BookingForm() {
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Customer:</span>
-                <span className="font-medium">Not Selected</span>
+                <span className="font-medium">
+                  {customerName || "Not Selected"}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Room Type:</span>
@@ -310,29 +434,39 @@ export default function BookingForm() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Check-in:</span>
-                <span className="font-medium"> Not Selected</span>
+                <span className="font-medium">
+                  {checkInDate || "Not Selected"}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Check-out:</span>
-                <span className="font-medium"> Not Selected</span>
+                <span className="font-medium">
+                  {checkOutDate || "Not Selected"}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Nights:</span>
-                <span className="font-medium">4</span>
+                <span className="font-medium">
+                  {totalNights > 0 ? `${totalNights} Night(s)` : "Check-out Date not Selected"}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Guests:</span>
-                <span className="font-medium">5</span>
+                <span className="font-medium">
+                  {numberOfGuests > 0 ? `${numberOfGuests} Guest(s)` : "Not Selected"}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Payment:</span>
-                <span className="font-medium">Not Selected</span>
+                <span className="font-medium">
+                  {paymentMethod || "Not Selected"}
+                </span>
               </div>
 
               <div className="border-t pt-3">
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total Amount:</span>
-                  <span className="text-green-600">$234</span>
+                  <span className="text-green-600">${totalAmount.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -355,61 +489,6 @@ export default function BookingForm() {
               <X className="w-4 h-4 mr-2" />
               Cancel
             </button>
-          </div>
-        </div>
-
-        {/* Emergency Contact */}
-        <div className="space-y-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <User className="w-5 h-5 mr-2 text-red-600" />
-            Emergency Contact
-          </h3>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Emergency Contact Name *
-              </label>
-              <input
-                type="text"
-                name="emergency_contact_name"
-                className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                placeholder="Enter full name"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Relationship *
-              </label>
-              <select
-                name="emergency_contact_relationship"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                required
-              >
-                <option value="">Select relationship</option>
-                <option value="spouse">Spouse</option>
-                <option value="parent">Parent</option>
-                <option value="sibling">Sibling</option>
-                <option value="child">Child</option>
-                <option value="friend">Friend</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Emergency Contact Phone *
-              </label>
-              <input
-                type="tel"
-                name="emergency_contact_phone"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                placeholder="Enter phone number"
-                required
-              />
-            </div>
           </div>
         </div>
       </div>

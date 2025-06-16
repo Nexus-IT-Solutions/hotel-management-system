@@ -89,7 +89,7 @@ class Booking
         try {
             $query = "
                 SELECT 
-                    b.*, 
+                    b.*,
                     c.id as customer_id, 
                     c.full_name as customer_name, 
                     c.phone as customer_phone, 
@@ -101,10 +101,16 @@ class Booking
                     ec.id as emergency_contact_id,
                     ec.name as emergency_contact_name,
                     ec.relationship as emergency_contact_relationship,
-                    ec.phone as emergency_contact_phone
+                    ec.phone as emergency_contact_phone,
+                    rt.name as room_type_name,
+                    h.name as hotel_name,
+                    br.name as branch_name
                 FROM {$this->table_name} b
                 LEFT JOIN customers c ON b.customer_id = c.id
                 LEFT JOIN emergency_contacts ec ON c.id = ec.customer_id
+                LEFT JOIN room_types rt ON b.room_type_id = rt.id
+                LEFT JOIN hotels h ON b.hotel_id = h.id
+                LEFT JOIN branches br ON b.branch_id = br.id
                 WHERE b.id = ?
             ";
             

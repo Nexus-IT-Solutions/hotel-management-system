@@ -1,0 +1,21 @@
+{
+    "name": "Hotel Management System",
+    "short_name": "HotelMS",
+    "description": "A comprehensive hotel management system for bookings, room management, and guest services",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#4a90e2",
+    "icons": [
+      {
+        "src": "/public/icon.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ],
+    "scope": "/",
+    "orientation": "any",
+    "categories": ["business", "productivity"],
+    "lang": "en-US",
+    "dir": "ltr"
+  }

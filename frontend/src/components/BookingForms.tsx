@@ -1,6 +1,7 @@
 import { User, CreditCard, Calendar, Bed, X, Check } from "lucide-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import Swal from 'sweetalert2';
 
 // Define interfaces for room data
 interface RoomType {
@@ -129,7 +130,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     // Prepare booking data with all fields
     const bookingData = {
       customer_name: customerName,
-      phone: phoneNumber,
+      phone_number: phoneNumber,
       email_address: emailAddress,
       address,
       nationality,
@@ -143,7 +144,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       check_out_date: checkOutDate,
       room_type_id: selectedRoomTypeId,
       room_id: selectedRoomId,
-      guests: numberOfGuests,
+      number_of_guests: numberOfGuests,
       special_requests: specialRequests,
       payment_method: paymentMethod,
       nights: totalNights,
@@ -154,15 +155,25 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
     // Make API call to create booking
     const response = await axios.post(
-      'http://hotel-management-system-5gk8.onrender.com/v1/bookings', 
+      'https://hotel-management-system-5gk8.onrender.com/v1/bookings', 
       bookingData
     );
-    
+   
     console.log('Booking successful:', response.data);
-    alert('Booking created successfully!');
-    
-    // Reset form or redirect to bookings list
-    // You could add navigation here or clear the form
+    if (response.data.status === 'success') {
+      const booking = response.data.booking
+      // Show sweet alert and redirect to payment page
+      Swal.fire({
+        title: 'Success!',
+        text: `You have successfully booked a ${booking.room_type || 'room'} for ${booking.customer_name}.`,
+        icon: 'success',
+        confirmButtonText: 'Proceed to Payment'
+      }).then(() => {
+        // Redirect to payment page with the booking ID
+        window.location.href = `/payment/booking/${booking.booking.booking_id}`;
+      });
+    }
+   
     
   } catch (error) {
     console.error('Booking failed:', error);

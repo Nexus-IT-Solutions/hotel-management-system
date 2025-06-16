@@ -114,10 +114,8 @@ export default function BookingForm() {
     }
     return 0;
   };
-
   const totalNights = calculateNights();
   const totalAmount = calculateTotalAmount();
-
 
 // Handle form submission
 const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -154,9 +152,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     };
 
     // Make API call to create booking
-    const response = await axios.post(
-      'https://hotel-management-system-5gk8.onrender.com/v1/bookings', 
-      bookingData
+    const response = await axios.post('https://hotel-management-system-5gk8.onrender.com/v1/bookings', bookingData
     );
    
     console.log('Booking successful:', response.data);
@@ -165,7 +161,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       // Show sweet alert and redirect to payment page
       Swal.fire({
         title: 'Success!',
-        text: `You have successfully booked a ${booking.room_type_name} room for ${booking.customer.full_name} for ${bookingData.nights}.`,
+        text: `You have successfully booked a ${booking.room_type_name} for ${booking.customer.full_name} for ${bookingData.nights} nights.`,
         icon: 'success',
         confirmButtonText: 'Proceed to Payment'
       }).then(() => {
@@ -173,11 +169,15 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         window.location.href = `/payment/booking/${booking.booking_code}`;
       });
     }
-   
-    
   } catch (error) {
     console.error('Booking failed:', error);
-    alert('Failed to create booking. Please try again.');
+    // Show error alert
+    Swal.fire({
+      title: 'Error!',
+      text: 'There was an error creating the booking. Please try again.',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
   }
 };
 

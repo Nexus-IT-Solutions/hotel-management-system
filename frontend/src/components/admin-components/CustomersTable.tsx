@@ -31,14 +31,11 @@ interface EditCustomerForm {
   emergencyContact: string;
 }
 
-
 // Add the missing interface
 interface DeleteCustomerModal {
   isOpen: boolean;
   customer: customersSummary | null;
 }
-
-
 
 export default function CustomersTable() {
   const [customers, setCustomers] = useState<customersSummary[]>([]);

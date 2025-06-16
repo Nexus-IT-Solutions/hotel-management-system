@@ -152,8 +152,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     };
 
     // Make API call to create booking
-    const response = await axios.post('https://hotel-management-system-5gk8.onrender.com/v1/bookings', bookingData
-    );
+    const response = await axios.post('https://hotel-management-system-5gk8.onrender.com/v1/bookings', bookingData );
    
     console.log('Booking successful:', response.data);
     if (response.data.status === 'success') {

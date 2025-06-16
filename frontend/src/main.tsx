@@ -20,6 +20,7 @@ import MakeReport from './pages/admin/MakeReport.tsx'
 import ProtectedRoute from './pages/ProtectedRoute.tsx'
 import OTP from './pages/OTP.tsx'
 import RoomType from './pages/admin/RoomType.tsx'
+import PayBooking from './pages/admin/PayBooking.tsx'
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
@@ -41,6 +42,7 @@ createRoot(document.getElementById("root")!).render(
         <Route path="issues" element={<Issues />} />
         <Route path="make-reports-admin" element={<MakeReport />} />
         <Route path="add-room-type" element={<RoomType />} />
+        <Route path="/payment/booking/:bookingCode" element={<PayBooking />} />
       </Route>
 
       {/* Protected Receptionist Routes */}

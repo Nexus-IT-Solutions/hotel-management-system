@@ -161,16 +161,16 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
    
     console.log('Booking successful:', response.data);
     if (response.data.status === 'success') {
-      const booking = response.data.booking
+      const booking = response.data.booking;
       // Show sweet alert and redirect to payment page
       Swal.fire({
         title: 'Success!',
-        text: `You have successfully booked a ${booking.room_type || 'room'} for ${booking.customer_name}.`,
+        text: `You have successfully booked a ${booking.room_type_name} room for ${booking.customer.full_name} for ${bookingData.nights}.`,
         icon: 'success',
         confirmButtonText: 'Proceed to Payment'
       }).then(() => {
         // Redirect to payment page with the booking ID
-        window.location.href = `/payment/booking/${booking.booking.booking_id}`;
+        window.location.href = `/payment/booking/${booking.booking_code}`;
       });
     }
    

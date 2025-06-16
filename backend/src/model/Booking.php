@@ -84,6 +84,12 @@ class Booking
         }
     }
 
+    /**
+     * Retrieves a booking by its ID, including customer and emergency contact details.
+     *
+     * @param string $id The unique identifier of the booking.
+     * @return array|null Returns an associative array of booking details if found, or null if not found.
+     */
     public function getById(string $id): ?array
     {
         try {
@@ -107,7 +113,15 @@ class Booking
                     br.name as branch_name
                 FROM {$this->table_name} b
                 LEFT JOIN customers c ON b.customer_id = c.id
-                LEFT JOIN emergency_contacts ec ON c.id = ec.customer_id
+                LEFT JOIN (
+                    SELECT ec1.*
+                    FROM emergency_contacts ec1
+                    INNER JOIN (
+                        SELECT customer_id, MAX(id) AS max_id
+                        FROM emergency_contacts
+                        GROUP BY customer_id
+                    ) ec2 ON ec1.customer_id = ec2.customer_id AND ec1.id = ec2.max_id
+                ) ec ON c.id = ec.customer_id
                 LEFT JOIN room_types rt ON b.room_type_id = rt.id
                 LEFT JOIN hotels h ON b.hotel_id = h.id
                 LEFT JOIN branches br ON b.branch_id = br.id
@@ -130,14 +144,21 @@ class Booking
                 'booking_code' => $result['booking_code'],
                 'room_id' => $result['room_id'],
                 'room_type_id' => $result['room_type_id'],
+                'room_type_name' => $result['room_type_name'],
                 'hotel_id' => $result['hotel_id'],
+                'hotel_name' => $result['hotel_name'],
                 'branch_id' => $result['branch_id'],
+                'branch_name' => $result['branch_name'],
                 'check_in_date' => $result['check_in_date'],
                 'check_out_date' => $result['check_out_date'],
                 'status' => $result['status'],
                 'special_requests' => $result['special_requests'],
                 'number_of_guests' => $result['number_of_guests'],
                 'total_amount' => $result['total_amount'],
+                'purpose_of_visit' => $result['purpose_of_visit'] ?? null,
+                'payment_method' => $result['payment_method'] ?? null,
+                'created_at' => $result['created_at'] ?? null,
+                'updated_at' => $result['updated_at'] ?? null,
                 'customer' => [
                     'id' => $result['customer_id'],
                     'full_name' => $result['customer_name'],

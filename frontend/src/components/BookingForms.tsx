@@ -165,7 +165,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         confirmButtonText: 'Proceed to Payment'
       }).then(() => {
         // Redirect to payment page with the booking ID
-        window.location.href = `/payment/booking/${booking.booking_code}`;
+        window.location.href = `/admin/pay-booking/${booking.booking_code}`;
       });
     }
   } catch (error) {

@@ -410,14 +410,14 @@ export default function Login() {
           <img src={Image1} alt="" className="object-cover w-full h-full" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white z-10 text-center px-4 sm:px-8">
             <h1 className="text-3xl md:text-5xl font-bold mb-20">
-              Hotel Name Here
+              Azure Horizon
             </h1>
             <div className="mb-6 w-16 md:w-24 lg:w-28 h-16 md:h-24 lg:h-28 bg-white/20 rounded-full flex items-center justify-center">
               <div className="w-8 md:w-12 lg:w-14 h-8 md:h-12 lg:h-14 bg-white rounded-full"></div>
             </div>
             <p className="text-base md:text-lg max-w-md leading-relaxed px-4">
-              Lorem ipsum dolor sit amet consectetur. Habitasse tempus vitae
-              vitae pellentesque.
+              Experience luxury redefined in every detail of your stay, where comfort 
+              meets elegance creating memories that last a lifetime.
             </p>
           </div>
           {/* Decorative circle */}

@@ -26,8 +26,8 @@ interface Booking {
 export default function PayBooking() {
   const { bookingCode } = useParams<{ bookingCode: string }>();
   const [booking, setBooking] = useState<Booking | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   useEffect(() => {
@@ -80,7 +80,7 @@ export default function PayBooking() {
     );
   }
 
-  if (error) {
+  if (error !== null) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
         <div className="text-red-600 font-semibold text-lg mb-2">{error}</div>
@@ -107,7 +107,7 @@ export default function PayBooking() {
             <div className="text-right font-medium">{booking?.customer?.full_name}</div>
             <div className="text-left text-gray-600">Amount Paid:</div>
             <div className="text-right font-medium text-green-600">
-              ${booking?.total_amount.toFixed(2)}
+              ${booking?.total_amount !== undefined ? booking.total_amount.toFixed(2) : "0.00"}
             </div>
           </div>
         </div>
@@ -192,7 +192,7 @@ export default function PayBooking() {
                     <div className="flex justify-between font-bold">
                       <span>Total Amount:</span>
                       <span className="text-green-600">
-                        ${booking?.total_amount?.toFixed(2)}
+                        ${(booking?.total_amount ?? 0).toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -218,13 +218,19 @@ export default function PayBooking() {
                     onPaymentSuccess={handlePaymentSuccess}
                   />
                 ) : (
-                  <PaystackPayment
-                    email={booking?.customer?.email || "guest@example.com"}
-                    amount={booking?.total_amount || 0}
-                    name={booking?.customer?.full_name || "Guest"}
-                    bookingCode={booking?.booking_code || ""}
-                    onPaymentSuccess={handlePaymentSuccess}
-                  />
+                  booking?.booking_code ? (
+                    <PaystackPayment
+                      email={booking?.customer?.email || "guest@example.com"}
+                      amount={booking?.total_amount || 0}
+                      name={booking?.customer?.full_name || "Guest"}
+                      bookingCode={booking?.booking_code}
+                      onPaymentSuccess={handlePaymentSuccess}
+                    />
+                  ) : (
+                    <div className="text-red-600 font-semibold">
+                      Booking code is missing. Cannot proceed with payment.
+                    </div>
+                  )
                 )}
               </div>
             </div>

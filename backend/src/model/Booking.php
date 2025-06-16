@@ -190,6 +190,27 @@ class Booking
         }
     }
 
+    /**
+     * Get booking by booking code
+     * @param booking_code
+     */
+    public function getByBookingCode(string $booking_code): ?array
+    {
+        try {
+            $query = "SELECT * FROM {$this->table_name} WHERE booking_code = ?";
+            $stmt = $this->db->prepare($query);
+            if (!$this->executeQuery($stmt, [$booking_code])) {
+                return null;
+            }
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ? $result : null;
+        } catch (PDOException $e) {
+            $this->lastError = "Failed to get booking by code: " . $e->getMessage();
+            error_log($this->lastError);
+            return null;
+        }
+    }
+
    /**
      * Creates a new booking, including customer and emergency contact information.
      *

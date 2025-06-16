@@ -42,7 +42,7 @@ createRoot(document.getElementById("root")!).render(
         <Route path="issues" element={<Issues />} />
         <Route path="make-reports-admin" element={<MakeReport />} />
         <Route path="add-room-type" element={<RoomType />} />
-        <Route path="/payment/booking/:bookingCode" element={<PayBooking />} />
+        <Route path="pay-booking/:bookingCode" element={<PayBooking />} />
       </Route>
 
       {/* Protected Receptionist Routes */}

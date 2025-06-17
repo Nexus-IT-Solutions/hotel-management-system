@@ -24,7 +24,7 @@ export default function PaystackPayment({
     reference: `booking-${bookingCode}-${Date.now()}`,
     email,
     amount: Math.round(amount * 100), // Paystack expects amount in kobo (multiply by 100)
-    publicKey: 'pk_test_your_paystack_public_key_here', // Replace with your actual Paystack public key
+    publicKey: 'pk_test_3a243aa0a24572b40ef92531641e5809cd500d3b', // Replace with your actual Paystack public key
     firstname: name.split(' ')[0],
     lastname: name.split(' ')[1] || '',
     currency: 'USD',

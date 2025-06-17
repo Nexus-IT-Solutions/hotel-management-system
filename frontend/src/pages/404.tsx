@@ -17,9 +17,7 @@ const NotFoundPage = () => {
       >
         <Hotel size={60} style={{ color: '#4796E3', marginBottom: '16px' }} />
         
-        <h1 style={{ 
-          marginBottom: '16px', 
-          fontSize: '4rem',
+        <h1 style={{ marginBottom: '16px', fontSize: '4rem',
           fontWeight: 'bold' 
         }}>
           404

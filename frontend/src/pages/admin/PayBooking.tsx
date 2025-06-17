@@ -25,7 +25,6 @@ interface Booking {
   check_out_date: string;
   created_at: string;
   updated_at: string | null;
-  // Optional fields that might come from joins or additional processing
   customer?: {
     full_name: string;
     email: string;

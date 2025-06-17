@@ -21,6 +21,7 @@ import ProtectedRoute from './pages/ProtectedRoute.tsx'
 import OTP from './pages/OTP.tsx'
 import RoomType from './pages/admin/RoomType.tsx'
 import PayBooking from './pages/admin/PayBooking.tsx'
+import NotFoundPage from './pages/404.tsx'
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
@@ -54,6 +55,9 @@ createRoot(document.getElementById("root")!).render(
         <Route path="customers" element={<Customer />} />
         <Route path="make-reports" element={<ReportIssueForm />} />
       </Route>
+
+      {/* 404 catch-all route - must be LAST in the Routes list */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   </BrowserRouter>
 );

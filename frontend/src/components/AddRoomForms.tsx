@@ -38,6 +38,7 @@ export default function AddRoomForms() {
   const [branchRooms, setBranchRooms] = useState<BranchRoom[]>([]);
   const [availableRoomNumbers, setAvailableRoomNumbers] = useState<string[]>([]);
   const [availableFloors, setAvailableFloors] = useState<number[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [formData, setFormData] = useState({
     roomNumber: "",
     roomType: "",
@@ -77,7 +78,7 @@ export default function AddRoomForms() {
   const fetchBranchRooms = async () => {
     try {
       const response = await axios.get<ApiResponse>(
-        "https://api.placeholder.com/v1/branch-rooms" // Placeholder API endpoint
+        "https://hotel-management-system-5gk8.onrender.com/v1/branches/2092ff29-4786-11f0-a9cd-862ccfb04b4e/rooms" // Placeholder API endpoint
       );
       setBranchRooms(response.data.branchRooms || []);
     } catch (err) {
@@ -150,18 +151,19 @@ export default function AddRoomForms() {
       status: "available",
       hotel_id: formData.hotelId,
       branch_id: formData.branchId,
-      price: formData.roomPrice,
-      capacity: formData.roomCapacity,
-      amenities: formattedAmenities,
+      // price: formData.roomPrice,
+      // capacity: formData.roomCapacity,
+      // amenities: formattedAmenities,
     };
 
     try {
       // Placeholder API endpoint for creating room
       const res = await axios.post(
-        "https://api.placeholder.com/v1/rooms/create",
+        "https://hotel-management-system-5gk8.onrender.com/v1/rooms",
         payload
       );
       alert(res.data.message || "Room created successfully!");
+      setLoading(false);
       setFormData((prev) => ({
         ...prev,
         roomNumber: "",
@@ -174,6 +176,7 @@ export default function AddRoomForms() {
     } catch (err: any) {
       console.error("Room creation failed:", err);
       alert(err?.response?.data?.message || "Room creation failed");
+      setLoading(false);
     }
   };
 
@@ -361,9 +364,10 @@ export default function AddRoomForms() {
               <button
                 type="submit"
                 className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center"
+                onClick={setLoading(true)}
               >
                 <Check className="w-4 h-4 mr-2" />
-                Create Room
+                {loading ? "Creating Room..." : "Create Room"}
               </button>
               <button
                 type="button"

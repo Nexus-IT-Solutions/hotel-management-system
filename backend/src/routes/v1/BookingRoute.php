@@ -19,8 +19,16 @@ return function ($app): void {
         return $response->withHeader('Content-Type', 'application/json');
     });
 
+    // Get booking by booking code
+    $app->get('/v1/bookings/code/{code}', function ($request, $response, $args) use ($bookingController) {
+        $code = $args['code'] ?? '';
+        $result = $bookingController->getBookingByCode($code);
+        $response->getBody()->write($result);
+        return $response->withHeader('Content-Type', 'application/json');
+    });
+
     // Create a new booking
-    $app->post('/v1/bookings/new', function ($request, $response) use ($bookingController) {
+    $app->post('/v1/bookings', function ($request, $response) use ($bookingController) {
         $data = json_decode($request->getBody()->getContents(), true);
         $result = $bookingController->createBooking($data);
         $response->getBody()->write($result);

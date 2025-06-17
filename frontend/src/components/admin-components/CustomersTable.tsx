@@ -31,14 +31,11 @@ interface EditCustomerForm {
   emergencyContact: string;
 }
 
-
 // Add the missing interface
 interface DeleteCustomerModal {
   isOpen: boolean;
   customer: customersSummary | null;
 }
-
-
 
 export default function CustomersTable() {
   const [customers, setCustomers] = useState<customersSummary[]>([]);
@@ -156,7 +153,7 @@ const handleConfirmDelete = async () => {
     setEditLoading(true);
     try {
       // TODO: Replace with your API endpoint
-      const response = await axios.put(
+      await axios.put(
         `https://hotel-management-system-5gk8.onrender.com/v1/customers/${editModal.customer.id}`,
         editForm
       );

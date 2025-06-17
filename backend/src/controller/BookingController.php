@@ -41,6 +41,21 @@ class BookingController
     }
 
     /**
+     * Get booking by booking code
+     * 
+     */
+    public function getBookingByCode(string $code): string
+    {
+        $booking = $this->bookingModel->getByBookingCode($code);
+        return json_encode([
+            'status' => !empty($booking) ? 'success' : 'error',
+            'booking' => $booking,
+            'message' => !empty($booking) ? null : 'Booking not found'
+        ], JSON_PRETTY_PRINT);
+    }
+
+
+    /**
      * Create a new booking
      */
     public function createBooking(array $data): string

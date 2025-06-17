@@ -1,6 +1,7 @@
 import { User, CreditCard, Calendar, Bed, X, Check } from "lucide-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import Swal from 'sweetalert2';
 
 // Define interfaces for room data
 interface RoomType {
@@ -113,12 +114,74 @@ export default function BookingForm() {
     }
     return 0;
   };
-
   const totalNights = calculateNights();
   const totalAmount = calculateTotalAmount();
 
+// Handle form submission
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  
+  try {
+    // Get user data from localStorage
+    const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+    
+    // Prepare booking data with all fields
+    const bookingData = {
+      customer_name: customerName,
+      phone_number: phoneNumber,
+      email_address: emailAddress,
+      address,
+      nationality,
+      purpose_of_visit: purposeOfVisit,
+      id_type: idType,
+      id_number: idNumber,
+      emergency_contact_name: emergencyContactName,
+      emergency_contact_relationship: emergencyContactRelationship,
+      emergency_contact_phone: emergencyContactPhone,
+      check_in_date: checkInDate,
+      check_out_date: checkOutDate,
+      room_type_id: selectedRoomTypeId,
+      room_id: selectedRoomId,
+      number_of_guests: numberOfGuests,
+      special_requests: specialRequests,
+      payment_method: paymentMethod,
+      nights: totalNights,
+      total_amount: totalAmount,
+      hotel_id: userData.user.hotel_id,
+      branch_id: userData.user.branch_id,
+    };
+
+    // Make API call to create booking
+    const response = await axios.post('https://hotel-management-system-5gk8.onrender.com/v1/bookings', bookingData );
+   
+    console.log('Booking successful:', response.data);
+    if (response.data.status === 'success') {
+      const booking = response.data.booking;
+      // Show sweet alert and redirect to payment page
+      Swal.fire({
+        title: 'Success!',
+        text: `You have successfully booked a ${booking.room_type_name} for ${booking.customer.full_name} for ${bookingData.nights} nights.`,
+        icon: 'success',
+        confirmButtonText: 'Proceed to Payment'
+      }).then(() => {
+        // Redirect to payment page with the booking ID
+        window.location.href = `/admin/pay-booking/${booking.booking_code}`;
+      });
+    }
+  } catch (error) {
+    console.error('Booking failed:', error);
+    // Show error alert
+    Swal.fire({
+      title: 'Error!',
+      text: 'There was an error creating the booking. Please try again.',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+  }
+};
+
   return (
-    <form action="">
+    <form onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Hotel and Branch Id (Hidden Inputs) */}
         <input

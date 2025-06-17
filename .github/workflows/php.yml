@@ -220,7 +220,7 @@ jobs:
           sed -i 's/DB_DATABASE=ngo_help/DB_DATABASE=ngo_help_test/g' .env
           sed -i 's/DB_USERNAME=root/DB_USERNAME=root/g' .env
           sed -i 's/DB_PASSWORD=/DB_PASSWORD=root/g' .env
-          sed -i 's/ENVIRONMENT=production/ENVIRONMENT=testing/g' .env
+          sed -i 's/ENVIRONMENT=development/ENVIRONMENT=testing/g' .env
 
       - name: Create log directory
         working-directory: ./backend/

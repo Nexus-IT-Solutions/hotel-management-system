@@ -84,7 +84,7 @@ export default function CashPayment({ totalAmount, onPaymentSuccess }: CashPayme
         <div className="bg-blue-50 p-4 rounded-lg">
           <div className="flex justify-between text-sm font-medium">
             <span>Amount Due:</span>
-            <span className="text-blue-700">${totalAmount.toFixed(2)}</span>
+            <span className="text-blue-700">${typeof totalAmount === 'number' ? totalAmount.toFixed(2) : "0.00"}</span>
           </div>
         </div>
 

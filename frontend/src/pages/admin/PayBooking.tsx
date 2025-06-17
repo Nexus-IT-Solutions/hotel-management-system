@@ -5,23 +5,43 @@ import { CreditCard, DollarSign, CheckCircle, Loader2 } from "lucide-react";
 import CashPayment from "../../components/admin-components/CashPayment";
 import PaystackPayment from "../../components/admin-components/PaystackPayment";
 
+// Update the Booking interface to match the actual response
 interface Booking {
   id: string;
-  customer: {
+  customer_id: string;
+  room_id: string;
+  room_type_id: string;
+  hotel_id: string;
+  branch_id: string;
+  booking_code: string;
+  special_requests: string;
+  number_of_guests: number;
+  purpose_of_visit: string;
+  status: string;
+  payment_method: string;
+  payment_status: string;
+  total_amount: string; // API returns this as string
+  check_in_date: string;
+  check_out_date: string;
+  created_at: string;
+  updated_at: string | null;
+  // Optional fields that might come from joins or additional processing
+  customer?: {
     full_name: string;
     email: string;
     phone: string;
   };
-  booking_code: string;
-  room_type_name: string;
-  room_number: string;
-  check_in_date: string;
-  check_out_date: string;
-  total_amount: number;
-  payment_method: string;
-  payment_status: string;
-  nights: number;
+  room_type_name?: string;
+  room_number?: string;
+  nights?: number;
 }
+
+// Helper function to add at the top of your component
+const getNumericAmount = (amount: string | undefined): number => {
+  if (!amount) return 0;
+  const parsedAmount = parseFloat(amount);
+  return isNaN(parsedAmount) ? 0 : parsedAmount;
+};
 
 export default function PayBooking() {
   const { bookingCode } = useParams<{ bookingCode: string }>();
@@ -73,7 +93,7 @@ export default function PayBooking() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex items-center justify-center h-[100]">
         <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
         <span className="ml-2 text-gray-600">Loading booking information...</span>
       </div>
@@ -107,7 +127,7 @@ export default function PayBooking() {
             <div className="text-right font-medium">{booking?.customer?.full_name}</div>
             <div className="text-left text-gray-600">Amount Paid:</div>
             <div className="text-right font-medium text-green-600">
-              ${booking?.total_amount !== undefined ? booking.total_amount.toFixed(2) : "0.00"}
+              ${getNumericAmount(booking?.total_amount).toFixed(2)}
             </div>
           </div>
         </div>
@@ -192,7 +212,7 @@ export default function PayBooking() {
                     <div className="flex justify-between font-bold">
                       <span>Total Amount:</span>
                       <span className="text-green-600">
-                        ${(booking?.total_amount ?? 0).toFixed(2)}
+                        ${getNumericAmount(booking?.total_amount).toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -214,14 +234,14 @@ export default function PayBooking() {
 
                 {booking?.payment_method === "Cash" ? (
                   <CashPayment 
-                    totalAmount={booking?.total_amount || 0} 
+                    totalAmount={getNumericAmount(booking.total_amount)} 
                     onPaymentSuccess={handlePaymentSuccess}
                   />
                 ) : (
                   booking?.booking_code ? (
                     <PaystackPayment
                       email={booking?.customer?.email || "guest@example.com"}
-                      amount={booking?.total_amount || 0}
+                      amount={getNumericAmount(booking?.total_amount)}
                       name={booking?.customer?.full_name || "Guest"}
                       bookingCode={booking?.booking_code}
                       onPaymentSuccess={handlePaymentSuccess}
@@ -240,3 +260,4 @@ export default function PayBooking() {
     </div>
   );
 }
+
